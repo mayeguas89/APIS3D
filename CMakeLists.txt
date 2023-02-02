@@ -42,7 +42,6 @@ target_link_libraries(
   APIS3D 
   PRIVATE
   glfw3
-#   stdc++fs
 )
 
 add_custom_command(TARGET APIS3D POST_BUILD
