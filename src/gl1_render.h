@@ -19,6 +19,6 @@ public:
   void Clear() override;
   void SwapBuffers() override;
 
-private:
+protected:
   GLFWwindow* window_;
 };

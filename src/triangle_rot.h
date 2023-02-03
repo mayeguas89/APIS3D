@@ -7,7 +7,7 @@ class TriangleRot: public Object
 public:
   TriangleRot();
 
-  void LoadDataFromFile(const std::string& filaname) override;
+  void LoadDataFromFile(const std::string& filename) override;
 
   void Update(float delta_time) override;
 

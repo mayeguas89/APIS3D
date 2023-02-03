@@ -10,8 +10,10 @@ public:
   virtual ~Entity() = default;
 
   glm::vec4 GetPosition();
+  void SetPosition(const glm::vec4& vect4);
 
   glm::vec4 GetRotation();
+  void SetRotation(const glm::vec4& vect4);
 
   glm::vec4 GetScaling();
 

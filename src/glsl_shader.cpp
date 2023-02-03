@@ -48,7 +48,10 @@ void GLSLShader::SetVec3(const std::string& name, const glm::vec3& value) {}
 
 void GLSLShader::SetVec4(const std::string& name, const glm::vec4& value) {}
 
-void GLSLShader::SetMat4(const std::string& name, const glm::mat4& value) {}
+void GLSLShader::SetMat4(const std::string& name, const glm::mat4& value)
+{
+  glUniformMatrix4fv(variable_list_[name], 1, GL_FALSE, &(value)[0][0]);
+}
 
 void GLSLShader::SetVariables()
 {

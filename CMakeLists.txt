@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG> CACHE STRING "")
 
+add_subdirectory("externalLibs")
+
 link_directories(
     ${CMAKE_SOURCE_DIR}/externalLibs/glfw/lib
 )
@@ -42,6 +44,7 @@ target_link_libraries(
   APIS3D 
   PRIVATE
   glfw3
+  imgui
 )
 
 add_custom_command(TARGET APIS3D POST_BUILD

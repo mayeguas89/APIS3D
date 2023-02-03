@@ -17,6 +17,16 @@ glm::vec4 Entity::GetRotation()
   return rotation_;
 }
 
+void Entity::SetRotation(const glm::vec4& vect4)
+{
+  rotation_ = vect4;
+}
+
+void Entity::SetPosition(const glm::vec4& vect4)
+{
+  position_ = vect4;
+}
+
 glm::vec4 Entity::GetScaling()
 {
   return scaling_;

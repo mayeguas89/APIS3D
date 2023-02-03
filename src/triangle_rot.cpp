@@ -22,8 +22,12 @@ TriangleRot::TriangleRot(): Object()
   if (auto* material = FactoryEngine::GetNewMaterial(); material)
   {
     std::unordered_map<std::string, RenderType> program_map;
-    program_map["data/program.vertex"] = RenderType::Vertex;
-    program_map["data/program.fragment"] = RenderType::Fragment;
+    program_map
+      ["C:/Users/mayeg/Documents/U-TAD/Master/ApisTridimensionales/MyAPIS3D/build/Debug/data/program.vertex"] =
+        RenderType::Vertex;
+    program_map
+      ["C:/Users/mayeg/Documents/U-TAD/Master/ApisTridimensionales/MyAPIS3D/build/Debug/data/program.fragment"] =
+        RenderType::Fragment;
     material->LoadPrograms(program_map);
 
     mesh_->SetMaterial(material);
@@ -37,11 +41,11 @@ TriangleRot::TriangleRot(): Object()
   }
 }
 
-void TriangleRot::LoadDataFromFile(const std::string& filaname) {}
+void TriangleRot::LoadDataFromFile(const std::string& filename) {}
 
 void TriangleRot::Update(float delta_time)
 {
-  rotation_.y += delta_time * glm::quarter_pi<float>();
+  // rotation_.y += delta_time * glm::quarter_pi<float>();
 
   UpdateModelMatrix();
 }

@@ -1,7 +1,13 @@
 #include "gl1_render.h"
 
+static void glfw_error_callback(int error, const char* description)
+{
+  fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
+
 GL1Render::GL1Render(int width, int height): Render{width, height}
 {
+  glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit())
   {
     // Error del so de versionado de librerias
@@ -12,12 +18,14 @@ GL1Render::GL1Render(int width, int height): Render{width, height}
 
 GL1Render::~GL1Render()
 {
+  glfwDestroyWindow(window_);
   glfwTerminate();
 }
 
 void GL1Render::Init()
 {
   glfwMakeContextCurrent(window_);
+  glfwSwapInterval(1);
   gladLoadGL(glfwGetProcAddress);
 }
 

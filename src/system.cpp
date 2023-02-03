@@ -40,6 +40,9 @@ void System::MainLoop()
     // Calcula delta_time
     TimeManager::Update(glfwGetTime());
 
+    // Gestionar eventos
+    glfwPollEvents();
+
     // Limpiar buffer color
     render_->Clear();
 
@@ -54,9 +57,6 @@ void System::MainLoop()
 
     // Intercambiar el front y el back buffer
     render_->SwapBuffers();
-
-    // Gestionar eventos
-    glfwPollEvents();
 
     if (input_manager_->IsPressed('E'))
     {

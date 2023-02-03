@@ -21,7 +21,7 @@ public:
 
   void SetMesh(Mesh3D* mesh);
 
-  virtual void LoadDataFromFile(const std::string& filaname) = 0;
+  virtual void LoadDataFromFile(const std::string& filename) = 0;
   virtual void Update(float delta_time) = 0;
 
 protected:

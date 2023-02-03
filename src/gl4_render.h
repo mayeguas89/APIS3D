@@ -22,6 +22,8 @@ class GL4Render: public GL1Render
 public:
   GL4Render(int width, int height);
   ~GL4Render();
+
+  void Init() override;
   void SetupObject(Object* object) override;
   void RemoveObject(Object* object) override;
   void DrawObjects(const std::vector<Object*>* objects) override;
