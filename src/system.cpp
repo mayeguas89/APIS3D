@@ -105,12 +105,18 @@ Render* System::GetRender()
 
 float System::GetAspectRatio()
 {
-  return render_->GetWidth() / render_->GetHeight();
+  return render_->GetWidth() / (float)(render_->GetHeight());
 }
 
 float System::GetFarPlane()
 {
   return 100.f;
+}
+
+void System::WindowResizeCallback(GLFWwindow* window, int width, int height)
+{
+  render_->SetSize(width, height);
+  System::GetCamera()->ComputeProjectionMatrix(Camera::ProjectionType::Perspective);
 }
 
 float System::GetNearPlane()

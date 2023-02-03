@@ -28,6 +28,7 @@ public:
   static float GetAspectRatio();
   static float GetNearPlane();
   static float GetFarPlane();
+  static void WindowResizeCallback(GLFWwindow* window, int width, int height);
 
 private:
   void Init();

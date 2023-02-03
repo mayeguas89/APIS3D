@@ -12,6 +12,9 @@ public:
 
   int GetWidth();
   int GetHeight();
+
+  virtual void SetSize(int width, int height);
+
   virtual void Init() = 0;
   virtual void SetupObject(Object* object) = 0;
   virtual void RemoveObject(Object* object) = 0;

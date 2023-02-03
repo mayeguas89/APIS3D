@@ -1,5 +1,7 @@
 #include "gl1_render.h"
 
+#include "system.h"
+
 static void glfw_error_callback(int error, const char* description)
 {
   fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -27,6 +29,7 @@ void GL1Render::Init()
   glfwMakeContextCurrent(window_);
   glfwSwapInterval(1);
   gladLoadGL(glfwGetProcAddress);
+  glfwSetWindowSizeCallback(window_, &System::WindowResizeCallback);
 }
 
 void GL1Render::SetupObject(Object* object) {}
@@ -53,6 +56,13 @@ void GL1Render::DrawObjects(const std::vector<Object*>* objects)
 bool GL1Render::IsClosed()
 {
   return glfwWindowShouldClose(window_);
+}
+
+void GL1Render::SetSize(int width, int height)
+{
+  Render::SetSize(width, height);
+  glViewport(0, 0, width, height);
+  glfwSetWindowSize(window_, width, height);
 }
 
 void GL1Render::SetKeyCallback(void (*callback)(GLFWwindow* window, int key, int scancode, int action, int mods))
