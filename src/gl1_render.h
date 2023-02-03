@@ -16,6 +16,9 @@ public:
   void DrawObjects(const std::vector<Object*>* objects) override;
   bool IsClosed() override;
   void SetKeyCallback(void (*callback)(GLFWwindow* window, int key, int scancode, int action, int mods));
+  void SetCursorPositionCallback(void (*callback)(GLFWwindow* window, double x_key, double y_pos));
+  void SetMouseButtonCallback(void (*callback)(GLFWwindow* window, int button, int action, int mods));
+  void SetScrollCallback(void (*callback)(GLFWwindow* window, double x_offset, double y_offset));
   void Clear() override;
   void SwapBuffers() override;
 

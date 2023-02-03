@@ -6,6 +6,9 @@
 #include "time_manager.h"
 
 glm::mat4* System::current_object_model_matrix_ = nullptr;
+Camera* System::camera_ = nullptr;
+Render* System::render_ = nullptr;
+InputManager* System::input_manager_ = nullptr;
 
 System::System()
 {
@@ -46,6 +49,9 @@ void System::MainLoop()
     // Limpiar buffer color
     render_->Clear();
 
+    // Actualizar la camara
+    camera_->Update(TimeManager::deltaTime);
+
     // Actualiza Objetos
     for (Object* object: *objects_)
     {
@@ -74,6 +80,42 @@ void System::SetModelMatrix(glm::mat4* model_matrix)
 glm::mat4* System::GetModelMatrix()
 {
   return current_object_model_matrix_;
+}
+
+void System::SetCamera(Camera* camera)
+{
+  if (camera != nullptr)
+    camera_ = camera;
+}
+
+Camera* System::GetCamera()
+{
+  return camera_;
+}
+
+InputManager* System::GetInputManager()
+{
+  return input_manager_;
+}
+
+Render* System::GetRender()
+{
+  return render_;
+}
+
+float System::GetAspectRatio()
+{
+  return render_->GetWidth() / render_->GetHeight();
+}
+
+float System::GetFarPlane()
+{
+  return 100.f;
+}
+
+float System::GetNearPlane()
+{
+  return 0.1f;
 }
 
 void System::Init()

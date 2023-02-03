@@ -66,7 +66,9 @@ void GLSLShader::SetVariables()
                         sizeof(Vertex),
                         (void*)(sizeof(glm::vec4)));
 
-  glUniformMatrix4fv(variable_list_["MVP"], 1, GL_FALSE, &(*System::GetModelMatrix())[0][0]);
+  Camera* camera = System::GetCamera();
+  auto mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix() * (*System::GetModelMatrix());
+  glUniformMatrix4fv(variable_list_["MVP"], 1, GL_FALSE, &mvp[0][0]);
 }
 
 bool GLSLShader::HasErrors(std::string& error_message)

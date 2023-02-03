@@ -60,6 +60,21 @@ void GL1Render::SetKeyCallback(void (*callback)(GLFWwindow* window, int key, int
   glfwSetKeyCallback(window_, callback);
 }
 
+void GL1Render::SetCursorPositionCallback(void (*callback)(GLFWwindow* window, double x_key, double y_pos))
+{
+  glfwSetCursorPosCallback(window_, callback);
+}
+
+void GL1Render::SetMouseButtonCallback(void (*callback)(GLFWwindow* window, int button, int action, int mods))
+{
+  glfwSetMouseButtonCallback(window_, callback);
+}
+
+void GL1Render::SetScrollCallback(void (*callback)(GLFWwindow* window, double x_offset, double y_offset))
+{
+  glfwSetScrollCallback(window_, callback);
+}
+
 void GL1Render::Clear()
 {
   glClear(GL_COLOR_BUFFER_BIT);

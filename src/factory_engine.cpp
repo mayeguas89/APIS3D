@@ -45,6 +45,9 @@ Render* FactoryEngine::GetNewRender()
     {
       GL1Render* render = new GL1Render(600, 480);
       render->SetKeyCallback(GLFWInputManager::KeyManager);
+      render->SetCursorPositionCallback(GLFWInputManager::MouseManager);
+      render->SetScrollCallback(GLFWInputManager::ScrollManager);
+      render->SetMouseButtonCallback(GLFWInputManager::MouseKeyManager);
       return render;
       break;
     }
@@ -53,6 +56,9 @@ Render* FactoryEngine::GetNewRender()
     {
       GL4Render* render = new GL4Render(600, 480);
       render->SetKeyCallback(GLFWInputManager::KeyManager);
+      render->SetCursorPositionCallback(GLFWInputManager::MouseManager);
+      render->SetScrollCallback(GLFWInputManager::ScrollManager);
+      render->SetMouseButtonCallback(GLFWInputManager::MouseKeyManager);
       return render;
       break;
     }

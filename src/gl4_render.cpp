@@ -67,12 +67,14 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 {
   static float rotation[] = {0.0, 0.0, 0.0};
   static float translation[] = {0.0, 0.0};
+  static float camera_speed = 0.f;
   static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // Start the Dear ImGui frame
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
+  System::GetCamera()->SetSpeed(camera_speed);
 
   for (auto i = 0; i < objects->size(); i++)
   {
@@ -95,6 +97,7 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   // render your GUI
   ImGui::Begin("Triangle Position/Color");
 
+  ImGui::SliderFloat("CameraSpeed", &camera_speed, 0.0, 5.0);
   ImGui::SliderFloat3("Rotation", rotation, 0, glm::pi<float>());
   ImGui::SliderFloat2("Position", translation, -1.0, 1.0);
   ImGui::ColorEdit3("Clear color", (float*)&clear_color);

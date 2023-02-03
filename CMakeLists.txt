@@ -13,6 +13,8 @@ link_directories(
 )
 
 add_executable(APIS3D 
+    src/camera.cpp
+    src/camera_keyboard.cpp
     src/entity.cpp
     src/factory_engine.cpp
     src/gl1_render.cpp
