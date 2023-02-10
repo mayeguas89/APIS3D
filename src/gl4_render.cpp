@@ -28,6 +28,9 @@ GL4Render::~GL4Render()
 void GL4Render::Init()
 {
   GL1Render::Init();
+  // glEnable(GL_DEPTH_TEST);
+  // glDepthFunc(GL_LESS);
+
   const char* glsl_version = "#version 130";
 
   // Setup Platform/Renderer backends
@@ -78,11 +81,13 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 
   for (auto i = 0; i < objects->size(); i++)
   {
+    // IMGUI
     glm::vec4 rotation_vec(rotation[0], rotation[1], rotation[2], 0.f);
     objects->at(i)->SetRotation(rotation_vec);
     glm::vec4 position_vec(translation[0], translation[1], 0.f, 0.f);
     objects->at(i)->SetPosition(position_vec);
 
+    // OPENGL
     System::SetModelMatrix(&(objects->at(i)->GetModelMatrix()));
     auto* mesh = objects->at(i)->GetMesh();
     auto buffer = buffer_object_list_[mesh->GetMeshId()];
@@ -91,7 +96,14 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
 
     mesh->GetMaterial()->Prepare();
-    glDrawElements(GL_TRIANGLES, mesh->GetVertIndexesList()->size(), GL_UNSIGNED_INT, nullptr);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, objects->at(i)->GetMesh()->GetMaterial()->GetTexture()->GetTextureId());
+
+    glDrawElements(GL_TRIANGLES,
+                   static_cast<GLsizei>(mesh->GetVertIndexesList()->size()),
+                   GL_UNSIGNED_INT,
+                   nullptr);
   }
 
   // render your GUI

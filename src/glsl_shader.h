@@ -56,5 +56,5 @@ private:
   std::vector<std::unique_ptr<Shader>> shaders_;
 
   // Variables que el programa almacena de los shaders
-  std::unordered_map<std::string, unsigned int> variable_list_;
+  std::unordered_map<std::string, int> variable_list_;
 };

@@ -1,26 +1,37 @@
-#include "triangle_rot.h"
+#include "cube_text.h"
 
-#define GLAD_ONLY_HEADER
-#include "common.h"
 #include "factory_engine.h"
 
-TriangleRot::TriangleRot(): Object()
+CubeText::CubeText(): Object3D()
 {
   mesh_ = new Mesh3D();
 
-  Vertex v1;
-  Vertex v2;
-  Vertex v3;
-
+  // Front Face
+  Vertex v1, v2, v3, v4;
   v1.position = glm::vec4(-0.5f, -0.5f, 0.f, 1.f);
   v1.color = glm::vec4(1.f, 0.f, 0.f, 0.f);
   v1.texture_coordinates = glm::vec2(0.f, 0.f);
-  v2.position = glm::vec4(0.f, 0.5f, 0.f, 1.f);
-  v2.color = glm::vec4(0.f, 1.f, 0.f, 0.f);
-  v2.texture_coordinates = glm::vec2(0.5f, 0.5f);
-  v3.position = glm::vec4(0.5f, -0.5f, 0.f, 1.f);
-  v3.color = glm::vec4(0.f, 0.f, 1.f, 0.f);
-  v3.texture_coordinates = glm::vec2(1.f, 0.f);
+  v2.position = glm::vec4(-0.5f, 0.5f, 0.f, 1.f);
+  v2.color = glm::vec4(1.f, 0.f, 0.f, 0.f);
+  v2.texture_coordinates = glm::vec2(0.f, 1.f);
+  v3.position = glm::vec4(0.5f, 0.5f, 0.f, 1.f);
+  v3.color = glm::vec4(1.f, 0.f, 0.f, 0.f);
+  v3.texture_coordinates = glm::vec2(1.f, 1.f);
+  v4.position = glm::vec4(0.5f, -0.5f, 0.f, 1.f);
+  v4.color = glm::vec4(1.f, 0.f, 0.f, 0.f);
+  v4.texture_coordinates = glm::vec2(1.f, 0.f);
+
+  mesh_->AddTriangle(v1, 0, v2, 1, v3, 2);
+  mesh_->AddTriangle(v1, 0, v3, 2, v4, 3);
+
+  // top Face
+  v1.position = glm::vec4(-0.5f, -0.5f, 0.f, 1.f);
+  v2.position = glm::vec4(-0.5f, 0.5f, 0.f, 1.f);
+  v3.position = glm::vec4(-0.5f, -0.5f, -0.5f, 1.f);
+  v4.position = glm::vec4(-0.5f, 0.5f, -0.5f, 1.f);
+
+  mesh_->AddTriangle(v1, 4, v2, 5, v3, 6);
+  mesh_->AddTriangle(v1, 4, v3, 6, v4, 7);
 
   if (auto* material = FactoryEngine::GetNewMaterial(); material)
   {
@@ -38,28 +49,22 @@ TriangleRot::TriangleRot(): Object()
         RenderType::Fragment;
     material->LoadPrograms(program_map);
     material->SetTexture(texture);
-
     mesh_->SetMaterial(material);
-    mesh_->AddTriangle(v1, 0, v2, 1, v3, 2);
-  }
-  else
-  {
-    mesh_->AddVertex(v1);
-    mesh_->AddVertex(v2);
-    mesh_->AddVertex(v3);
   }
 }
 
-void TriangleRot::LoadDataFromFile(const std::string& filename) {}
+CubeText::~CubeText() {}
 
-void TriangleRot::Update(float delta_time)
+void CubeText::LoadDataFromFile(const std::string& filename) {}
+
+void CubeText::Update(float delta_time)
 {
-  // rotation_.y += delta_time * glm::quarter_pi<float>();
+  rotation_.y += delta_time * glm::quarter_pi<float>();
 
   UpdateModelMatrix();
 }
 
-void TriangleRot::UpdateModelMatrix()
+void CubeText::UpdateModelMatrix()
 {
   // La matriz modelo se calcula a partir de la composicion de la transformacion de traslacion, rotacion y escalado
 

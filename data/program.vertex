@@ -1,13 +1,19 @@
 #version 330
+//layout (location = 0) in vec4 vPos;
+//layout (location = 1) in vec4 vColor;
+//layout (location = 2) in vec2 vTexture;
 
 uniform mat4 MVP;
 
 attribute vec4 vPos;
 attribute vec4 vColor;
+attribute vec2 vTexture;
 
 out vec4 fColor;
+out vec2 fTextCoord;
 
 void main() {
     gl_Position = MVP * vPos;
     fColor = vColor;
+    fTextCoord = vTexture;
 }

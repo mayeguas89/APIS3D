@@ -3,6 +3,7 @@
 #include "input_manager.h"
 #include "material.h"
 #include "render.h"
+#include "texture.h"
 
 class FactoryEngine
 {
@@ -32,6 +33,7 @@ public:
   static InputManager* GetNewInputManager();
 
   static Material* GetNewMaterial();
+  static Texture* GetNewTexture();
 
 private:
   static RenderBackend selected_graphics_backend_;

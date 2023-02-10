@@ -13,9 +13,9 @@ void CameraKeyboard::Update(float delta_time)
   if (System::GetInputManager()->IsPressed(GLFW_MOUSE_BUTTON_2))
   {
     if (System::GetInputManager()->IsPressed('D'))
-      position_.x += delta_time * camera_speed_;
-    if (System::GetInputManager()->IsPressed('A'))
       position_.x -= delta_time * camera_speed_;
+    if (System::GetInputManager()->IsPressed('A'))
+      position_.x += delta_time * camera_speed_;
 
     static double prev_x, prev_y;
 

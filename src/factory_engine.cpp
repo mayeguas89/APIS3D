@@ -2,6 +2,7 @@
 
 #include "gl1_render.h"
 #include "gl4_render.h"
+#include "gl_texture.h"
 #include "glfw_input_manager.h"
 #include "glsl_material.h"
 
@@ -23,6 +24,16 @@ Material* FactoryEngine::GetNewMaterial()
   if (selected_graphics_backend_ == FactoryEngine::RenderBackend::GL4Render)
   {
     return new GLSLMaterial();
+  }
+  return nullptr;
+}
+
+Texture* FactoryEngine::GetNewTexture()
+{
+  if (selected_graphics_backend_ == FactoryEngine::RenderBackend::GL4Render
+      || selected_graphics_backend_ == FactoryEngine::RenderBackend::GL1Render)
+  {
+    return new GLTexture();
   }
   return nullptr;
 }

@@ -55,32 +55,51 @@ void GLSLShader::SetMat4(const std::string& name, const glm::mat4& value)
 
 void GLSLShader::SetVariables()
 {
-  glEnableVertexAttribArray(variable_list_["vPos"]);
-  glVertexAttribPointer(variable_list_["vPos"], 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0x00);
+  if (variable_list_.find("vPos") != variable_list_.end())
+  {
+    glEnableVertexAttribArray(variable_list_["vPos"]);
+    glVertexAttribPointer(variable_list_["vPos"], 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0x00);
+  }
 
-  glEnableVertexAttribArray(variable_list_["vColor"]);
-  glVertexAttribPointer(variable_list_["vColor"],
-                        4,
-                        GL_FLOAT,
-                        GL_FALSE,
-                        sizeof(Vertex),
-                        (void*)(sizeof(glm::vec4)));
+  if (variable_list_.find("vColor") != variable_list_.end())
+  {
+    glEnableVertexAttribArray(variable_list_["vColor"]);
+    glVertexAttribPointer(variable_list_["vColor"],
+                          4,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          (void*)(sizeof(glm::vec4)));
+  }
+  if (variable_list_.find("vTexture") != variable_list_.end())
+  {
+    glEnableVertexAttribArray(variable_list_["vTexture"]);
+    glVertexAttribPointer(variable_list_["vTexture"],
+                          2,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          (void*)(2 * sizeof(glm::vec4)));
+  }
+
+  glUniform1i(variable_list_["textUnit"], 0);
 
   Camera* camera = System::GetCamera();
   auto mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix() * (*System::GetModelMatrix());
+
   glUniformMatrix4fv(variable_list_["MVP"], 1, GL_FALSE, &mvp[0][0]);
 }
 
 bool GLSLShader::HasErrors(std::string& error_message)
 {
-  std::string error_log;
+  char error_log[1024];
   GLint link_success;
   glGetProgramiv(program_id_, GL_LINK_STATUS, &link_success);
   if (link_success)
     return false;
   GLsizei log_length = 0;
-  glGetProgramInfoLog(program_id_, 1024, &log_length, error_log.data());
-  error_message = std::string("ERROR linking program\n" + error_log + "\n\n");
+  glGetProgramInfoLog(program_id_, 1024, &log_length, error_log);
+  error_message = std::string("ERROR linking program\n" + std::string(error_log) + "\n\n");
   return true;
 }
 
@@ -170,15 +189,14 @@ void GLSLShader::Shader::CompileShader()
 
 bool GLSLShader::Shader::HasErrors(std::string& error_message)
 {
-  std::string error_log;
-  //   char error_log[1024];
+  char error_log[1024];
   GLint compilation_succes;
   glGetShaderiv(shader_id_, GL_COMPILE_STATUS, &compilation_succes);
   if (compilation_succes)
     return false;
   GLsizei log_length = 0;
-  glGetShaderInfoLog(shader_id_, 1024, &log_length, error_log.data());
-  error_message = std::string("ERROR compiling shader " + filename_ + "\n" + error_log + "\n\n");
+  glGetShaderInfoLog(shader_id_, 1024, &log_length, error_log);
+  error_message = std::string("ERROR compiling shader " + filename_ + "\n" + std::string(error_log) + "\n\n");
   return true;
 }
 

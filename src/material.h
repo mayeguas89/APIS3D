@@ -1,12 +1,15 @@
 #pragma once
 
 #include "render_program.h"
+#include "texture.h"
 
 class Material
 {
 public:
   Material();
-  virtual ~Material() = default;
+  ~Material();
+  Texture* GetTexture();
+  void SetTexture(Texture* texture);
 
   /**
    * @brief Metodo que recibe una lista de programas, los pasa al render program para que los compile y los linke
@@ -22,4 +25,5 @@ public:
 
 protected:
   RenderProgram* render_program_;
+  Texture* texture_;
 };

@@ -1,4 +1,5 @@
 #include "camera_keyboard.h"
+#include "cube_text.h"
 #include "factory_engine.h"
 #include "system.h"
 #include "triangle_rot.h"
@@ -11,6 +12,7 @@ int main(int argc, char const* argv[])
 
   System system;
   TriangleRot triangle;
+  CubeText cube;
   Camera* camera_keyboard = new CameraKeyboard(Camera::ProjectionType::Perspective,
                                                glm::vec3(0.f, 0.f, 1.f),
                                                glm::vec3(triangle.GetPosition()),
