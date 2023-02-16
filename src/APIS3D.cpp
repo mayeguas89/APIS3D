@@ -1,9 +1,9 @@
+#include "asian_town.h"
 #include "camera_keyboard.h"
 #include "cube_text.h"
 #include "factory_engine.h"
 #include "system.h"
 #include "triangle_rot.h"
-
 int main(int argc, char const* argv[])
 {
   // FactoryEngine::SetRenderBackend(FactoryEngine::RenderBackend::GL1Render);
@@ -11,14 +11,16 @@ int main(int argc, char const* argv[])
   FactoryEngine::SetInputBackend(FactoryEngine::InputBackend::GLFWInputManager);
 
   System system;
-  TriangleRot triangle;
-  CubeText cube;
+  // TriangleRot triangle;
+  // CubeText cube;
+  AsianTown asian_town;
+  asian_town.LoadDataFromFile("data/asian_town.msh");
   Camera* camera_keyboard = new CameraKeyboard(Camera::ProjectionType::Perspective,
-                                               glm::vec3(0.f, 0.f, 1.f),
-                                               glm::vec3(triangle.GetPosition()),
+                                               glm::vec3(0.f, 0.f, 0.f),
+                                               glm::vec3(0.f, 0.f, -0.01f),
                                                glm::vec3(0.f, 1.f, 0.f));
   system.SetCamera(camera_keyboard);
-  system.AddObject(&triangle);
+  system.AddObject(&asian_town);
   system.MainLoop();
 
   delete camera_keyboard;

@@ -7,6 +7,8 @@ double GLFWInputManager::old_pos_x_ = 0.;
 double GLFWInputManager::old_pos_y_ = 0.;
 double GLFWInputManager::scroll_y_ = 0.;
 double GLFWInputManager::scroll_x_ = 0.;
+double GLFWInputManager::fov_ = 45.;
+glm::vec3 GLFWInputManager::rotation_direction_ = glm::vec3(0.f, 0.f, 0.f);
 
 GLFWInputManager::GLFWInputManager() {}
 
@@ -26,6 +28,16 @@ double GLFWInputManager::GetMouseXPos()
 double GLFWInputManager::GetMouseYPos()
 {
   return pos_y_;
+}
+
+double GLFWInputManager::GetYScroll()
+{
+  return fov_;
+}
+
+glm::vec3 GLFWInputManager::GetMouseRotationDirection()
+{
+  return rotation_direction_;
 }
 
 bool GLFWInputManager::IsPressed(char key)
@@ -63,12 +75,32 @@ void GLFWInputManager::MouseManager(GLFWwindow* window, double x_pos, double y_p
   pos_y_ = y_pos;
 
   std::cout << "Mouse position (" << x_pos << ", " << y_pos << ")" << std::endl;
+
+  static float yaw = -90.f;
+  static float pitch = 0.f;
+
+  yaw += (pos_x_ - old_pos_x_) * kMouseSensibility;
+  pitch += (old_pos_y_ - pos_y_) * kMouseSensibility;
+
+  if (pitch > 89.0f)
+    pitch = 89.0f;
+  if (pitch < -89.0f)
+    pitch = -89.0f;
+
+  rotation_direction_.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+  rotation_direction_.y = glm::sin(glm::radians(pitch));
+  rotation_direction_.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
 }
 
 void GLFWInputManager::ScrollManager(GLFWwindow* window, double x_offset, double y_offset)
 {
   scroll_x_ = x_offset;
   scroll_y_ = y_offset;
+  fov_ -= scroll_y_;
+  if (fov_ < 1.f)
+    fov_ = 1.f;
+  else if (fov_ > 90.f)
+    fov_ = 90.f;
   std::cout << "Mouse scroll (" << x_offset << ", " << y_offset << ")" << std::endl;
 }
 

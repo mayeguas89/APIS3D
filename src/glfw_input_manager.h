@@ -25,10 +25,16 @@ public:
 
   double GetMouseXPos() override;
   double GetMouseYPos() override;
+  double GetYScroll() override;
+
+  glm::vec3 GetMouseRotationDirection() override;
 
 private:
+  inline static const double kMouseSensibility = 0.1;
   static std::unordered_map<int, bool> keyState_;
   static double pos_x_, pos_y_;
   static double old_pos_x_, old_pos_y_;
   static double scroll_y_, scroll_x_;
+  static glm::vec3 rotation_direction_;
+  static double fov_;
 };

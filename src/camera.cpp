@@ -2,6 +2,7 @@
 
 Camera::Camera(ProjectionType type, glm::vec3 position, glm::vec3 look_at, glm::vec3 up):
   Entity(),
+  projection_type_{type},
   look_at_{look_at},
   up_{up},
   angle_{glm::half_pi<float>()}

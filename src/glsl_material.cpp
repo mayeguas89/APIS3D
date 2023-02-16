@@ -9,7 +9,7 @@ GLSLMaterial::GLSLMaterial(): Material()
 
 GLSLMaterial::~GLSLMaterial()
 {
-  delete render_program_;
+  // delete render_program_;
 }
 
 /**

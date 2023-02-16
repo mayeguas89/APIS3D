@@ -15,16 +15,16 @@ public:
 
   Object();
 
-  ~Object();
+  virtual ~Object() = default;
 
-  Mesh3D* GetMesh();
+  std::vector<Mesh3D*>& GetMeshes();
 
-  void SetMesh(Mesh3D* mesh);
+  void AddMesh(Mesh3D* mesh);
 
   virtual void LoadDataFromFile(const std::string& filename) = 0;
   virtual void Update(float delta_time) = 0;
 
 protected:
-  Mesh3D* mesh_;
+  std::vector<Mesh3D*> meshes_;
   Type type_;
 };

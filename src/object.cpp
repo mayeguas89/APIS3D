@@ -2,21 +2,15 @@
 
 Object::Object(): Entity()
 {
-  mesh_ = nullptr;
   type_ = Type::None;
 }
 
-Object::~Object()
+std::vector<Mesh3D*>& Object::GetMeshes()
 {
-  delete mesh_;
+  return meshes_;
 }
 
-Mesh3D* Object::GetMesh()
+void Object::AddMesh(Mesh3D* mesh)
 {
-  return mesh_;
-}
-
-void Object::SetMesh(Mesh3D* mesh)
-{
-  mesh_ = mesh;
+  meshes_.push_back(mesh);
 }

@@ -13,6 +13,7 @@ link_directories(
 )
 
 add_executable(APIS3D 
+    src/asian_town.cpp
     src/camera.cpp
     src/camera_keyboard.cpp
     src/cube_text.cpp
@@ -51,6 +52,7 @@ target_link_libraries(
   PRIVATE
   glfw3
   imgui
+  pugixml
 )
 
 add_custom_command(TARGET APIS3D POST_BUILD

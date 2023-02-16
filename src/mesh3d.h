@@ -23,6 +23,7 @@ public:
                    unsigned int index_two,
                    const Vertex& vertex_three,
                    unsigned int index_three);
+  void AddIndex(unsigned int index_list);
 
 protected:
   int id_;

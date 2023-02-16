@@ -26,4 +26,5 @@ public:
 
 protected:
   GLFWwindow* window_;
+  glm::vec4 clear_color_;
 };

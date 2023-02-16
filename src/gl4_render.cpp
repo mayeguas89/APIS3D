@@ -43,25 +43,26 @@ void GL4Render::Init()
 
 void GL4Render::SetupObject(Object* object)
 {
-  auto* mesh = object->GetMesh();
+  for (auto* mesh: object->GetMeshes())
+  {
+    VBO vbo;
+    glGenVertexArrays(1, &vbo.bo_id);
+    glGenBuffers(1, &vbo.vbo);
+    glGenBuffers(1, &vbo.idxbo);
 
-  VBO vbo;
-  glGenVertexArrays(1, &vbo.bo_id);
-  glGenBuffers(1, &vbo.vbo);
-  glGenBuffers(1, &vbo.idxbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo.vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+                 sizeof(Vertex) * mesh->GetVertList()->size(),
+                 mesh->GetVertList()->data(),
+                 GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo.vbo);
-  glBufferData(GL_ARRAY_BUFFER,
-               sizeof(Vertex) * mesh->GetVertList()->size(),
-               mesh->GetVertList()->data(),
-               GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.idxbo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               sizeof(unsigned int) * mesh->GetVertIndexesList()->size(),
-               mesh->GetVertIndexesList()->data(),
-               GL_STATIC_DRAW);
-  buffer_object_list_[mesh->GetMeshId()] = vbo;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.idxbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 sizeof(unsigned int) * mesh->GetVertIndexesList()->size(),
+                 mesh->GetVertIndexesList()->data(),
+                 GL_STATIC_DRAW);
+    buffer_object_list_[mesh->GetMeshId()] = vbo;
+  }
 }
 
 void GL4Render::RemoveObject(Object* object) {}
@@ -70,7 +71,7 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 {
   static float rotation[] = {0.0, 0.0, 0.0};
   static float translation[] = {0.0, 0.0};
-  static float camera_speed = 0.f;
+  static float camera_speed = 0.1f;
   static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // Start the Dear ImGui frame
@@ -78,6 +79,8 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
   System::GetCamera()->SetSpeed(camera_speed);
+  // IMGUI
+  clear_color_ = glm::vec4(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 
   for (auto i = 0; i < objects->size(); i++)
   {
@@ -89,28 +92,30 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 
     // OPENGL
     System::SetModelMatrix(&(objects->at(i)->GetModelMatrix()));
-    auto* mesh = objects->at(i)->GetMesh();
-    auto buffer = buffer_object_list_[mesh->GetMeshId()];
-    glBindVertexArray(buffer.bo_id);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
+    for (auto* mesh: objects->at(i)->GetMeshes())
+    {
+      auto buffer = buffer_object_list_[mesh->GetMeshId()];
+      glBindVertexArray(buffer.bo_id);
+      glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
 
-    mesh->GetMaterial()->Prepare();
+      mesh->GetMaterial()->Prepare();
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, objects->at(i)->GetMesh()->GetMaterial()->GetTexture()->GetTextureId());
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, mesh->GetMaterial()->GetTexture()->GetTextureId());
 
-    glDrawElements(GL_TRIANGLES,
-                   static_cast<GLsizei>(mesh->GetVertIndexesList()->size()),
-                   GL_UNSIGNED_INT,
-                   nullptr);
+      glDrawElements(GL_TRIANGLES,
+                     static_cast<GLsizei>(mesh->GetVertIndexesList()->size()),
+                     GL_UNSIGNED_INT,
+                     nullptr);
+    }
   }
 
   // render your GUI
   ImGui::Begin("Triangle Position/Color");
 
   ImGui::SliderFloat("CameraSpeed", &camera_speed, 0.0, 5.0);
-  ImGui::SliderFloat3("Rotation", rotation, 0, glm::pi<float>());
+  ImGui::SliderFloat3("Rotation", rotation, 0, 2 * glm::pi<float>());
   ImGui::SliderFloat2("Position", translation, -1.0, 1.0);
   ImGui::ColorEdit3("Clear color", (float*)&clear_color);
   ImGui::End();

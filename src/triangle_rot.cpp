@@ -6,7 +6,7 @@
 
 TriangleRot::TriangleRot(): Object()
 {
-  mesh_ = new Mesh3D();
+  auto mesh = std::make_shared<Mesh3D>();
 
   Vertex v1;
   Vertex v2;
@@ -39,15 +39,10 @@ TriangleRot::TriangleRot(): Object()
     material->LoadPrograms(program_map);
     material->SetTexture(texture);
 
-    mesh_->SetMaterial(material);
-    mesh_->AddTriangle(v1, 0, v2, 1, v3, 2);
+    mesh->SetMaterial(material);
   }
-  else
-  {
-    mesh_->AddVertex(v1);
-    mesh_->AddVertex(v2);
-    mesh_->AddVertex(v3);
-  }
+  mesh->AddTriangle(v1, 0, v2, 1, v3, 2);
+  AddMesh(mesh.get());
 }
 
 void TriangleRot::LoadDataFromFile(const std::string& filename) {}

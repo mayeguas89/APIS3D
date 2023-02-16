@@ -29,7 +29,18 @@ void GL1Render::Init()
   glfwMakeContextCurrent(window_);
   glfwSwapInterval(1);
   gladLoadGL(glfwGetProcAddress);
+
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+
   glfwSetWindowSizeCallback(window_, &System::WindowResizeCallback);
+
+  // Set Mouse in middle on the screen
+  // glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  // glfwSetCursorPos(window_, width_ / 2.f, height_ / 2.f);
 }
 
 void GL1Render::SetupObject(Object* object) {}
@@ -43,11 +54,14 @@ void GL1Render::DrawObjects(const std::vector<Object*>* objects)
   glColor3f(color.r, color.g, color.b);
   for (Object* object: *(objects))
   {
-    for (Vertex vertex: *(object->GetMesh()->GetVertList()))
+    for (auto* mesh: object->GetMeshes())
     {
-      vertex.position = object->GetModelMatrix() * vertex.position;
-      glColor3f(vertex.color.r, vertex.color.g, vertex.color.b);
-      glVertex3f(vertex.position.x, vertex.position.y, vertex.position.z);
+      for (Vertex vertex: *(mesh->GetVertList()))
+      {
+        vertex.position = object->GetModelMatrix() * vertex.position;
+        glColor3f(vertex.color.r, vertex.color.g, vertex.color.b);
+        glVertex3f(vertex.position.x, vertex.position.y, vertex.position.z);
+      }
     }
   }
   glEnd();
@@ -87,7 +101,9 @@ void GL1Render::SetScrollCallback(void (*callback)(GLFWwindow* window, double x_
 
 void GL1Render::Clear()
 {
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
+  // glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GL1Render::SwapBuffers()

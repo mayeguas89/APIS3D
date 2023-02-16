@@ -13,3 +13,10 @@ add_library(
         imgui/backends/imgui_impl_opengl3_loader.h
 )
 target_include_directories(imgui PUBLIC imgui glfw/inc imgui/backends)
+
+add_library(
+        pugixml STATIC
+        pugixml pugixml/src/pugixml.cpp
+)
+
+target_include_directories(pugixml PUBLIC pugixml/src)

@@ -27,4 +27,5 @@ protected:
   glm::vec3 radius_;
   float angle_;
   float camera_speed_;
+  ProjectionType projection_type_;
 };

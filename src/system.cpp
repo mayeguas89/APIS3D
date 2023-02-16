@@ -64,7 +64,7 @@ void System::MainLoop()
     // Intercambiar el front y el back buffer
     render_->SwapBuffers();
 
-    if (input_manager_->IsPressed('E'))
+    if (input_manager_->IsPressed('X'))
     {
       end_ = true;
     }

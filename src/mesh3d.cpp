@@ -13,7 +13,7 @@ Mesh3D::Mesh3D(): id_{counter_}
 
 Mesh3D::~Mesh3D()
 {
-  delete material_;
+  // delete material_;
   delete vert_list_;
   delete indexes_list_;
 }
@@ -55,10 +55,19 @@ void Mesh3D::AddTriangle(const Vertex& vertex_one,
                          const Vertex& vertex_three,
                          unsigned int index_three)
 {
-  vert_list_->push_back(vertex_one);
+  if (std::count(indexes_list_->begin(), indexes_list_->end(), index_one) == 0)
+    vert_list_->push_back(vertex_one);
+  if (std::count(indexes_list_->begin(), indexes_list_->end(), index_two) == 0)
+    vert_list_->push_back(vertex_two);
+  if (std::count(indexes_list_->begin(), indexes_list_->end(), index_three) == 0)
+    vert_list_->push_back(vertex_three);
+
   indexes_list_->push_back(index_one);
-  vert_list_->push_back(vertex_two);
-  indexes_list_->push_back(index_two);
-  vert_list_->push_back(vertex_three);
   indexes_list_->push_back(index_three);
+  indexes_list_->push_back(index_two);
+}
+
+void Mesh3D::AddIndex(unsigned int index)
+{
+  indexes_list_->push_back(index);
 }

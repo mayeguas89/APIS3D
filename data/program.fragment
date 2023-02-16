@@ -7,7 +7,7 @@ in vec2 fTextCoord;
 uniform sampler2D texUnit;
 
 void main() {
-    FragColor = texture(texUnit, fTextCoord);
+    FragColor = texture2D(texUnit, fTextCoord);
     //FragColor = fColor;
     //gl_FragColor = fColor;
 }
