@@ -13,6 +13,7 @@ void CameraKeyboard::Update(float delta_time)
 {
   if (System::GetInputManager()->IsPressed(GLFW_MOUSE_BUTTON_2))
   {
+    auto last_y_position = position_.y;
     if (System::GetInputManager()->IsPressed('D'))
       position_ += glm::vec4(delta_time * camera_speed_ * glm::normalize(glm::cross(look_at_, up_)), 1.f);
     if (System::GetInputManager()->IsPressed('A'))
@@ -21,12 +22,12 @@ void CameraKeyboard::Update(float delta_time)
       position_ += glm::vec4(delta_time * camera_speed_ * look_at_, 1.f);
     if (System::GetInputManager()->IsPressed('S'))
       position_ -= glm::vec4(delta_time * camera_speed_ * look_at_, 1.f);
-    // if (System::GetInputManager()->IsPressed('E'))
-    //   position_.y -= delta_time * camera_speed_;
-    // if (System::GetInputManager()->IsPressed('Q'))
-    //   position_.y += delta_time * camera_speed_;
+    if (System::GetInputManager()->IsPressed('E'))
+      last_y_position -= delta_time * camera_speed_;
+    if (System::GetInputManager()->IsPressed('Q'))
+      last_y_position += delta_time * camera_speed_;
 
-    position_.y = 0.f; // keeps the user at the ground level (xz plane)
+    position_.y = last_y_position; // keeps the user at the ground level (xz plane)
 
     // static double prev_x, prev_y;
 

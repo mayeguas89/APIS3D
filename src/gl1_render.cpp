@@ -31,10 +31,10 @@ void GL1Render::Init()
   gladLoadGL(glfwGetProcAddress);
 
   glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
+  // glDepthFunc(GL_LESS);
 
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
+  // glEnable(GL_CULL_FACE);
+  // glCullFace(GL_BACK);
 
   glfwSetWindowSizeCallback(window_, &System::WindowResizeCallback);
 

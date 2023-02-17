@@ -27,11 +27,15 @@ public:
   static Render* GetRender();
   static float GetAspectRatio();
   static float GetNearPlane();
+  static void SetNearPlane(float value);
   static float GetFarPlane();
+  static void SetFarPlane(float value);
   static void WindowResizeCallback(GLFWwindow* window, int width, int height);
 
 private:
   void Init();
+  static float near_plane_;
+  static float far_plane_;
 
   static glm::mat4* current_object_model_matrix_;
 

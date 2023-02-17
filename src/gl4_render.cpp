@@ -28,8 +28,6 @@ GL4Render::~GL4Render()
 void GL4Render::Init()
 {
   GL1Render::Init();
-  // glEnable(GL_DEPTH_TEST);
-  // glDepthFunc(GL_LESS);
 
   const char* glsl_version = "#version 130";
 
@@ -72,6 +70,8 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   static float rotation[] = {0.0, 0.0, 0.0};
   static float translation[] = {0.0, 0.0};
   static float camera_speed = 0.1f;
+  static float near_plane = 0.1f;
+  static float far_plane = 100.f;
   static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // Start the Dear ImGui frame
@@ -81,7 +81,8 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   System::GetCamera()->SetSpeed(camera_speed);
   // IMGUI
   clear_color_ = glm::vec4(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-
+  System::SetFarPlane(far_plane);
+  System::SetNearPlane(near_plane);
   for (auto i = 0; i < objects->size(); i++)
   {
     // IMGUI
@@ -115,6 +116,8 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   ImGui::Begin("Triangle Position/Color");
 
   ImGui::SliderFloat("CameraSpeed", &camera_speed, 0.0, 5.0);
+  ImGui::SliderFloat("NearPlane", &near_plane, 0.001f, 10.0f);
+  ImGui::SliderFloat("FarPlane", &far_plane, 100.0f, 200.f);
   ImGui::SliderFloat3("Rotation", rotation, 0, 2 * glm::pi<float>());
   ImGui::SliderFloat2("Position", translation, -1.0, 1.0);
   ImGui::ColorEdit3("Clear color", (float*)&clear_color);

@@ -9,6 +9,8 @@ glm::mat4* System::current_object_model_matrix_ = nullptr;
 Camera* System::camera_ = nullptr;
 Render* System::render_ = nullptr;
 InputManager* System::input_manager_ = nullptr;
+float System::far_plane_ = 100.f;
+float System::near_plane_ = 0.1f;
 
 System::System()
 {
@@ -110,7 +112,12 @@ float System::GetAspectRatio()
 
 float System::GetFarPlane()
 {
-  return 100.f;
+  return far_plane_;
+}
+
+void System::SetFarPlane(float value)
+{
+  far_plane_ = value;
 }
 
 void System::WindowResizeCallback(GLFWwindow* window, int width, int height)
@@ -121,7 +128,12 @@ void System::WindowResizeCallback(GLFWwindow* window, int width, int height)
 
 float System::GetNearPlane()
 {
-  return 0.1f;
+  return near_plane_;
+}
+
+void System::SetNearPlane(float value)
+{
+  near_plane_ = value;
 }
 
 void System::Init()
