@@ -12,15 +12,15 @@ int main(int argc, char const* argv[])
 
   System system;
   // TriangleRot triangle;
-  CubeText cube;
-  // AsianTown asian_town;
-  // asian_town.LoadDataFromFile("data/asian_town.msh");
+  // CubeText cube;
+  AsianTown asian_town;
+  asian_town.LoadDataFromFile("data/bunny.msh");
   Camera* camera_keyboard = new CameraKeyboard(Camera::ProjectionType::Perspective,
                                                glm::vec3(0.f, 0.f, 1.f),
                                                glm::vec3(0.f, 0.f, -1.f),
                                                glm::vec3(0.f, 1.f, 0.f));
   system.SetCamera(camera_keyboard);
-  system.AddObject(&cube);
+  system.AddObject(&asian_town);
   system.MainLoop();
 
   delete camera_keyboard;

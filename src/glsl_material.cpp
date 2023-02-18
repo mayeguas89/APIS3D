@@ -47,7 +47,8 @@ void GLSLMaterial::LoadPrograms(std::unordered_map<std::string, RenderType>& pro
  */
 void GLSLMaterial::Prepare()
 {
-  texture_->Bind();
+  if (texture_)
+    texture_->Bind();
   render_program_->UseProgram();
   // De momento sabemos las variables harcodeadas
   // Luego podemos obtener de alguna forma el nombre de las variables

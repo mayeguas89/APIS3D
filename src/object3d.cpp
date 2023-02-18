@@ -21,27 +21,34 @@ void Object3D::LoadDataFromFile(const std::string& filename)
 
   std::unordered_map<std::string, Texture*> textures;
 
-  // for (pugi::xml_node buffer = buffers_node.child("buffer"); buffer; buffer = buffers_node.next_sibling("buffer"))
-  // {
   for (pugi::xml_node buffer: buffers_node.children("buffer"))
   {
+    glm::vec4 material_color = glm::vec4(1.f, 1.f, 1.f, 1.f);
+
     // Creamos material
     auto material = FactoryEngine::GetNewMaterial();
     if (!material)
       throw std::runtime_error("Selected backend does not support materials");
 
-    // Añadimos la textura al material
-    auto texture_filename = buffer.child("material").child("texture").text().as_string();
-    Texture* texture = nullptr;
-    // Si la textura está en nuestro mapa de texturas la añadimos
-    if (textures.find(texture_filename) == textures.end())
+    // Material with color
+    if (auto attrib = buffer.child("material").child("color"); attrib != nullptr)
     {
-      texture = FactoryEngine::GetNewTexture();
-      textures[texture_filename] = texture;
-      texture->Load(texture_filename);
-      texture->Bind();
+      auto color_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+      auto the_color = color_list.begin();
+      while (the_color != color_list.end())
+      {
+        material_color.r = *the_color++;
+        material_color.g = *the_color++;
+        material_color.b = *the_color++;
+        material_color.a = *the_color++;
+      }
     }
-    texture = textures[texture_filename];
+
+    // Shininess
+    if (auto attrib = buffer.child("material").child("shininess"); attrib != nullptr)
+    {
+      shininess_ = attrib.text().as_int();
+    }
 
     // Usamos los shaders de vertices y de los fragmentos
     auto vextex_shader_filename = buffer.child("material").child("vShader").text().as_string();
@@ -52,35 +59,78 @@ void Object3D::LoadDataFromFile(const std::string& filename)
     program_map[fragment_shader_filename] = RenderType::Fragment;
 
     material->LoadPrograms(program_map);
-    material->SetTexture(texture);
 
-    auto pos_coords_list = utils::SplitString<float>(buffer.child("coords").text().as_string(), ',');
-    auto texture_coords_list = utils::SplitString<float>(buffer.child("texCoords").text().as_string(), ',');
-    auto coord = pos_coords_list.begin();
-    auto text = texture_coords_list.begin();
-
-    std::vector<Vertex> vertices;
-    auto mesh = new Mesh3D();
-    while (coord != pos_coords_list.end() && text != texture_coords_list.end())
+    // Material with texture
+    if (auto attrib = buffer.child("material").child("texture"); attrib != nullptr)
     {
-      Vertex v;
-      v.position.x = *coord++;
-      v.position.y = *coord++;
-      v.position.z = *coord++;
-      v.position.w = 1.0f;
+      // Añadimos la textura al material
+      auto texture_filename = buffer.child("material").child("texture").text().as_string();
+      Texture* texture = nullptr;
+      // Si la textura está en nuestro mapa de texturas la añadimos
+      if (textures.find(texture_filename) == textures.end())
+      {
+        texture = FactoryEngine::GetNewTexture();
+        textures[texture_filename] = texture;
+        texture->Load(texture_filename);
+        texture->Bind();
+      }
+      texture = textures[texture_filename];
+      material->SetTexture(texture);
+    }
 
-      v.texture_coordinates.x = *text++;
-      v.texture_coordinates.y = *text++;
+    auto mesh = new Mesh3D();
 
-      v.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    if (auto attrib = buffer.child("coords"); attrib != nullptr)
+    {
+      auto pos_coords_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+      auto coord = pos_coords_list.begin();
 
-      mesh->AddVertex(v);
+      while (coord != pos_coords_list.end())
+      {
+        Vertex v;
+        v.position.x = *coord++;
+        v.position.y = *coord++;
+        v.position.z = *coord++;
+        v.position.w = 1.0f;
+
+        v.color = material_color;
+
+        mesh->AddVertex(v);
+      }
+    }
+
+    if (auto attrib = buffer.child("normals"); attrib != nullptr)
+    {
+      auto norm_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+      auto norm = norm_list.begin();
+      for (auto it = mesh->GetVertList()->begin(); it != mesh->GetVertList()->end() && norm != norm_list.end();
+           it++)
+      {
+        it->normal.x = *norm++;
+        it->normal.y = *norm++;
+        it->normal.z = *norm++;
+        it->normal.w = 0.0f;
+      }
+    }
+
+    if (auto attrib = buffer.child("texCoords"); attrib != nullptr)
+    {
+      auto texture_coords_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+      auto text = texture_coords_list.begin();
+      for (auto it = mesh->GetVertList()->begin();
+           it != mesh->GetVertList()->end() && text != texture_coords_list.end();
+           it++)
+      {
+        it->texture_coordinates.x = *text++;
+        it->texture_coordinates.y = *text++;
+      }
     }
 
     for (auto index: utils::SplitString<unsigned int>(buffer.child("indices").text().as_string(), ','))
     {
       mesh->AddIndex(index);
     }
+
     mesh->SetMaterial(material);
 
     AddMesh(mesh);

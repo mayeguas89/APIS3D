@@ -8,10 +8,10 @@ Material::Material()
 
 Material::~Material()
 {
-  // if (render_program_)
-  //   delete render_program_;
-  // if (texture_)
-  //   delete texture_;
+  if (render_program_)
+    delete render_program_;
+  if (texture_)
+    delete texture_;
 }
 
 Texture* Material::GetTexture()

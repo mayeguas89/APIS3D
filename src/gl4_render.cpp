@@ -102,8 +102,11 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 
       mesh->GetMaterial()->Prepare();
 
-      glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, mesh->GetMaterial()->GetTexture()->GetTextureId());
+      if (auto* texture = mesh->GetMaterial()->GetTexture(); texture)
+      {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture->GetTextureId());
+      }
 
       glDrawElements(GL_TRIANGLES,
                      static_cast<GLsizei>(mesh->GetVertIndexesList()->size()),
