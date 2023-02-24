@@ -44,10 +44,12 @@ void Object3D::LoadDataFromFile(const std::string& filename)
       }
     }
 
+    material->SetColor(material_color);
+
     // Shininess
     if (auto attrib = buffer.child("material").child("shininess"); attrib != nullptr)
     {
-      shininess_ = attrib.text().as_int();
+      material->SetShininess(attrib.text().as_int());
     }
 
     // Usamos los shaders de vertices y de los fragmentos

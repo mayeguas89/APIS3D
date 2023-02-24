@@ -40,13 +40,37 @@ void GLSLShader::UseProgram()
   glUseProgram(program_id_);
 }
 
-void GLSLShader::SetInt(const std::string& name, int value) {}
+void GLSLShader::SetInt(const std::string& name, int value)
+{
+  if (variable_list_.find(name) != variable_list_.end())
+  {
+    glUniform1i(variable_list_[name], value);
+  }
+}
 
-void GLSLShader::SetFloat(const std::string& name, int value) {}
+void GLSLShader::SetFloat(const std::string& name, int value)
+{
+  if (variable_list_.find(name) != variable_list_.end())
+  {
+    glUniform1f(variable_list_[name], value);
+  }
+}
 
-void GLSLShader::SetVec3(const std::string& name, const glm::vec3& value) {}
+void GLSLShader::SetVec3(const std::string& name, const glm::vec3& value)
+{
+  if (variable_list_.find(name) != variable_list_.end())
+  {
+    glUniform3fv(variable_list_[name], 1, glm::value_ptr(value));
+  }
+}
 
-void GLSLShader::SetVec4(const std::string& name, const glm::vec4& value) {}
+void GLSLShader::SetVec4(const std::string& name, const glm::vec4& value)
+{
+  if (variable_list_.find(name) != variable_list_.end())
+  {
+    glUniform4fv(variable_list_[name], 1, glm::value_ptr(value));
+  }
+}
 
 void GLSLShader::SetMat4(const std::string& name, const glm::mat4& value)
 {
@@ -71,6 +95,20 @@ void GLSLShader::SetVariables()
                           sizeof(Vertex),
                           (void*)(sizeof(glm::vec4)));
   }
+
+  if (variable_list_.find("vNormal") != variable_list_.end())
+  {
+    glEnableVertexAttribArray(variable_list_["vNormal"]);
+    glVertexAttribPointer(variable_list_["vNormal"],
+                          4,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          (void*)(2 * sizeof(glm::vec4)));
+  }
+
+  // ---------------------Texture----------------------
+
   if (variable_list_.find("vTexture") != variable_list_.end())
   {
     glEnableVertexAttribArray(variable_list_["vTexture"]);
@@ -79,15 +117,30 @@ void GLSLShader::SetVariables()
                           GL_FLOAT,
                           GL_FALSE,
                           sizeof(Vertex),
-                          (void*)(2 * sizeof(glm::vec4)));
+                          (void*)(3 * sizeof(glm::vec4)));
   }
 
-  glUniform1i(variable_list_["textUnit"], 0);
+  glUniform3fv(variable_list_["ambient"], 1, glm::value_ptr(System::GetAmbient()));
+
+  // ---------------------Lights----------------------
+  auto lights = System::GetLights();
+  for (auto light: lights)
+  {
+    glUniform4fv(variable_list_["lightDirection"], 1, glm::value_ptr(light->GetDirection()));
+    glUniform3fv(variable_list_["lightColor"], 1, glm::value_ptr(light->GetColor()));
+  }
 
   Camera* camera = System::GetCamera();
+  glUniform3fv(variable_list_["cameraPosition"], 1, glm::value_ptr(glm::vec3(camera->GetPosition())));
+
+  // ---------------------Camera----------------------
+  auto model_matrix = *System::GetModelMatrix();
   auto mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix() * (*System::GetModelMatrix());
 
+  glUniform1i(variable_list_["computeLight"], System::isCalculateLight());
+
   glUniformMatrix4fv(variable_list_["MVP"], 1, GL_FALSE, &mvp[0][0]);
+  glUniformMatrix4fv(variable_list_["M"], 1, GL_FALSE, &(*System::GetModelMatrix())[0][0]);
 }
 
 bool GLSLShader::HasErrors(std::string& error_message)

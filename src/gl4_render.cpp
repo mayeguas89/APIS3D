@@ -68,7 +68,7 @@ void GL4Render::RemoveObject(Object* object) {}
 void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 {
   static float rotation[] = {0.0, 0.0, 0.0};
-  static float translation[] = {0.0, 0.0};
+  static float translation[] = {0.0, 0.0, 0.0};
   static float camera_speed = 0.1f;
   static float near_plane = 0.1f;
   static float far_plane = 100.f;
@@ -88,12 +88,12 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
     // IMGUI
     glm::vec4 rotation_vec(rotation[0], rotation[1], rotation[2], 0.f);
     objects->at(i)->SetRotation(rotation_vec);
-    glm::vec4 position_vec(translation[0], translation[1], 0.f, 0.f);
+    glm::vec4 position_vec(translation[0], translation[1], translation[2], 0.f);
     objects->at(i)->SetPosition(position_vec);
 
     // OPENGL
     System::SetModelMatrix(&(objects->at(i)->GetModelMatrix()));
-    for (auto* mesh: objects->at(i)->GetMeshes())
+    for (auto mesh: objects->at(i)->GetMeshes())
     {
       auto buffer = buffer_object_list_[mesh->GetMeshId()];
       glBindVertexArray(buffer.bo_id);
@@ -102,7 +102,7 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 
       mesh->GetMaterial()->Prepare();
 
-      if (auto* texture = mesh->GetMaterial()->GetTexture(); texture)
+      if (auto texture = mesh->GetMaterial()->GetTexture(); texture)
       {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture->GetTextureId());
@@ -122,7 +122,7 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   ImGui::SliderFloat("NearPlane", &near_plane, 0.001f, 10.0f);
   ImGui::SliderFloat("FarPlane", &far_plane, 100.0f, 200.f);
   ImGui::SliderFloat3("Rotation", rotation, 0, 2 * glm::pi<float>());
-  ImGui::SliderFloat2("Position", translation, -1.0, 1.0);
+  ImGui::SliderFloat3("Position", translation, -1.0, 1.0);
   ImGui::ColorEdit3("Clear color", (float*)&clear_color);
   ImGui::End();
 

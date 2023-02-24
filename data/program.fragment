@@ -1,13 +1,52 @@
 #version 330
 out vec4 FragColor;
 
+// Color de la luz ambiente
+uniform vec3 ambient;
+
+// Brillo del material
+uniform int shininess;
+
+// Direccion de la luz
+uniform vec4 lightDirection;
+
+// Color de la luz
+uniform vec3 lightColor;
+
+// CameraPosition
+uniform vec3 cameraPosition;
+
+// Variable que controla si pintar o no la luz
+uniform int computeLight;
+
 in vec4 fColor;
 in vec2 fTextCoord;
-
-uniform sampler2D texUnit;
+in vec4 fNormal;
+in vec4 fPos;
 
 void main() {
-    FragColor = texture2D(texUnit, fTextCoord);
-    //FragColor = fColor;
-    //gl_FragColor = fColor;
+
+    if (computeLight == 1)
+    {
+        vec3 L = normalize(lightDirection.xyz);
+        vec3 N = normalize(fNormal.xyz);
+
+        // Componente difusa
+        float diffuse = max(dot(L, N), 0.f);
+
+        // Componente especular
+        // Vector reflexion de la luz (espejo)
+        vec3 R = normalize(reflect(L, N));
+
+        vec3 EYE = normalize(fPos.xyz - cameraPosition);
+        float specular = pow(max(dot(R, EYE), 0.f), shininess);
+
+        vec3 light = (ambient + diffuse) * lightColor + specular;
+        FragColor = vec4(light, 1.0f) * fColor;
+    }
+    else
+    {
+        FragColor = fColor;
+    }
+
 }

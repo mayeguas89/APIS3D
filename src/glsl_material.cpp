@@ -52,5 +52,8 @@ void GLSLMaterial::Prepare()
   render_program_->UseProgram();
   // De momento sabemos las variables harcodeadas
   // Luego podemos obtener de alguna forma el nombre de las variables
+
+  render_program_->SetInt("shininess", shininess_);
+
   render_program_->SetVariables();
 }

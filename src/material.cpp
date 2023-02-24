@@ -23,3 +23,19 @@ void Material::SetTexture(Texture* texture)
 {
   texture_ = texture;
 }
+const glm::vec3& Material::GetColor() const
+{
+  return color_;
+}
+uint8_t Material::GetShininess() const
+{
+  return shininess_;
+}
+void Material::SetColor(const glm::vec3& color)
+{
+  color_ = color;
+}
+void Material::SetShininess(uint8_t shininess)
+{
+  shininess_ = shininess;
+}

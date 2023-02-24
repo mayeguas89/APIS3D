@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "common.h"
 #include "input_manager.h"
+#include "light.h"
 #include "object.h"
 #include "render.h"
 
@@ -14,6 +15,11 @@ public:
   ~System();
 
   void AddObject(Object* object);
+  static void AddLight(Light* light);
+  //  void DeleteLight(Light* light);
+  static const std::vector<Light*>& GetLights();
+  static void SetAmbient(const glm::vec3& value);
+  static const glm::vec3& GetAmbient();
 
   void Exit();
 
@@ -43,6 +49,15 @@ private:
 
   static Render* render_;
   static InputManager* input_manager_;
-  std::vector<Object*>* objects_;
+  static std::vector<Object*>* objects_;
+  static std::vector<Light*> lights_;
+  static glm::vec3 ambient_;
+  inline static bool calculate_light_ = false;
+
+public:
+  static bool isCalculateLight();
+  static void setCalculateLight(bool calculateLight);
+
+private:
   bool end_;
 };

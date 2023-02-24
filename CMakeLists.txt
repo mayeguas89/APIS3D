@@ -13,6 +13,7 @@ link_directories(
 )
 
 add_executable(APIS3D 
+    src/APIS3D.cpp
     src/asian_town.cpp
     src/camera.cpp
     src/camera_keyboard.cpp
@@ -25,7 +26,7 @@ add_executable(APIS3D
     src/glfw_input_manager.cpp
     src/glsl_material.cpp
     src/glsl_shader.cpp
-    src/APIS3D.cpp
+    src/light.cpp
     src/material.cpp
     src/mesh3d.cpp
     src/object.cpp

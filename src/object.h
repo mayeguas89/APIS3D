@@ -19,9 +19,6 @@ public:
 
   std::vector<Mesh3D*>& GetMeshes();
 
-  int GetShininess();
-  void SetShininess(int value);
-
   void AddMesh(Mesh3D* mesh);
 
   virtual void LoadDataFromFile(const std::string& filename) = 0;
@@ -30,5 +27,4 @@ public:
 protected:
   std::vector<Mesh3D*> meshes_;
   Type type_;
-  int shininess_ = 0;
 };

@@ -11,6 +11,9 @@ Render* System::render_ = nullptr;
 InputManager* System::input_manager_ = nullptr;
 float System::far_plane_ = 100.f;
 float System::near_plane_ = 0.1f;
+std::vector<Object*>* System::objects_ = nullptr;
+std::vector<Light*> System::lights_;
+glm::vec3 System::ambient_ = glm::vec3(1.f);
 
 System::System()
 {
@@ -143,4 +146,31 @@ void System::Init()
 
   render_ = FactoryEngine::GetNewRender();
   render_->Init();
+}
+
+void System::SetAmbient(const glm::vec3& value)
+{
+  ambient_ = value;
+}
+
+void System::AddLight(Light* light)
+{
+  lights_.push_back(light);
+}
+
+const std::vector<Light*>& System::GetLights()
+{
+  return lights_;
+}
+const glm::vec3& System::GetAmbient()
+{
+  return ambient_;
+}
+bool System::isCalculateLight()
+{
+  return calculate_light_;
+}
+void System::setCalculateLight(bool calculateLight)
+{
+  calculate_light_ = calculateLight;
 }

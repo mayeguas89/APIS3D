@@ -23,7 +23,15 @@ public:
    */
   virtual void Prepare() = 0;
 
+  void SetColor(const glm::vec3& color);
+  void SetShininess(uint8_t shininess);
+
+  const glm::vec3& GetColor() const;
+  uint8_t GetShininess() const;
+
 protected:
   RenderProgram* render_program_;
   Texture* texture_;
+  glm::vec3 color_;
+  uint8_t shininess_;
 };

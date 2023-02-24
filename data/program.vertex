@@ -4,16 +4,23 @@
 //layout (location = 2) in vec2 vTexture;
 
 uniform mat4 MVP;
+uniform mat4 M;
 
 attribute vec4 vPos;
 attribute vec4 vColor;
+attribute vec4 vNormal;
 attribute vec2 vTexture;
 
 out vec4 fColor;
+out vec4 fNormal;
+out vec4 fPos;
 out vec2 fTextCoord;
 
 void main() {
     gl_Position = MVP * vPos;
     fColor = vColor;
     fTextCoord = vTexture;
+
+    fNormal = inverse(transpose(M))*vNormal;
+    fPos = M * vPos;
 }
