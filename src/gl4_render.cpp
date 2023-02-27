@@ -1,6 +1,5 @@
 #include "gl4_render.h"
 
-#include "common.h"
 #include "system.h"
 #include "vertex.h"
 
@@ -72,7 +71,7 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   static float camera_speed = 0.1f;
   static float near_plane = 0.1f;
   static float far_plane = 100.f;
-  static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+  static ImVec4 clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
 
   // Start the Dear ImGui frame
   ImGui_ImplOpenGL3_NewFrame();
@@ -83,13 +82,13 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   clear_color_ = glm::vec4(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
   System::SetFarPlane(far_plane);
   System::SetNearPlane(near_plane);
-  for (auto i = 0; i < objects->size(); i++)
+  for (size_t i = 0; i < objects->size(); i++)
   {
     // IMGUI
-    glm::vec4 rotation_vec(rotation[0], rotation[1], rotation[2], 0.f);
-    objects->at(i)->SetRotation(rotation_vec);
-    glm::vec4 position_vec(translation[0], translation[1], translation[2], 0.f);
-    objects->at(i)->SetPosition(position_vec);
+    // glm::vec4 rotation_vec(rotation[0], rotation[1], rotation[2], 0.f);
+    // objects->at(i)->SetRotation(rotation_vec);
+    //    glm::vec4 position_vec(translation[0], translation[1], translation[2], 0.f);
+    //    objects->at(i)->SetPosition(position_vec);
 
     // OPENGL
     System::SetModelMatrix(&(objects->at(i)->GetModelMatrix()));
@@ -101,12 +100,6 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
 
       mesh->GetMaterial()->Prepare();
-
-      if (auto texture = mesh->GetMaterial()->GetTexture(); texture)
-      {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture->GetTextureId());
-      }
 
       glDrawElements(GL_TRIANGLES,
                      static_cast<GLsizei>(mesh->GetVertIndexesList()->size()),

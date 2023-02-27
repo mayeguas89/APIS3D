@@ -13,8 +13,10 @@ class GL4Render: public GL1Render
   {
     // Identificador del bo del grupo : el grupo es vertice e indice
     GLuint bo_id;
+
     // Buffer objects para los vertices
     GLuint vbo;
+
     // Buffer objects para los indices de los vertices
     GLuint idxbo;
   };

@@ -1,17 +1,28 @@
 #version 330
 out vec4 FragColor;
 
+#define MAX_NUMBER_OF_LIGHTS 8
+
+uniform sampler2D textUnit;
+
+struct LightSource
+{
+    int Type;
+    vec3 Position;
+    vec4 Direction;
+    float Attenuation;
+    vec3 Color;
+    // Para spotLights cos(phi)
+    float Cutoff;
+};
+
+uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
+
 // Color de la luz ambiente
 uniform vec3 ambient;
 
 // Brillo del material
 uniform int shininess;
-
-// Direccion de la luz
-uniform vec4 lightDirection;
-
-// Color de la luz
-uniform vec3 lightColor;
 
 // CameraPosition
 uniform vec3 cameraPosition;
@@ -28,25 +39,61 @@ void main() {
 
     if (computeLight == 1)
     {
-        vec3 L = normalize(lightDirection.xyz);
-        vec3 N = normalize(fNormal.xyz);
+        vec3 totalLight = vec3(0.f);
+        for (int i=0;i<MAX_NUMBER_OF_LIGHTS;i++)
+        {
+            vec3 L = vec3(1.f);
 
-        // Componente difusa
-        float diffuse = max(dot(L, N), 0.f);
+            // Directional
+            if (Lights[i].Type == 0)
+            {
+                L = normalize(Lights[i].Direction.xyz);
+            }
+            // Point light
+            else if (Lights[i].Type == 1)
+            {
+                L = normalize(Lights[i].Position-fPos.xyz);
+            }
+            // Spot light
+            else if (Lights[i].Type == 2)
+            {
+                // Vector pointing from light to framgent position
+                L = normalize(Lights[i].Position-fPos.xyz);
+                // Calculate the cos of the angle between the light direction and L
+                float cos_theta = max(dot(normalize(Lights[i].Direction.xyz), L), 0.0);
+                // If the fragment does not received light from the focal light, give only ambient
+                if (cos_theta < Lights[i].Cutoff)
+                {
+                    vec3 light = ambient * Lights[i].Color;
+                    totalLight += light;
+                    continue;
+                }
+            }
 
-        // Componente especular
-        // Vector reflexion de la luz (espejo)
-        vec3 R = normalize(reflect(L, N));
+            vec3 N = normalize(fNormal.xyz);
 
-        vec3 EYE = normalize(fPos.xyz - cameraPosition);
-        float specular = pow(max(dot(R, EYE), 0.f), shininess);
+            // Componente difusa
+            float diffuse = max(dot(L, N), 0.f);
 
-        vec3 light = (ambient + diffuse) * lightColor + specular;
-        FragColor = vec4(light, 1.0f) * fColor;
+            // Componente especular
+            // Vector reflexion de la luz (espejo)
+            vec3 R = normalize(reflect(L, N));
+
+            vec3 EYE = normalize(fPos.xyz - cameraPosition);
+            float specular = pow(max(dot(R, EYE), 0.f), shininess);
+
+            vec3 light = ambient + diffuse + specular;
+            light *= Lights[i].Attenuation;
+            light *= Lights[i].Color;
+            totalLight += light;
+        }
+        FragColor = vec4(totalLight, 1.0f) * fColor;
+        //FragColor = vec4(totalLight, 1.0f) * texture2D(textUnit, fTextCoord);
     }
     else
     {
         FragColor = fColor;
+        //FragColor = texture2D(textUnit, fTextCoord);
     }
 
 }

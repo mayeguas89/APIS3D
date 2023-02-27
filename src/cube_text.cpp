@@ -14,22 +14,19 @@ CubeText::CubeText(): Object3D()
     throw std::runtime_error("Selected backend does not support materials");
 
   auto* texture_front = FactoryEngine::GetNewTexture();
-  texture_front->Load(
-    "C:/Users/mayeg/Documents/U-TAD/Master/ApisTridimensionales/MyAPIS3D/build/Debug/data/front.png");
+  texture_front->Load("data/front.png");
   texture_front->Bind();
 
   auto* texture_top = FactoryEngine::GetNewTexture();
-  texture_top->Load(
-    "C:/Users/mayeg/Documents/U-TAD/Master/ApisTridimensionales/MyAPIS3D/build/Debug/data/top.png");
+  texture_top->Load("data/top.png");
   texture_top->Bind();
 
   std::unordered_map<std::string, RenderType> program_map;
-  program_map
-    ["C:/Users/mayeg/Documents/U-TAD/Master/ApisTridimensionales/MyAPIS3D/build/Debug/data/program.vertex"] =
-      RenderType::Vertex;
-  program_map
-    ["C:/Users/mayeg/Documents/U-TAD/Master/ApisTridimensionales/MyAPIS3D/build/Debug/data/program.fragment"] =
-      RenderType::Fragment;
+  program_map["data/program.vertex"] = RenderType::Vertex;
+  program_map["data/program.fragment"] = RenderType::Fragment;
+
+  material_front->SetShininess(255);
+  material_top->SetShininess(255);
 
   material_front->LoadPrograms(program_map);
   material_front->SetTexture(texture_front);

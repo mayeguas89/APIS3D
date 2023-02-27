@@ -79,8 +79,8 @@ void GLFWInputManager::MouseManager(GLFWwindow* window, double x_pos, double y_p
   static float yaw = -90.f;
   static float pitch = 0.f;
 
-  yaw += (pos_x_ - old_pos_x_) * kMouseSensibility;
-  pitch += (old_pos_y_ - pos_y_) * kMouseSensibility;
+  yaw += (float)((pos_x_ - old_pos_x_) * kMouseSensibility);
+  pitch += (float)((old_pos_y_ - pos_y_) * kMouseSensibility);
 
   if (pitch > 89.0f)
     pitch = 89.0f;

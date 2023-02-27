@@ -36,7 +36,7 @@ add_executable(APIS3D
     src/texture.cpp
     src/time_manager.cpp
     src/triangle_rot.cpp
-)
+        src/cube_light.cpp src/cube_light.h src/orbital_light.cpp src/orbital_light.h src/directional_light.cpp src/directional_light.h src/flash_light.cpp src/flash_light.h)
 
 target_include_directories(
     APIS3D 

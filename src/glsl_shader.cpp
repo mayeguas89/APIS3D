@@ -48,7 +48,7 @@ void GLSLShader::SetInt(const std::string& name, int value)
   }
 }
 
-void GLSLShader::SetFloat(const std::string& name, int value)
+void GLSLShader::SetFloat(const std::string& name, float value)
 {
   if (variable_list_.find(name) != variable_list_.end())
   {
@@ -107,8 +107,6 @@ void GLSLShader::SetVariables()
                           (void*)(2 * sizeof(glm::vec4)));
   }
 
-  // ---------------------Texture----------------------
-
   if (variable_list_.find("vTexture") != variable_list_.end())
   {
     glEnableVertexAttribArray(variable_list_["vTexture"]);
@@ -120,27 +118,83 @@ void GLSLShader::SetVariables()
                           (void*)(3 * sizeof(glm::vec4)));
   }
 
-  glUniform3fv(variable_list_["ambient"], 1, glm::value_ptr(System::GetAmbient()));
+  if (variable_list_.find("textUnit") != variable_list_.end())
+  {
+    glUniform1i(variable_list_["textUnit"], 0);
+  }
+
+  // ---------------------Ambient Lights----------------------
+  if (variable_list_.find("ambient") != variable_list_.end())
+  {
+    glUniform3fv(variable_list_["ambient"], 1, glm::value_ptr(System::GetAmbient()));
+  }
+
+  // ---------------------Camera----------------------
+  Camera* camera = System::GetCamera();
+  if (variable_list_.find("cameraPosition") != variable_list_.end())
+  {
+    glUniform3fv(variable_list_["cameraPosition"], 1, glm::value_ptr(glm::vec3(camera->GetPosition())));
+  }
 
   // ---------------------Lights----------------------
   auto lights = System::GetLights();
-  for (auto light: lights)
+  if (variable_list_.find("computeLight") != variable_list_.end())
   {
-    glUniform4fv(variable_list_["lightDirection"], 1, glm::value_ptr(light->GetDirection()));
-    glUniform3fv(variable_list_["lightColor"], 1, glm::value_ptr(light->GetColor()));
+    glUniform1i(variable_list_["computeLight"], System::GetCalculateLight());
   }
 
-  Camera* camera = System::GetCamera();
-  glUniform3fv(variable_list_["cameraPosition"], 1, glm::value_ptr(glm::vec3(camera->GetPosition())));
+  for (auto i = 0; i < lights.size(); i++)
+  {
+    auto light = lights.at(i);
+    std::string index = std::to_string(i);
 
-  // ---------------------Camera----------------------
+    if (auto key = "Lights[" + index + "].Type"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1i(variable_list_[key], light->GetType());
+    }
+
+    if (auto key = "Lights[" + index + "].Attenuation"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], light->GetLinearAttenuation());
+    }
+
+    if (auto key = "Lights[" + index + "].Cutoff"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], light->GetCutOff());
+    }
+
+    if (auto key = "Lights[" + index + "].Direction"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform4fv(variable_list_[key], 1, glm::value_ptr(light->GetDirection()));
+    }
+
+    if (auto key = "Lights[" + index + "].Color"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform3fv(variable_list_[key], 1, glm::value_ptr(light->GetColor()));
+    }
+
+    if (auto key = "Lights[" + index + "].Position"; variable_list_.find(key) != variable_list_.end())
+    {
+      auto light_mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix() * light->GetModelMatrix();
+      auto light_position = light_mvp * light->GetPosition();
+      glUniform3fv(variable_list_[key], 1, glm::value_ptr(light_position));
+    }
+  }
+
+  // ---------------------Object----------------------
+
   auto model_matrix = *System::GetModelMatrix();
   auto mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix() * (*System::GetModelMatrix());
 
-  glUniform1i(variable_list_["computeLight"], System::isCalculateLight());
+  if (variable_list_.find("MVP") != variable_list_.end())
+  {
+    glUniformMatrix4fv(variable_list_["MVP"], 1, GL_FALSE, &mvp[0][0]);
+  }
 
-  glUniformMatrix4fv(variable_list_["MVP"], 1, GL_FALSE, &mvp[0][0]);
-  glUniformMatrix4fv(variable_list_["M"], 1, GL_FALSE, &(*System::GetModelMatrix())[0][0]);
+  if (variable_list_.find("M") != variable_list_.end())
+  {
+    glUniformMatrix4fv(variable_list_["M"], 1, GL_FALSE, &(*System::GetModelMatrix())[0][0]);
+  }
 }
 
 bool GLSLShader::HasErrors(std::string& error_message)

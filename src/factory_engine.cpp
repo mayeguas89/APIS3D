@@ -88,7 +88,9 @@ InputManager* FactoryEngine::GetNewInputManager()
   {
     case FactoryEngine::InputBackend::GLFWInputManager:
     {
-      return new GLFWInputManager();
+      InputManager* inputManager = new GLFWInputManager();
+      inputManager->Init();
+      return inputManager;
       break;
     }
 

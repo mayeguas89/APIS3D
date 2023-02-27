@@ -46,7 +46,7 @@ void CameraKeyboard::Update(float delta_time)
     // //  look_at_ = glm::rotate(glm::mat4(1.f), rotation_.y, glm::vec3(0.f, 1.f, 0.f)) * glm::vec4(radius_, 1.f);
     // look_at_ += glm::vec3(position_);
     look_at_ = glm::normalize(System::GetInputManager()->GetMouseRotationDirection());
-    angle_ = glm::radians(System::GetInputManager()->GetYScroll());
+    angle_ = (float)(glm::radians(System::GetInputManager()->GetYScroll()));
   }
   ComputeProjectionMatrix(projection_type_);
   ComputeViewMatrix();

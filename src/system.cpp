@@ -1,7 +1,5 @@
 #include "system.h"
 
-#define GLAD_ONLY_HEADER
-#include "common.h"
 #include "factory_engine.h"
 #include "time_manager.h"
 
@@ -32,6 +30,8 @@ System::~System()
 
 void System::AddObject(Object* object)
 {
+  if (object == nullptr)
+    return;
   render_->SetupObject(object);
   objects_->push_back(object);
 }
@@ -56,6 +56,11 @@ void System::MainLoop()
 
     // Actualizar la camara
     camera_->Update(TimeManager::deltaTime);
+
+    for(auto light: lights_)
+    {
+      light->Update(TimeManager::deltaTime);
+    }
 
     // Actualiza Objetos
     for (Object* object: *objects_)
@@ -162,15 +167,18 @@ const std::vector<Light*>& System::GetLights()
 {
   return lights_;
 }
+
 const glm::vec3& System::GetAmbient()
 {
   return ambient_;
 }
-bool System::isCalculateLight()
+
+bool System::GetCalculateLight()
 {
   return calculate_light_;
 }
-void System::setCalculateLight(bool calculateLight)
+
+void System::SetCalculateLight(bool calculateLight)
 {
   calculate_light_ = calculateLight;
 }

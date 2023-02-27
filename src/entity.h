@@ -19,13 +19,16 @@ public:
 
   glm::mat4& GetModelMatrix();
 
+  void SetModelMatrix(const glm::mat4& matrix);
+
   virtual void Update(float delta_time) = 0;
+
+  void SetScaling(const glm::vec4& scaling);
 
 protected:
   glm::vec4 position_;
   glm::vec4 rotation_;
   glm::vec4 scaling_;
-
   // Matriz modelo
   glm::mat4 model_mtx_;
 };

@@ -102,7 +102,6 @@ void GL1Render::SetScrollCallback(void (*callback)(GLFWwindow* window, double x_
 void GL1Render::Clear()
 {
   glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
-  // glClear(GL_COLOR_BUFFER_BIT);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

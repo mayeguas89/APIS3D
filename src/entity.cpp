@@ -36,3 +36,13 @@ glm::mat4& Entity::GetModelMatrix()
 {
   return model_mtx_;
 }
+
+void Entity::SetModelMatrix(const glm::mat4& matrix)
+{
+  model_mtx_ = matrix;
+}
+
+void Entity::SetScaling(const glm::vec4& scaling)
+{
+  scaling_ = scaling;
+}

@@ -1,5 +1,4 @@
 #pragma once
-
 #define GLAD_ONLY_HEADER
 #include "camera.h"
 #include "common.h"
@@ -38,6 +37,8 @@ public:
   static void SetFarPlane(float value);
   static void WindowResizeCallback(GLFWwindow* window, int width, int height);
 
+    static bool GetCalculateLight();
+    static void SetCalculateLight(bool calculateLight);
 private:
   void Init();
   static float near_plane_;
@@ -53,10 +54,6 @@ private:
   static std::vector<Light*> lights_;
   static glm::vec3 ambient_;
   inline static bool calculate_light_ = false;
-
-public:
-  static bool isCalculateLight();
-  static void setCalculateLight(bool calculateLight);
 
 private:
   bool end_;
