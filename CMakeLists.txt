@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG> CACHE STRING "")
 
+
+set(ASSIMP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/externalLibs/assimp/include)
+find_library(ASSIMP_LIBRARY NAMES assimp-vc142-mtd PATHS ${CMAKE_SOURCE_DIR}/externalLibs/assimp/lib/Debug)
+
 add_subdirectory("externalLibs")
 
 link_directories(
@@ -46,6 +50,7 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/externalLibs/glfw/inc
     ${CMAKE_SOURCE_DIR}/externalLibs/glm/inc
     ${CMAKE_SOURCE_DIR}/externalLibs/stb
+    ${CMAKE_SOURCE_DIR}/externalLibs/assimp/include
 )
 
 target_link_libraries(
@@ -54,8 +59,12 @@ target_link_libraries(
   glfw3
   imgui
   pugixml
+  ${ASSIMP_LIBRARY}
 )
 
 add_custom_command(TARGET APIS3D POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data.
+)
+add_custom_command(TARGET APIS3D POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/externalLibs/assimp/bin/Debug/assimp-vc142-mtd.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )

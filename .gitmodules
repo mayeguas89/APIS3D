@@ -7,3 +7,6 @@
 [submodule "externalLibs/pugixml"]
 	path = externalLibs/pugixml
 	url = https://github.com/zeux/pugixml
+[submodule "externalLibs/assimp"]
+	path = externalLibs/assimp
+	url = https://github.com/assimp/assimp.git

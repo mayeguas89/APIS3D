@@ -15,8 +15,8 @@ int main(int argc, char const* argv[])
   System system;
 
   AsianTown asian_town;
-  asian_town.LoadDataFromFile("data/bunny.msh");
-  asian_town.SetScaling(glm::vec4(1.5f, 1.5f, 1.5f, 1.f));
+  asian_town.LoadDataFromFile("data/backpack/backpack.obj");
+  // asian_town.SetScaling(glm::vec4(1.5f, 1.5f, 1.5f, 1.f));
 
   // CubeText asian_town;
 
