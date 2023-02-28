@@ -27,9 +27,11 @@ private:
   void CameraMenu();
   void ObjectsMenu();
   void LightsMenu();
+  void AddMenu();
 
   struct ObjectData
   {
+    bool enabled = true;
     float translation[4] = {0.0, 0.0, 0.0, 0.0};
     float rotation[4] = {0.0, 0.0, 0.0, 0.0};
     float scale[4] = {0.0, 0.0, 0.0, 0.0};
@@ -37,9 +39,22 @@ private:
 
   struct LightData
   {
+    bool enabled = true;
     float position[4] = {0.0, 0.0, 0.0, 0.0};
-    float direction[4] = {0.0, 0.0, 0.0, 0.0};
+    float rotation[4] = {0.0, 0.0, 0.0, 0.0};
     ImVec4 color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    float cut_off_angle = 12.5f;
+    float linear_attenuation = 0.f;
+    float ambient_contribution = 1.f;
+    float difuse_contribution = 1.f;
+    float specular_contribution = 1.f;
+  };
+
+  struct AmbientLightData
+  {
+    bool enabled = true;
+    ImVec4 color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    float intensity = 0.f;
   };
 
   std::vector<ObjectData> objects_data_;
@@ -47,4 +62,6 @@ private:
 
   std::vector<Object*> objects_;
   std::vector<Light*> lights_;
+
+  AmbientLightData ambient_light_data_;
 };

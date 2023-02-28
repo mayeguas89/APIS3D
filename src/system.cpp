@@ -174,6 +174,16 @@ const glm::vec3& System::GetAmbient()
   return ambient_;
 }
 
+void System::SetAmbientIntensity(float value)
+{
+  ambient_intensity_ = value;
+}
+
+float System::GetAmbientIntensity()
+{
+  return ambient_intensity_;
+}
+
 bool System::GetCalculateLight()
 {
   return calculate_light_;

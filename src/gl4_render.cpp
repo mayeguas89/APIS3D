@@ -52,8 +52,16 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 
   for (size_t i = 0; i < objects->size(); i++)
   {
-    // OPENGL
     System::SetModelMatrix(&(objects->at(i)->GetModelMatrix()));
+    if (!objects->at(i)->IsEnabled())
+    {
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+      glBlendFunc(GL_ONE, GL_ZERO);
+    }
+
     for (auto mesh: objects->at(i)->GetMeshes())
     {
       auto buffer = buffer_object_list_[mesh->GetMeshId()];

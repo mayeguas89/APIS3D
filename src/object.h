@@ -24,6 +24,19 @@ public:
   virtual void LoadDataFromFile(const std::string& filename) = 0;
   virtual void Update(float delta_time) = 0;
 
+  void SetEnabled(bool value)
+  {
+    Entity::SetEnabled(value);
+    float alpha = value ? 1.0f : 0.0f;
+    for (auto mesh: meshes_)
+    {
+      for (auto& v: *(mesh->GetVertList()))
+      {
+        v.color = glm::vec4(glm::vec3(v.color), alpha);
+      }
+    }
+  }
+
 protected:
   std::vector<Mesh3D*> meshes_;
   Type type_;

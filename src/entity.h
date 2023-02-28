@@ -25,10 +25,21 @@ public:
 
   void SetScaling(const glm::vec4& scaling);
 
+  void SetEnabled(bool value)
+  {
+    enabled_ = value;
+  }
+
+  bool IsEnabled()
+  {
+    return enabled_;
+  }
+
 protected:
   glm::vec4 position_;
   glm::vec4 rotation_;
   glm::vec4 scaling_;
   // Matriz modelo
   glm::mat4 model_mtx_;
+  bool enabled_ = true;
 };

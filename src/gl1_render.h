@@ -27,5 +27,5 @@ public:
 
 protected:
   GLFWwindow* window_;
-  glm::vec4 clear_color_;
+  glm::vec4 clear_color_ = {0.2, 0.2, 0.2, 1.0f};
 };

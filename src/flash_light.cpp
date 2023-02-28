@@ -2,8 +2,20 @@
 FlashLight::FlashLight(const glm::vec3& position,
                        const glm::vec3& direction,
                        const glm::vec3& color,
-                       float cut_angle_degrees):
-  Light(Light::Type::kFocal, position, direction, color, cut_angle_degrees)
+                       float cutoff_angle_degrees,
+                       float linear_attenuation,
+                       float ambient_contribution,
+                       float difuse_contribution,
+                       float specular_contribution):
+  Light(Light::Type::kFocal,
+        position,
+        direction,
+        color,
+        cutoff_angle_degrees,
+        linear_attenuation,
+        ambient_contribution,
+        difuse_contribution,
+        specular_contribution)
 {
   linear_attenuation_ = 1.f;
 }

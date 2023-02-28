@@ -17,6 +17,7 @@ int main(int argc, char const* argv[])
   AsianTown asian_town;
   asian_town.LoadDataFromFile("data/bunny.msh");
   asian_town.SetScaling(glm::vec4(1.5f, 1.5f, 1.5f, 1.f));
+  asian_town.SetRotation(glm::vec4(glm::half_pi<float>(), 0.f, 0.f, 0.f));
 
   // CubeText asian_town;
 
@@ -24,22 +25,41 @@ int main(int argc, char const* argv[])
                                        glm::vec3(1.f, 1.f, 1.f),
                                        glm::vec3(1.f, 1.f, 1.f),
                                        glm::vec3(1.f, 1.f, 1.f),
-                                       0.f);
+                                       0.f,
+                                       1.f,
+                                       1.f,
+                                       1.f,
+                                       1.f);
   directional_light->SetLinearAttenuation(1.f);
 
   Light* point_light = new Light(Light::Type::kPoint,
                                  glm::vec3(0.f, .3f, 0.f),
                                  glm::vec3(.5f, .33f, .7f),
                                  glm::vec3(.1f, .1f, 1.f),
-                                 0.f);
+                                 0.f,
+                                 1.f,
+                                 1.f,
+                                 1.f,
+                                 1.f);
   point_light->SetLinearAttenuation(.5f);
 
-  Light* orbital_light =
-    new OrbitalLight(glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f));
+  Light* orbital_light = new OrbitalLight(glm::vec3(0.25f, 0.25f, 0.25f),
+                                          glm::vec3(1.f, 1.f, 1.f),
+                                          glm::vec3(1.f, 1.f, 1.f),
+                                          1.f,
+                                          1.f,
+                                          1.f,
+                                          1.f);
 
   orbital_light->SetLinearAttenuation(1.f);
-  Light* flash_light =
-    new FlashLight(glm::vec3(.5f, .5f, .5f), glm::vec3(-1.f, -1.f, -1.f), glm::vec3(.1f, 1.f, .1f), 60.f);
+  Light* flash_light = new FlashLight(glm::vec3(.5f, .5f, .5f),
+                                      glm::vec3(-1.f, -1.f, -1.f),
+                                      glm::vec3(.1f, 1.f, .1f),
+                                      60.f,
+                                      1.f,
+                                      1.f,
+                                      1.f,
+                                      1.f);
 
   System::SetAmbient(glm::vec3(0.2f, 0.2f, 0.2f));
   System::AddLight(directional_light);

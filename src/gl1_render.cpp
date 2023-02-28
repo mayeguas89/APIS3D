@@ -31,6 +31,7 @@ void GL1Render::Init()
   gladLoadGL(glfwGetProcAddress);
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
   // glDepthFunc(GL_LESS);
 
   // glEnable(GL_CULL_FACE);

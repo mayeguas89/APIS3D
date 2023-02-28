@@ -16,6 +16,7 @@ public:
   const glm::mat4& GetViewMatrix();
   const glm::mat4& GetProjectionMatrix();
   void SetSpeed(float speed);
+  float GetSpeed();
   virtual void ComputeProjectionMatrix(ProjectionType type) = 0;
 
 protected:

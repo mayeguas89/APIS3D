@@ -1,15 +1,23 @@
 #include "light.h"
 
-Light::Light(Light::Type light_type,
+Light::Light(Type light_type,
              const glm::vec3& position,
              const glm::vec3& direction,
              const glm::vec3& color,
-             float cut_angle_degrees):
+             float cutoff_angle_degrees,
+             float linear_attenuation,
+             float ambient_contribution,
+             float difuse_contribution,
+             float specular_contribution):
   Entity(),
   light_type_{light_type},
   color_{color},
   direction_{direction},
-  cut_off_{glm::cos(glm::radians(cut_angle_degrees))}
+  cut_off_{cutoff_angle_degrees},
+  linear_attenuation_{linear_attenuation},
+  ambient_contribution_{ambient_contribution},
+  difuse_contribution_{difuse_contribution},
+  specular_contribution_{specular_contribution}
 {
   cube_ = nullptr;
   position_ = glm::vec4(position, 1.f);
@@ -30,6 +38,15 @@ void Light::SetPosition(const glm::vec4& vect4)
   Entity::SetPosition(vect4);
   if (cube_)
     cube_->SetPosition(vect4);
+}
+
+void Light::SetRotation(const glm::vec4& vect4)
+{
+  Entity::SetRotation(vect4);
+  direction_.x = glm::cos(vect4.x) * glm::cos(vect4.y);
+  direction_.y = glm::sin(vect4.y);
+  direction_.z = glm::sin(vect4.x) * glm::cos(vect4.y);
+  direction_ = glm::normalize(direction_);
 }
 
 void Light::SetColor(const glm::vec3& color)
@@ -76,4 +93,29 @@ void Light::Update(float delta_time)
 CubeLight* Light::GetCube()
 {
   return cube_;
+}
+
+float Light::GetAmbientContribution() const
+{
+  return ambient_contribution_;
+}
+void Light::SetAmbientContribution(float ambientContribution)
+{
+  ambient_contribution_ = ambientContribution;
+}
+float Light::GetDifuseContribution() const
+{
+  return difuse_contribution_;
+}
+void Light::SetDifuseContribution(float difuseContribution)
+{
+  difuse_contribution_ = difuseContribution;
+}
+float Light::GetSpecularContribution() const
+{
+  return specular_contribution_;
+}
+void Light::SetSpecularContribution(float specularContribution)
+{
+  specular_contribution_ = specularContribution;
 }
