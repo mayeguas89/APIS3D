@@ -45,6 +45,8 @@ void GL1Render::Init()
 
 void GL1Render::SetupObject(Object* object) {}
 
+void GL1Render::SetupLight(Light* light) {}
+
 void GL1Render::RemoveObject(Object* object) {}
 
 void GL1Render::DrawObjects(const std::vector<Object*>* objects)

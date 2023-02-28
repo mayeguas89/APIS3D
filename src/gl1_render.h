@@ -12,6 +12,7 @@ public:
 
   void Init() override;
   void SetupObject(Object* object) override;
+  void SetupLight(Light* light) override;
   void RemoveObject(Object* object) override;
   void DrawObjects(const std::vector<Object*>* objects) override;
   bool IsClosed() override;

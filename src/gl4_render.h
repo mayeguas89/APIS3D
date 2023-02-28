@@ -2,7 +2,7 @@
 
 #define GLAD_ONLY_HEADER
 #include "gl1_render.h"
-
+#include "imgui_app.h"
 class GL4Render: public GL1Render
 {
   /**
@@ -27,10 +27,12 @@ public:
 
   void Init() override;
   void SetupObject(Object* object) override;
+  void SetupLight(Light* light) override;
   void RemoveObject(Object* object) override;
   void DrawObjects(const std::vector<Object*>* objects) override;
 
 private:
   // Vamos a acceder a los elementos por ids de cada objeto
   std::unordered_map<int, VBO> buffer_object_list_;
+  ImguiApp imgui_app_;
 };

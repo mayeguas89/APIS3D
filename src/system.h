@@ -37,8 +37,9 @@ public:
   static void SetFarPlane(float value);
   static void WindowResizeCallback(GLFWwindow* window, int width, int height);
 
-    static bool GetCalculateLight();
-    static void SetCalculateLight(bool calculateLight);
+  static bool GetCalculateLight();
+  static void SetCalculateLight(bool calculateLight);
+
 private:
   void Init();
   static float near_plane_;

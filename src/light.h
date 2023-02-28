@@ -18,8 +18,10 @@ public:
         const glm::vec3& direction,
         const glm::vec3& color,
         float cut_angle_degrees);
-  
+
   virtual ~Light() = default;
+
+  void SetPosition(const glm::vec4& vect4);
 
   int GetType()
   {

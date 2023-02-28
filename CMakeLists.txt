@@ -20,6 +20,7 @@ add_executable(APIS3D
     src/cube_text.cpp
     src/entity.cpp
     src/factory_engine.cpp
+    src/imgui_app.cpp
     src/gl1_render.cpp
     src/gl4_render.cpp
     src/gl_texture.cpp

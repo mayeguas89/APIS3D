@@ -33,7 +33,7 @@ void System::AddObject(Object* object)
   if (object == nullptr)
     return;
   render_->SetupObject(object);
-  objects_->push_back(object);
+  objects_->push_back(std::move(object));
 }
 
 void System::Exit()
@@ -57,7 +57,7 @@ void System::MainLoop()
     // Actualizar la camara
     camera_->Update(TimeManager::deltaTime);
 
-    for(auto light: lights_)
+    for (auto light: lights_)
     {
       light->Update(TimeManager::deltaTime);
     }
@@ -160,7 +160,8 @@ void System::SetAmbient(const glm::vec3& value)
 
 void System::AddLight(Light* light)
 {
-  lights_.push_back(light);
+  lights_.push_back(std::move(light));
+  render_->SetupLight(light);
 }
 
 const std::vector<Light*>& System::GetLights()
