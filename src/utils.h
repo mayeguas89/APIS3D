@@ -31,7 +31,9 @@ std::vector<T> SplitString(const std::string& str, char delim)
   return elems;
 }
 
-inline Material* ProcessMaterial(pugi::xml_node buffer, std::unordered_map<std::string, Texture*>& textures)
+inline Material* ProcessMaterial(pugi::xml_node buffer,
+                                 std::unordered_map<std::string, Texture*>& textures,
+                                 const std::string& directory)
 {
   glm::vec4 material_color = glm::vec4(1.f, 1.f, 1.f, 1.f);
 
@@ -106,12 +108,18 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, std::unordered_map<std::
     // Añadimos la textura al material
     auto texture_filename = buffer.child("material").child("texture").text().as_string();
     Texture* texture = nullptr;
-    // Si la textura está en nuestro mapa de texturas la añadimos
     if (textures.find(texture_filename) == textures.end())
     {
       texture = FactoryEngine::GetNewTexture();
       textures[texture_filename] = texture;
-      texture->Load(texture_filename);
+      std::string string_texture_filename{texture_filename};
+      auto texture_file =
+        string_texture_filename.substr(string_texture_filename.find_last_of('/'), string_texture_filename.back());
+      if (!texture->Load(directory + texture_file))
+      {
+        std::string error_msg = "Error reading the texture file " + directory + texture_file + "\n";
+        throw std::runtime_error(error_msg);
+      }
       texture->Bind();
     }
     texture = textures[texture_filename];

@@ -37,8 +37,12 @@ public:
   static void SetFarPlane(float value);
   static void WindowResizeCallback(GLFWwindow* window, int width, int height);
 
-    static bool GetCalculateLight();
-    static void SetCalculateLight(bool calculateLight);
+  static bool GetCalculateLight();
+  static void SetCalculateLight(bool calculateLight);
+
+  static void AddMesh(const std::string& filename, Mesh3D* mesh);
+  static const std::vector<Mesh3D*>& GetMesh(const std::string& filename);
+
 private:
   void Init();
   static float near_plane_;
@@ -54,6 +58,7 @@ private:
   static std::vector<Light*> lights_;
   static glm::vec3 ambient_;
   inline static bool calculate_light_ = false;
+  inline static std::unordered_map<std::string, std::vector<Mesh3D*>> mesh_map_;
 
 private:
   bool end_;

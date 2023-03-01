@@ -22,6 +22,7 @@ add_executable(APIS3D
     src/billboard.cpp
     src/camera.cpp
     src/camera_keyboard.cpp
+    src/column.cpp
     src/cube_light.cpp 
     src/cube_text.cpp
     src/directional_light.cpp 

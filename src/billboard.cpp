@@ -38,10 +38,18 @@ void Billboard::SetSpin(float spin)
 
 void Billboard::LoadDataFromFile(const std::string& filename)
 {
+  if (const auto meshes = System::GetMesh(filename); !meshes.empty())
+  {
+    for (auto mesh: meshes)
+      AddMesh(mesh);
+    return;
+  }
+
   std::unordered_map<std::string, Texture*> textures;
 
   if (filename.ends_with("msh"))
   {
+    auto directory = filename.substr(0, filename.find_last_of('/'));
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
 
@@ -55,8 +63,10 @@ void Billboard::LoadDataFromFile(const std::string& filename)
 
     for (pugi::xml_node buffer: buffers_node.children("buffer"))
     {
-      auto material = utils::ProcessMaterial(buffer, textures);
+      auto material = utils::ProcessMaterial(buffer, textures, directory);
       auto mesh = utils::ProcessMesh(buffer, material);
+
+      System::AddMesh(filename, mesh);
 
       AddMesh(mesh);
     }

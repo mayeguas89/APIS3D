@@ -57,7 +57,7 @@ void System::MainLoop()
     // Actualizar la camara
     camera_->Update(TimeManager::deltaTime);
 
-    for(auto light: lights_)
+    for (auto light: lights_)
     {
       light->Update(TimeManager::deltaTime);
     }
@@ -181,4 +181,19 @@ bool System::GetCalculateLight()
 void System::SetCalculateLight(bool calculateLight)
 {
   calculate_light_ = calculateLight;
+}
+
+void System::AddMesh(const std::string& filename, Mesh3D* mesh)
+{
+  if (auto it = mesh_map_.find(filename); it == mesh_map_.end())
+    mesh_map_[filename] = {{std::move(mesh)}};
+  else
+    mesh_map_[filename].push_back(std::move(mesh));
+}
+
+const std::vector<Mesh3D*>& System::GetMesh(const std::string& filename)
+{
+  if (auto it = mesh_map_.find(filename); it != mesh_map_.end())
+    return it->second;
+  return {};
 }
