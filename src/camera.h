@@ -18,6 +18,16 @@ public:
   void SetSpeed(float speed);
   virtual void ComputeProjectionMatrix(ProjectionType type) = 0;
 
+  void SetLookAt(const glm::vec3& look_at)
+  {
+    look_at_ = look_at;
+  }
+
+  const glm::vec3& GetLookAt()
+  {
+    return look_at_;
+  }
+
 protected:
   virtual void ComputeViewMatrix() = 0;
   glm::mat4 view_mtx_;

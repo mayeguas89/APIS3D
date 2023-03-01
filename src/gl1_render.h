@@ -14,6 +14,7 @@ public:
   void SetupObject(Object* object) override;
   void RemoveObject(Object* object) override;
   void DrawObjects(const std::vector<Object*>* objects) override;
+  void DrawObject(Object* object) override;
   bool IsClosed() override;
   void SetSize(int width, int height) override;
 

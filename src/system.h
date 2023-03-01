@@ -2,6 +2,7 @@
 #define GLAD_ONLY_HEADER
 #include "camera.h"
 #include "common.h"
+#include "emitter.h"
 #include "input_manager.h"
 #include "light.h"
 #include "object.h"
@@ -10,19 +11,18 @@
 class System
 {
 public:
-  System();
-  ~System();
-
-  void AddObject(Object* object);
+  static void SetupObject(Object* object);
+  static void AddObject(Object* object);
+  static void AddEmitter(Emitter* emitter);
   static void AddLight(Light* light);
   //  void DeleteLight(Light* light);
   static const std::vector<Light*>& GetLights();
   static void SetAmbient(const glm::vec3& value);
   static const glm::vec3& GetAmbient();
 
-  void Exit();
+  static void Exit();
 
-  void MainLoop();
+  static void MainLoop();
 
   static void SetModelMatrix(glm::mat4* model_matrix);
   static glm::mat4* GetModelMatrix();
@@ -37,14 +37,13 @@ public:
   static void SetFarPlane(float value);
   static void WindowResizeCallback(GLFWwindow* window, int width, int height);
 
-  static bool GetCalculateLight();
-  static void SetCalculateLight(bool calculateLight);
-
   static void AddMesh(const std::string& filename, Mesh3D* mesh);
   static const std::vector<Mesh3D*>& GetMesh(const std::string& filename);
 
+  static void Init();
+  static void End();
+
 private:
-  void Init();
   static float near_plane_;
   static float far_plane_;
 
@@ -57,9 +56,8 @@ private:
   static std::vector<Object*>* objects_;
   static std::vector<Light*> lights_;
   static glm::vec3 ambient_;
-  inline static bool calculate_light_ = false;
   inline static std::unordered_map<std::string, std::vector<Mesh3D*>> mesh_map_;
+  inline static std::vector<Emitter*> emitters_;
 
-private:
-  bool end_;
+  inline static bool end_ = false;
 };

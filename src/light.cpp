@@ -25,9 +25,27 @@ const glm::vec3& Light::GetColor() const
   return color_;
 }
 
+void Light::SetPosition(const glm::vec4& vect4)
+{
+  Entity::SetPosition(vect4);
+  if (cube_)
+    cube_->SetPosition(vect4);
+}
+
+void Light::SetRotation(const glm::vec4& vect4)
+{
+  Entity::SetRotation(vect4);
+  direction_.x = glm::cos(vect4.x) * glm::cos(vect4.y);
+  direction_.y = glm::sin(vect4.y);
+  direction_.z = glm::sin(vect4.x) * glm::cos(vect4.y);
+  direction_ = glm::normalize(direction_);
+}
+
 void Light::SetColor(const glm::vec3& color)
 {
   color_ = color;
+  if (cube_)
+    cube_->SetColor(color);
 }
 
 const glm::vec3& Light::GetDirection() const

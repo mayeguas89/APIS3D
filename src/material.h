@@ -12,6 +12,7 @@ public:
     Add,
     Mul,
     Alpha,
+    None,
   };
 
   Material();
@@ -47,6 +48,8 @@ public:
 
   BlendMode GetBlendMode();
   void SetBlendMode(BlendMode value);
+  void SetAlpha(float alpha);
+  float GetAlpha();
 
 protected:
   RenderProgram* render_program_;
@@ -56,5 +59,6 @@ protected:
   bool light_enabled_ = true;
   bool culling_enabled_ = true;
   bool depth_test_enabled_ = true;
-  BlendMode blend_mode_ = BlendMode::Solid;
+  float alpha_ = 1.0f;
+  BlendMode blend_mode_ = BlendMode::None;
 };

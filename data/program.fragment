@@ -24,6 +24,8 @@ uniform vec3 ambient;
 // Brillo del material
 uniform int shininess;
 
+uniform float alpha;
+
 // CameraPosition
 uniform vec3 cameraPosition;
 
@@ -87,13 +89,12 @@ void main() {
             light *= Lights[i].Color;
             totalLight += light;
         }
-        //FragColor = vec4(totalLight, 1.0f) * fColor;
         FragColor = vec4(totalLight, 1.0f) * texture2D(textUnit, fTextCoord);
     }
     else
     {
-        //FragColor = fColor;
-        FragColor = texture2D(textUnit, fTextCoord);
+        FragColor = texture2D(textUnit, fTextCoord) * fColor;
+        FragColor.a = FragColor.a * alpha;
     }
 
 }

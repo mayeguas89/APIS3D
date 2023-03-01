@@ -138,11 +138,6 @@ void GLSLShader::SetVariables()
 
   // ---------------------Lights----------------------
   auto lights = System::GetLights();
-  if (variable_list_.find("computeLight") != variable_list_.end())
-  {
-    glUniform1i(variable_list_["computeLight"], System::GetCalculateLight());
-  }
-
   for (auto i = 0; i < lights.size(); i++)
   {
     auto light = lights.at(i);

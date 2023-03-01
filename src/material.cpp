@@ -72,3 +72,13 @@ void Material::SetBlendMode(BlendMode value)
 {
   blend_mode_ = value;
 }
+
+void Material::SetAlpha(float alpha)
+{
+  alpha_ = alpha;
+}
+
+float Material::GetAlpha()
+{
+  return alpha_;
+}

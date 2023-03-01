@@ -18,7 +18,7 @@ public:
         const glm::vec3& direction,
         const glm::vec3& color,
         float cut_angle_degrees);
-  
+
   virtual ~Light() = default;
 
   int GetType()
@@ -49,6 +49,8 @@ public:
   virtual void Update(float delta_time) override;
 
   const glm::vec3& GetColor() const;
+  void SetPosition(const glm::vec4& vect4);
+  void SetRotation(const glm::vec4& vect4);
   void SetColor(const glm::vec3& color);
   const glm::vec3& GetDirection() const;
   void SetDirection(const glm::vec3& direction);

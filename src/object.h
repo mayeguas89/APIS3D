@@ -21,6 +21,8 @@ public:
 
   void AddMesh(Mesh3D* mesh);
 
+  void SetAlpha(float alpha);
+
   virtual void LoadDataFromFile(const std::string& filename) = 0;
   virtual void Update(float delta_time) = 0;
 

@@ -13,19 +13,17 @@ std::vector<Object*>* System::objects_ = nullptr;
 std::vector<Light*> System::lights_;
 glm::vec3 System::ambient_ = glm::vec3(1.f);
 
-System::System()
-{
-  Init();
-  objects_ = new std::vector<Object*>();
-  end_ = false;
-}
-
-System::~System()
+void System::End()
 {
   if (render_)
     delete render_;
   if (input_manager_)
     delete input_manager_;
+}
+
+void System::SetupObject(Object* object)
+{
+  render_->SetupObject(object);
 }
 
 void System::AddObject(Object* object)
@@ -34,6 +32,11 @@ void System::AddObject(Object* object)
     return;
   render_->SetupObject(object);
   objects_->push_back(object);
+}
+
+void System::AddEmitter(Emitter* emitter)
+{
+  emitters_.push_back(std::move(emitter));
 }
 
 void System::Exit()
@@ -64,12 +67,21 @@ void System::MainLoop()
 
     // Actualiza Objetos
     for (Object* object: *objects_)
-    {
       object->Update(TimeManager::deltaTime);
-    }
 
     // Dibuja objectos
     render_->DrawObjects(objects_);
+
+    // Ordena particular en los emisores
+    for (auto emitter: emitters_)
+      emitter->Update(TimeManager::deltaTime);
+
+    // Pinta particular del emisor
+    for (auto emitter: emitters_)
+    {
+      for (auto particle: emitter->GetParticles())
+        render_->DrawObject(particle);
+    }
 
     // Intercambiar el front y el back buffer
     render_->SwapBuffers();
@@ -146,6 +158,8 @@ void System::SetNearPlane(float value)
 
 void System::Init()
 {
+  objects_ = new std::vector<Object*>();
+
   input_manager_ = FactoryEngine::GetNewInputManager();
   input_manager_->Init();
 
@@ -171,16 +185,6 @@ const std::vector<Light*>& System::GetLights()
 const glm::vec3& System::GetAmbient()
 {
   return ambient_;
-}
-
-bool System::GetCalculateLight()
-{
-  return calculate_light_;
-}
-
-void System::SetCalculateLight(bool calculateLight)
-{
-  calculate_light_ = calculateLight;
 }
 
 void System::AddMesh(const std::string& filename, Mesh3D* mesh)

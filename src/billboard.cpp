@@ -19,9 +19,9 @@ void Billboard::ComputeModelMatrix()
   model_mtx_[0][3] = position_.x;
   model_mtx_[1][3] = position_.y;
   model_mtx_[2][3] = position_.z;
+  model_mtx_[3] = glm::vec4(0.f, 0.f, 0.f, 1.0f);
 
   model_mtx_ = glm::transpose(model_mtx_);
-  model_mtx_[3] = glm::vec4(0.f, 0.f, 0.f, 1.0f);
   model_mtx_ = glm::rotate(model_mtx_, rotation_.z, glm::vec3(0.f, 0.f, 1.f));
   model_mtx_ = glm::scale(model_mtx_, glm::vec3(scaling_));
 }

@@ -26,6 +26,7 @@ add_executable(APIS3D
     src/cube_light.cpp 
     src/cube_text.cpp
     src/directional_light.cpp 
+    src/emitter.cpp
     src/entity.cpp
     src/factory_engine.cpp
     src/flash_light.cpp
@@ -42,6 +43,7 @@ add_executable(APIS3D
     src/object.cpp
     src/object3d.cpp
     src/render.cpp
+    src/rotate_camera.cpp
     src/system.cpp
     src/texture.cpp
     src/time_manager.cpp
