@@ -25,6 +25,8 @@ public:
 
   void SetScaling(const glm::vec4& scaling);
 
+  virtual void ComputeModelMatrix();
+
 protected:
   glm::vec4 position_;
   glm::vec4 rotation_;

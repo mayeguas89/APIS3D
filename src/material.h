@@ -6,6 +6,14 @@
 class Material
 {
 public:
+  enum class BlendMode
+  {
+    Solid = 0,
+    Add,
+    Mul,
+    Alpha,
+  };
+
   Material();
   ~Material();
   Texture* GetTexture();
@@ -29,9 +37,24 @@ public:
   const glm::vec3& GetColor() const;
   uint8_t GetShininess() const;
 
+  bool IsLightEnabled();
+  bool IsCullingEnabled();
+  bool IsDepthTestEnabled();
+
+  void SetLightEnabled(bool value);
+  void SetCullingEnabled(bool value);
+  void SetDepthTestEnabled(bool value);
+
+  BlendMode GetBlendMode();
+  void SetBlendMode(BlendMode value);
+
 protected:
   RenderProgram* render_program_;
   Texture* texture_;
   glm::vec3 color_;
   uint8_t shininess_;
+  bool light_enabled_ = true;
+  bool culling_enabled_ = true;
+  bool depth_test_enabled_ = true;
+  BlendMode blend_mode_ = BlendMode::Solid;
 };

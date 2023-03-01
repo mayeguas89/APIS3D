@@ -55,5 +55,42 @@ void GLSLMaterial::Prepare()
 
   render_program_->SetInt("shininess", shininess_);
 
+  // Guardamos o no los datos de profundidad en el buffer de profundidad que esta activo siempre
+  IsDepthTestEnabled() ? glDepthMask(GL_TRUE) : glDepthMask(GL_FALSE);
+
+  if (IsCullingEnabled())
+  {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+  }
+  else
+    glDisable(GL_CULL_FACE);
+
+  switch (GetBlendMode())
+  {
+    case BlendMode::Solid:
+    {
+      glBlendFunc(GL_ONE, GL_ZERO);
+      break;
+    }
+    case BlendMode::Add:
+    {
+      glBlendFunc(GL_ONE, GL_ONE);
+      break;
+    }
+    case BlendMode::Mul:
+    {
+      glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      break;
+    }
+    case BlendMode::Alpha:
+    {
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      break;
+    }
+    default:
+      break;
+  }
+
   render_program_->SetVariables();
 }

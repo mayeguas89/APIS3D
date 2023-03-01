@@ -39,3 +39,36 @@ void Material::SetShininess(uint8_t shininess)
 {
   shininess_ = shininess;
 }
+
+bool Material::IsLightEnabled()
+{
+  return light_enabled_;
+}
+bool Material::IsCullingEnabled()
+{
+  return culling_enabled_;
+}
+bool Material::IsDepthTestEnabled()
+{
+  return depth_test_enabled_;
+}
+void Material::SetLightEnabled(bool value)
+{
+  light_enabled_ = value;
+}
+void Material::SetCullingEnabled(bool value)
+{
+  culling_enabled_ = value;
+}
+void Material::SetDepthTestEnabled(bool value)
+{
+  depth_test_enabled_ = value;
+}
+Material::BlendMode Material::GetBlendMode()
+{
+  return blend_mode_;
+}
+void Material::SetBlendMode(BlendMode value)
+{
+  blend_mode_ = value;
+}
