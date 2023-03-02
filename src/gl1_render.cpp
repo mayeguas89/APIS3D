@@ -41,6 +41,7 @@ void GL1Render::Init()
 }
 
 void GL1Render::SetupObject(Object* object) {}
+void GL1Render::SetupParticle(Emitter* emitter) {}
 
 void GL1Render::RemoveObject(Object* object) {}
 
@@ -68,6 +69,8 @@ void GL1Render::DrawObject(Object* object)
     }
   }
 }
+
+void GL1Render::DrawParticles(Emitter* emitter) {}
 
 bool GL1Render::IsClosed()
 {

@@ -13,7 +13,6 @@ public:
   void SetVelocity(const glm::vec3& velocity);
   void SetLifetime(double lifetime);
   void SetAutofade(bool value);
-  float GetAlpha();
 
   void Update(float delta_time) override;
 

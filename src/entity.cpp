@@ -7,7 +7,7 @@ Entity::Entity()
   scaling_ = glm::vec4(1.f, 1.f, 1.f, 1.f);
 }
 
-glm::vec4 Entity::GetPosition()
+glm::vec4& Entity::GetPosition()
 {
   return position_;
 }

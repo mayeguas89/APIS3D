@@ -25,6 +25,21 @@ public:
     return particles_;
   }
 
+  glm::mat4* GetModelMatrices()
+  {
+    return &model_matrices_[0];
+  }
+
+  glm::vec3* GetCenterPosition()
+  {
+    return &center_position_[0];
+  }
+
+  Particle* GetModelParticle()
+  {
+    return model_particle_;
+  }
+
 private:
   const glm::vec2 lifetime_range_;
   const glm::vec2 scale_range_;
@@ -37,4 +52,7 @@ private:
   const std::string particle_filename_;
   const glm::vec3 initial_particle_position_;
   bool autofade_;
+  glm::mat4* model_matrices_;
+  glm::vec3* center_position_;
+  Particle* model_particle_;
 };

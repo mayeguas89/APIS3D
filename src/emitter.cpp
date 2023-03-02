@@ -20,9 +20,10 @@ Emitter::Emitter(const std::string& particle_filename,
   max_velocity_{max_velocity},
   autofade_{autofade}
 {
-  auto model_paticle = new Particle(particle_filename_, glm::vec3{0.f}, 0.f, 0.f, false);
-  System::SetupObject(model_paticle);
-  delete model_paticle;
+  model_matrices_ = new glm::mat4[System::kMaxParticles];
+  center_position_ = new glm::vec3[System::kMaxParticles];
+  model_particle_ = new Particle(particle_filename_, glm::vec3{0.f}, 0.f, 0.f, false);
+  System::SetupParticle(this);
 }
 
 void Emitter::Update(float delta_time)
@@ -49,14 +50,14 @@ void Emitter::Update(float delta_time)
     particles_.push_back(std::move(new_particle));
   }
 
+  auto camera = System::GetCamera();
   std::map<float, Particle*> distance_list;
   for (auto particle: particles_)
   {
     if (!particle->IsDead())
     {
       particle->Update(delta_time);
-      auto distance =
-        glm::distance(glm::vec3(particle->GetPosition()), glm::vec3(System::GetCamera()->GetPosition()));
+      auto distance = glm::distance(glm::vec3(particle->GetPosition()), glm::vec3(camera->GetPosition()));
       distance_list[distance] = particle;
     }
     else
@@ -64,8 +65,12 @@ void Emitter::Update(float delta_time)
   }
   particles_.clear();
 
+  int i = 0;
   for (auto item: distance_list)
   {
     particles_.push_back(item.second);
+    model_matrices_[i] = item.second->GetModelMatrix();
+    center_position_[i] = item.second->GetPosition();
+    i++;
   }
 }

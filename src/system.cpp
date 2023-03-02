@@ -21,9 +21,9 @@ void System::End()
     delete input_manager_;
 }
 
-void System::SetupObject(Object* object)
+void System::SetupParticle(Emitter* emitter)
 {
-  render_->SetupObject(object);
+  render_->SetupParticle(emitter);
 }
 
 void System::AddObject(Object* object)
@@ -79,8 +79,7 @@ void System::MainLoop()
     // Pinta particular del emisor
     for (auto emitter: emitters_)
     {
-      for (auto particle: emitter->GetParticles())
-        render_->DrawObject(particle);
+      render_->DrawParticles(emitter);
     }
 
     // Intercambiar el front y el back buffer

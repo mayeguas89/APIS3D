@@ -1,0 +1,15 @@
+#version 330
+
+uniform sampler2D textUnit;
+
+uniform int alpha;
+
+out vec4 FragColor;
+
+in vec4 fColor;
+in vec2 fTextCoord;
+
+void main() {
+    FragColor = texture2D(textUnit, fTextCoord) * fColor;
+    //FragColor.a = FragColor.a * alpha;
+}

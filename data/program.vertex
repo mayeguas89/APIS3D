@@ -3,7 +3,8 @@
 //layout (location = 1) in vec4 vColor;
 //layout (location = 2) in vec2 vTexture;
 
-uniform mat4 MVP;
+uniform mat4 P;
+uniform mat4 V;
 uniform mat4 M;
 
 attribute vec4 vPos;
@@ -17,7 +18,7 @@ out vec4 fPos;
 out vec2 fTextCoord;
 
 void main() {
-    gl_Position = MVP * vPos;
+    gl_Position = P * V * M * vPos;
     fColor = vColor;
     fTextCoord = vTexture;
 

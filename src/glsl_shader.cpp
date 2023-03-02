@@ -118,6 +118,24 @@ void GLSLShader::SetVariables()
                           (void*)(3 * sizeof(glm::vec4)));
   }
 
+  if (variable_list_.find("mModelMatrix") != variable_list_.end())
+  {
+    for (int i = 0; i < 4; i++)
+    {
+      // Enable it
+      glEnableVertexAttribArray(variable_list_["mModelMatrix"] + i);
+      // Set up the vertex attribute
+      glVertexAttribPointer(variable_list_["mModelMatrix"] + i, // Location
+                            4,
+                            GL_FLOAT,
+                            GL_FALSE,                        // vec4
+                            sizeof(glm::mat4),               // Stride
+                            (void*)(sizeof(glm::vec4) * i)); // Start offset
+      // Make it instanced
+      glVertexAttribDivisor(variable_list_["mModelMatrix"] + i, 1);
+    }
+  }
+
   if (variable_list_.find("textUnit") != variable_list_.end())
   {
     glUniform1i(variable_list_["textUnit"], 0);
@@ -134,6 +152,15 @@ void GLSLShader::SetVariables()
   if (variable_list_.find("cameraPosition") != variable_list_.end())
   {
     glUniform3fv(variable_list_["cameraPosition"], 1, glm::value_ptr(glm::vec3(camera->GetPosition())));
+  }
+  if (variable_list_.find("P") != variable_list_.end())
+  {
+    glUniformMatrix4fv(variable_list_["P"], 1, GL_FALSE, &camera->GetProjectionMatrix()[0][0]);
+  }
+
+  if (variable_list_.find("V") != variable_list_.end())
+  {
+    glUniformMatrix4fv(variable_list_["V"], 1, GL_FALSE, &camera->GetViewMatrix()[0][0]);
   }
 
   // ---------------------Lights----------------------
@@ -178,13 +205,13 @@ void GLSLShader::SetVariables()
 
   // ---------------------Object----------------------
 
-  auto model_matrix = *System::GetModelMatrix();
-  auto mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix() * (*System::GetModelMatrix());
+  // auto model_matrix = *System::GetModelMatrix();
+  // auto mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix() * (*System::GetModelMatrix());
 
-  if (variable_list_.find("MVP") != variable_list_.end())
-  {
-    glUniformMatrix4fv(variable_list_["MVP"], 1, GL_FALSE, &mvp[0][0]);
-  }
+  // if (variable_list_.find("MVP") != variable_list_.end())
+  // {
+  //   glUniformMatrix4fv(variable_list_["MVP"], 1, GL_FALSE, &mvp[0][0]);
+  // }
 
   if (variable_list_.find("M") != variable_list_.end())
   {

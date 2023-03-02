@@ -38,6 +38,37 @@ void GL4Render::Init()
   ImGui::StyleColorsDark();
 }
 
+void GL4Render::SetupParticle(Emitter* emitter)
+{
+  for (auto* mesh: emitter->GetModelParticle()->GetMeshes())
+  {
+    if (buffer_object_list_.find(mesh->GetMeshId()) != buffer_object_list_.end())
+      continue;
+    VBO vbo;
+    glGenVertexArrays(1, &vbo.bo_id);
+    glGenBuffers(1, &vbo.vbo);
+    glGenBuffers(1, &vbo.idxbo);
+    glGenBuffers(1, &vbo.vbm);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo.vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+                 sizeof(Vertex) * mesh->GetVertList()->size(),
+                 mesh->GetVertList()->data(),
+                 GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.idxbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 sizeof(unsigned int) * mesh->GetVertIndexesList()->size(),
+                 mesh->GetVertIndexesList()->data(),
+                 GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo.vbm);
+    glBufferData(GL_ARRAY_BUFFER, System::kMaxParticles * sizeof(glm::mat4), NULL, GL_STREAM_DRAW);
+
+    buffer_object_list_[mesh->GetMeshId()] = vbo;
+  }
+}
+
 void GL4Render::SetupObject(Object* object)
 {
   for (auto* mesh: object->GetMeshes())
@@ -63,6 +94,40 @@ void GL4Render::SetupObject(Object* object)
 }
 
 void GL4Render::RemoveObject(Object* object) {}
+
+void GL4Render::DrawParticles(Emitter* emitter)
+{
+  for (auto mesh: emitter->GetModelParticle()->GetMeshes())
+  {
+    auto it = buffer_object_list_.find(mesh->GetMeshId());
+    if (it == buffer_object_list_.end())
+    {
+      throw std::runtime_error("Mesh Id not binded in any buffer object, call Setup object on this object first");
+    }
+    auto buffer = it->second;
+    glBindVertexArray(buffer.bo_id);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer.vbm);
+    glBufferData(
+      GL_ARRAY_BUFFER,
+      System::kMaxParticles * sizeof(glm::mat4),
+      NULL,
+      GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
+    glBufferSubData(GL_ARRAY_BUFFER,
+                    0,
+                    emitter->GetParticles().size() * sizeof(glm::mat4),
+                    emitter->GetModelMatrices());
+
+    mesh->GetMaterial()->Prepare();
+
+    glDrawElementsInstanced(GL_TRIANGLES,
+                            static_cast<GLsizei>(mesh->GetVertIndexesList()->size()),
+                            GL_UNSIGNED_INT,
+                            0,
+                            static_cast<GLsizei>(emitter->GetParticles().size()));
+  }
+}
 
 void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 {
@@ -140,9 +205,7 @@ void GL4Render::DrawObject(Object* object)
   {
     auto it = buffer_object_list_.find(mesh->GetMeshId());
     if (it == buffer_object_list_.end())
-    {
       throw std::runtime_error("Mesh Id not binded in any buffer object, call Setup object on this object first");
-    }
     auto buffer = it->second;
     glBindVertexArray(buffer.bo_id);
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);

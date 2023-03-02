@@ -11,10 +11,13 @@ public:
   ~GL1Render();
 
   void Init() override;
+
+  void SetupParticle(Emitter* emitter) override;
   void SetupObject(Object* object) override;
   void RemoveObject(Object* object) override;
   void DrawObjects(const std::vector<Object*>* objects) override;
   void DrawObject(Object* object) override;
+  void DrawParticles(Emitter* emitter) override;
   bool IsClosed() override;
   void SetSize(int width, int height) override;
 
