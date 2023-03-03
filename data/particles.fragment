@@ -6,10 +6,8 @@ uniform int alpha;
 
 out vec4 FragColor;
 
-in vec4 fColor;
 in vec2 fTextCoord;
 
 void main() {
-    FragColor = texture2D(textUnit, fTextCoord) * fColor;
-    //FragColor.a = FragColor.a * alpha;
+    FragColor = texture2D(textUnit, fTextCoord) * vec4(1.0, 1.0, 1.0, 1.0);
 }

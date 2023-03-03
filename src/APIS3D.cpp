@@ -151,15 +151,15 @@ int main(int argc, char const* argv[])
                             false);
 
   System::AddEmitter(&fire_emitter_one);
-  System::AddEmitter(&fire_emitter_two);
-  System::AddEmitter(&fire_emitter_three);
-  System::AddEmitter(&fire_emitter_four);
-  System::AddEmitter(&fire_emitter_five);
-  System::AddEmitter(&smoke_emmiter_one);
-  System::AddEmitter(&smoke_emmiter_two);
-  System::AddEmitter(&smoke_emmiter_three);
-  System::AddEmitter(&smoke_emmiter_four);
-  System::AddEmitter(&smoke_emmiter_five);
+  // System::AddEmitter(&fire_emitter_two);
+  // System::AddEmitter(&fire_emitter_three);
+  // System::AddEmitter(&fire_emitter_four);
+  // System::AddEmitter(&fire_emitter_five);
+  // System::AddEmitter(&smoke_emmiter_one);
+  // System::AddEmitter(&smoke_emmiter_two);
+  // System::AddEmitter(&smoke_emmiter_three);
+  // System::AddEmitter(&smoke_emmiter_four);
+  // System::AddEmitter(&smoke_emmiter_five);
   System::SetCamera(rotate_camera);
   System::AddObject(&column);
   System::AddObject(point_light->GetCube());

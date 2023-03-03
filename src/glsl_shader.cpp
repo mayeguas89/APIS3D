@@ -118,6 +118,22 @@ void GLSLShader::SetVariables()
                           (void*)(3 * sizeof(glm::vec4)));
   }
 
+  // ---------------------Particles----------------------
+
+  if (variable_list_.find("vPosition") != variable_list_.end())
+  {
+    glEnableVertexAttribArray(variable_list_["vPosition"]);
+    glVertexAttribPointer(variable_list_["vPosition"], 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0x00);
+    glVertexAttribDivisor(variable_list_["vPosition"], 0);
+  }
+
+  if (variable_list_.find("vTexture") != variable_list_.end())
+  {
+    glEnableVertexAttribArray(variable_list_["vTexture"]);
+    glVertexAttribPointer(variable_list_["vTexture"], 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0x00);
+    glVertexAttribDivisor(variable_list_["vTexture"], 0);
+  }
+
   if (variable_list_.find("mModelMatrix") != variable_list_.end())
   {
     for (int i = 0; i < 4; i++)
@@ -130,7 +146,7 @@ void GLSLShader::SetVariables()
                             GL_FLOAT,
                             GL_FALSE,                        // vec4
                             sizeof(glm::mat4),               // Stride
-                            (void*)(sizeof(glm::vec4) * i)); // Start offset
+                            (void*)(sizeof(float) * 4 * i)); // Start offset
       // Make it instanced
       glVertexAttribDivisor(variable_list_["mModelMatrix"] + i, 1);
     }

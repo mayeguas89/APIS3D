@@ -49,12 +49,30 @@ void GL4Render::SetupParticle(Emitter* emitter)
     glGenBuffers(1, &vbo.vbo);
     glGenBuffers(1, &vbo.idxbo);
     glGenBuffers(1, &vbo.vbm);
+    glGenBuffers(1, &vbo.vbt);
+
+    auto vertex_list = emitter->GetModelParticle()->GetMeshes()[0]->GetVertList();
+    auto vertex_buffer_data_ = new glm::vec4[6];
+    vertex_buffer_data_[0] = vertex_list->at(0).position;
+    vertex_buffer_data_[1] = vertex_list->at(1).position;
+    vertex_buffer_data_[2] = vertex_list->at(2).position;
+    vertex_buffer_data_[3] = vertex_list->at(0).position;
+    vertex_buffer_data_[4] = vertex_list->at(2).position;
+    vertex_buffer_data_[5] = vertex_list->at(3).position;
+
+    auto texture_buffer_data_ = new glm::vec2[6];
+    texture_buffer_data_[0] = vertex_list->at(0).texture_coordinates;
+    texture_buffer_data_[1] = vertex_list->at(1).texture_coordinates;
+    texture_buffer_data_[2] = vertex_list->at(2).texture_coordinates;
+    texture_buffer_data_[3] = vertex_list->at(0).texture_coordinates;
+    texture_buffer_data_[4] = vertex_list->at(2).texture_coordinates;
+    texture_buffer_data_[5] = vertex_list->at(3).texture_coordinates;
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo.vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 sizeof(Vertex) * mesh->GetVertList()->size(),
-                 mesh->GetVertList()->data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(glm::vec4), vertex_buffer_data_, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo.vbt);
+    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(glm::vec2), texture_buffer_data_, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.idxbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -109,6 +127,8 @@ void GL4Render::DrawParticles(Emitter* emitter)
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vbm);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer.vbt);
+
     glBufferData(
       GL_ARRAY_BUFFER,
       System::kMaxParticles * sizeof(glm::mat4),
