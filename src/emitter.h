@@ -25,14 +25,19 @@ public:
     return particles_;
   }
 
-  glm::mat4* GetModelMatrices()
+  std::vector<glm::mat4>& GetModelMatrices()
   {
-    return &model_matrices_[0];
+    return model_matrices_;
   }
 
-  glm::vec3* GetCenterPosition()
+  std::vector<glm::vec2>& GetParticleVertexTextList()
   {
-    return &center_position_[0];
+    return particle_vertex_text_list_;
+  }
+
+  std::vector<glm::vec4>& GetParticleVertexPosList()
+  {
+    return particle_vertex_pos_list_;
   }
 
   Particle* GetModelParticle()
@@ -52,7 +57,9 @@ private:
   const std::string particle_filename_;
   const glm::vec3 initial_particle_position_;
   bool autofade_;
-  glm::mat4* model_matrices_;
+  std::vector<glm::mat4> model_matrices_;
+  std::vector<glm::vec4> particle_vertex_pos_list_;
+  std::vector<glm::vec2> particle_vertex_text_list_;
   glm::vec3* center_position_;
   Particle* model_particle_;
 };

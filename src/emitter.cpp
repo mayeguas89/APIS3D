@@ -20,9 +20,12 @@ Emitter::Emitter(const std::string& particle_filename,
   max_velocity_{max_velocity},
   autofade_{autofade}
 {
-  model_matrices_ = new glm::mat4[System::kMaxParticles];
-  center_position_ = new glm::vec3[System::kMaxParticles];
   model_particle_ = new Particle(particle_filename_, glm::vec3{0.f}, 0.f, 0.f, false);
+  for (auto v: *(model_particle_->GetMeshes()[0]->GetVertList()))
+  {
+    particle_vertex_pos_list_.push_back(v.position);
+    particle_vertex_text_list_.push_back(v.texture_coordinates);
+  }
   System::SetupParticle(this);
 }
 
@@ -64,13 +67,11 @@ void Emitter::Update(float delta_time)
       delete particle;
   }
   particles_.clear();
+  model_matrices_.clear();
 
-  int i = 0;
   for (auto item: distance_list)
   {
     particles_.push_back(item.second);
-    model_matrices_[i] = item.second->GetModelMatrix();
-    center_position_[i] = item.second->GetPosition();
-    i++;
+    model_matrices_.push_back(item.second->GetModelMatrix());
   }
 }

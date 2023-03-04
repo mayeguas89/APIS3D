@@ -1,6 +1,6 @@
 #version 330
 attribute vec4 vPosition;
-attribute vec2 vTexture;
+attribute vec2 vText;
 attribute mat4 mModelMatrix;
 
 out vec2 fTextCoord;
@@ -10,5 +10,5 @@ uniform mat4 V;
 
 void main() {
     gl_Position = P * V * mModelMatrix * vPosition;
-    fTextCoord = vTexture;
+    fTextCoord = vText;
 }

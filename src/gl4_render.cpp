@@ -51,28 +51,16 @@ void GL4Render::SetupParticle(Emitter* emitter)
     glGenBuffers(1, &vbo.vbm);
     glGenBuffers(1, &vbo.vbt);
 
-    auto vertex_list = emitter->GetModelParticle()->GetMeshes()[0]->GetVertList();
-    auto vertex_buffer_data_ = new glm::vec4[6];
-    vertex_buffer_data_[0] = vertex_list->at(0).position;
-    vertex_buffer_data_[1] = vertex_list->at(1).position;
-    vertex_buffer_data_[2] = vertex_list->at(2).position;
-    vertex_buffer_data_[3] = vertex_list->at(0).position;
-    vertex_buffer_data_[4] = vertex_list->at(2).position;
-    vertex_buffer_data_[5] = vertex_list->at(3).position;
-
-    auto texture_buffer_data_ = new glm::vec2[6];
-    texture_buffer_data_[0] = vertex_list->at(0).texture_coordinates;
-    texture_buffer_data_[1] = vertex_list->at(1).texture_coordinates;
-    texture_buffer_data_[2] = vertex_list->at(2).texture_coordinates;
-    texture_buffer_data_[3] = vertex_list->at(0).texture_coordinates;
-    texture_buffer_data_[4] = vertex_list->at(2).texture_coordinates;
-    texture_buffer_data_[5] = vertex_list->at(3).texture_coordinates;
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo.vbo);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(glm::vec4), vertex_buffer_data_, GL_STATIC_DRAW);
-
+    glBufferData(GL_ARRAY_BUFFER,
+                 mesh->GetVertList()->size(),
+                 emitter->GetParticleVertexPosList().data(),
+                 GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, vbo.vbt);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(glm::vec2), texture_buffer_data_, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER,
+                 mesh->GetVertList()->size(),
+                 emitter->GetParticleVertexTextList().data(),
+                 GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.idxbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -81,7 +69,7 @@ void GL4Render::SetupParticle(Emitter* emitter)
                  GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo.vbm);
-    glBufferData(GL_ARRAY_BUFFER, System::kMaxParticles * sizeof(glm::mat4), NULL, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, System::kMaxParticles * sizeof(glm::mat4), nullptr, GL_STREAM_DRAW);
 
     buffer_object_list_[mesh->GetMeshId()] = vbo;
   }
@@ -127,7 +115,6 @@ void GL4Render::DrawParticles(Emitter* emitter)
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vbm);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer.vbt);
 
     glBufferData(
       GL_ARRAY_BUFFER,
@@ -136,8 +123,8 @@ void GL4Render::DrawParticles(Emitter* emitter)
       GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
     glBufferSubData(GL_ARRAY_BUFFER,
                     0,
-                    emitter->GetParticles().size() * sizeof(glm::mat4),
-                    emitter->GetModelMatrices());
+                    emitter->GetModelMatrices().size() * sizeof(glm::mat4),
+                    emitter->GetModelMatrices().data());
 
     mesh->GetMaterial()->Prepare();
 
@@ -145,7 +132,7 @@ void GL4Render::DrawParticles(Emitter* emitter)
                             static_cast<GLsizei>(mesh->GetVertIndexesList()->size()),
                             GL_UNSIGNED_INT,
                             0,
-                            static_cast<GLsizei>(emitter->GetParticles().size()));
+                            static_cast<GLsizei>(emitter->GetModelMatrices().size()));
   }
 }
 
