@@ -51,11 +51,19 @@ void Particle::Update(float delta_time)
   lifetime_ -= delta_time;
   position_ += delta_time * glm::vec4(velocity_, 0.f);
   if (autofade_)
-    SetAlpha((float)std::abs(lifetime_ / initial_lifetime_));
+  {
+    alpha_ = (float)std::abs(lifetime_ / initial_lifetime_);
+    SetAlpha(alpha_);
+  }
   Billboard::Update(delta_time);
 }
 
 bool Particle::IsDead()
 {
   return lifetime_ <= 0.f;
+}
+
+float Particle::GetAlpha()
+{
+  return alpha_;
 }

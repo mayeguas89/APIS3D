@@ -64,15 +64,15 @@ void GLSLMaterial::Prepare()
     glDisable(GL_DEPTH_TEST);
   }
 
-  // if (IsCullingEnabled())
-  // {
-  //   glEnable(GL_CULL_FACE);
-  //   glCullFace(GL_BACK);
-  // }
-  // else
-  // {
-  //   glDisable(GL_CULL_FACE);
-  // }
+  if (IsCullingEnabled())
+  {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+  }
+  else
+  {
+    glDisable(GL_CULL_FACE);
+  }
 
   switch (GetBlendMode())
   {
@@ -101,7 +101,6 @@ void GLSLMaterial::Prepare()
   }
 
   render_program_->SetInt("shininess", shininess_);
-  render_program_->SetFloat("alpha", alpha_);
   render_program_->SetInt("computeLight", (int)IsLightEnabled());
   render_program_->SetVariables();
 }

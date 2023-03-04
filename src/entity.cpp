@@ -5,6 +5,7 @@ Entity::Entity()
   position_ = glm::vec4(0.f, 0.f, 0.f, 0.f);
   rotation_ = glm::vec4(0.f, 0.f, 0.f, 0.f);
   scaling_ = glm::vec4(1.f, 1.f, 1.f, 1.f);
+  model_mtx_ = glm::mat4(0.f);
 }
 
 glm::vec4& Entity::GetPosition()

@@ -49,13 +49,13 @@ void GL4Render::SetupParticle(Emitter* emitter)
     glGenBuffers(1, &vbo.vbo);
     glGenBuffers(1, &vbo.idxbo);
     glGenBuffers(1, &vbo.vbm);
+    glGenBuffers(1, &vbo.vba);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo.vbo);
     glBufferData(GL_ARRAY_BUFFER,
                  sizeof(Vertex) * mesh->GetVertList()->size(),
                  mesh->GetVertList()->data(),
                  GL_STATIC_DRAW);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.idxbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  sizeof(unsigned int) * mesh->GetVertIndexesList()->size(),
@@ -63,7 +63,7 @@ void GL4Render::SetupParticle(Emitter* emitter)
                  GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo.vbm);
-    glBufferData(GL_ARRAY_BUFFER, System::kMaxParticles * sizeof(glm::mat4), NULL, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo.vba);
 
     buffer_object_list_[mesh->GetMeshId()] = vbo;
   }
@@ -104,28 +104,42 @@ void GL4Render::DrawParticles(Emitter* emitter)
     {
       throw std::runtime_error("Mesh Id not binded in any buffer object, call Setup object on this object first");
     }
+    // System::SetModelMatrix(emitter->GetModelMatrices().data());
     auto buffer = it->second;
     glBindVertexArray(buffer.bo_id);
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
+    // Tiene que ir aqui con las localizaciones hardcodeadas porque primero hay que hacer el binbuffer de los vertices y luego el bind buffer de la matriz
+    // al meter todos los datos en prepare se sobreescribe el buffer donde se escriben los datos de posicion, color y textura
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0x00);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(glm::vec4)));
+
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vbm);
-    glBufferData(
-      GL_ARRAY_BUFFER,
-      System::kMaxParticles * sizeof(glm::mat4),
-      NULL,
-      GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-    glBufferSubData(GL_ARRAY_BUFFER,
-                    0,
-                    emitter->GetParticles().size() * sizeof(glm::mat4),
-                    emitter->GetModelMatrices());
+    glBufferData(GL_ARRAY_BUFFER,
+                 emitter->GetModelMatrices().size() * sizeof(glm::mat4),
+                 emitter->GetModelMatrices().data(),
+                 GL_DYNAMIC_DRAW);
 
     mesh->GetMaterial()->Prepare();
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffer.vba);
+    glBufferData(GL_ARRAY_BUFFER,
+                 emitter->GetParticleAlphaList().size() * sizeof(glm::mat4),
+                 emitter->GetParticleAlphaList().data(),
+                 GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(7);
+    glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, 0, 0);
 
     glDrawElementsInstanced(GL_TRIANGLES,
                             static_cast<GLsizei>(mesh->GetVertIndexesList()->size()),
                             GL_UNSIGNED_INT,
                             0,
-                            static_cast<GLsizei>(emitter->GetParticles().size()));
+                            static_cast<GLsizei>(emitter->GetModelMatrices().size()));
+    // glBindVertexArray(0);
   }
 }
 
@@ -141,7 +155,7 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   static float near_plane = 0.1f;
   static float far_plane = 100.f;
   static float linear_attenuation = System::GetLights()[0]->GetLinearAttenuation();
-  static ImVec4 clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
+  static ImVec4 clear_color = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);
   static ImVec4 light_color = ImVec4(System::GetLights()[0]->GetColor().r,
                                      System::GetLights()[0]->GetColor().g,
                                      System::GetLights()[0]->GetColor().b,
