@@ -23,11 +23,6 @@ Emitter::Emitter(const std::string& particle_filename,
   autofade_{autofade}
 {
   model_particle_ = new Particle(particle_filename_, glm::vec3{0.f}, 0.f, 0.f, false);
-  for (auto v: *(model_particle_->GetMeshes()[0]->GetVertList()))
-  {
-    particle_vertex_pos_list_.push_back(v.position);
-    particle_vertex_text_list_.push_back(v.texture_coordinates);
-  }
   System::SetupParticle(this);
 }
 

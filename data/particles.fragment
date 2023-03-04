@@ -4,6 +4,7 @@ uniform sampler2D textUnit;
 
 out vec4 FragColor;
 
+in vec4 fColor;
 in vec2 fTextCoord;
 in float fAlpha;
 

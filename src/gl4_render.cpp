@@ -53,13 +53,8 @@ void GL4Render::SetupParticle(Emitter* emitter)
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo.vbo);
     glBufferData(GL_ARRAY_BUFFER,
-                 mesh->GetVertList()->size(),
-                 emitter->GetParticleVertexPosList().data(),
-                 GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo.vbt);
-    glBufferData(GL_ARRAY_BUFFER,
-                 mesh->GetVertList()->size(),
-                 emitter->GetParticleVertexTextList().data(),
+                 sizeof(Vertex) * mesh->GetVertList()->size(),
+                 mesh->GetVertList()->data(),
                  GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.idxbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,

@@ -8,6 +8,7 @@ in float vAlpha;
 
 out vec2 fTextCoord;
 out float fAlpha;
+out vec4 fColor;
 
 uniform mat4 P;
 uniform mat4 V;
