@@ -25,3 +25,8 @@ void Camera::SetSpeed(float speed)
 {
   camera_speed_ = speed;
 }
+
+float Camera::GetSpeed()
+{
+  return camera_speed_;
+}

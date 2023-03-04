@@ -31,6 +31,7 @@ void GL1Render::Init()
   gladLoadGL(glfwGetProcAddress);
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
   // glDepthFunc(GL_LESS);
 
   // glEnable(GL_CULL_FACE);
@@ -44,6 +45,8 @@ void GL1Render::Init()
 }
 
 void GL1Render::SetupObject(Object* object) {}
+
+void GL1Render::SetupLight(Light* light) {}
 
 void GL1Render::RemoveObject(Object* object) {}
 

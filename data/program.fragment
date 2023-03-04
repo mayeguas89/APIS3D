@@ -14,12 +14,16 @@ struct LightSource
     vec3 Color;
     // Para spotLights cos(phi)
     float Cutoff;
+    float AmbientContribution;
+    float DifuseContribution;
+    float SpecularContribution;
 };
 
 uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
 
 // Color de la luz ambiente
 uniform vec3 ambient;
+uniform float ambientIntensity;
 
 // Brillo del material
 uniform int shininess;
@@ -64,7 +68,7 @@ void main() {
                 // If the fragment does not received light from the focal light, give only ambient
                 if (cos_theta < Lights[i].Cutoff)
                 {
-                    vec3 light = ambient * Lights[i].Color;
+                    vec3 light = ambient * Lights[i].AmbientContribution * ambientIntensity * Lights[i].Color;
                     totalLight += light;
                     continue;
                 }
@@ -82,7 +86,9 @@ void main() {
             vec3 EYE = normalize(fPos.xyz - cameraPosition);
             float specular = pow(max(dot(R, EYE), 0.f), shininess);
 
-            vec3 light = ambient + diffuse + specular;
+            vec3 light = ambient * Lights[i].AmbientContribution * ambientIntensity;
+            light += diffuse * Lights[i].DifuseContribution;
+            light += specular * Lights[i].SpecularContribution;
             light *= Lights[i].Attenuation;
             light *= Lights[i].Color;
             totalLight += light;

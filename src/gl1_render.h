@@ -12,6 +12,7 @@ public:
 
   void Init() override;
   void SetupObject(Object* object) override;
+  void SetupLight(Light* light) override;
   void RemoveObject(Object* object) override;
   void DrawObjects(const std::vector<Object*>* objects) override;
   bool IsClosed() override;
@@ -26,5 +27,5 @@ public:
 
 protected:
   GLFWwindow* window_;
-  glm::vec4 clear_color_;
+  glm::vec4 clear_color_ = {0.2, 0.2, 0.2, 1.0f};
 };

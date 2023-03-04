@@ -19,6 +19,8 @@ public:
   static const std::vector<Light*>& GetLights();
   static void SetAmbient(const glm::vec3& value);
   static const glm::vec3& GetAmbient();
+  static void SetAmbientIntensity(float value);
+  static float GetAmbientIntensity();
 
   void Exit();
 
@@ -37,8 +39,9 @@ public:
   static void SetFarPlane(float value);
   static void WindowResizeCallback(GLFWwindow* window, int width, int height);
 
-    static bool GetCalculateLight();
-    static void SetCalculateLight(bool calculateLight);
+  static bool GetCalculateLight();
+  static void SetCalculateLight(bool calculateLight);
+
 private:
   void Init();
   static float near_plane_;
@@ -53,6 +56,7 @@ private:
   static std::vector<Object*>* objects_;
   static std::vector<Light*> lights_;
   static glm::vec3 ambient_;
+  inline static float ambient_intensity_ = 1.f;
   inline static bool calculate_light_ = false;
 
 private:
