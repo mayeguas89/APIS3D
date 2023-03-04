@@ -32,10 +32,6 @@ void GL1Render::Init()
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
-  // glDepthFunc(GL_LESS);
-
-  // glEnable(GL_CULL_FACE);
-  // glCullFace(GL_BACK);
 
   glfwSetWindowSizeCallback(window_, &System::WindowResizeCallback);
 
@@ -45,6 +41,7 @@ void GL1Render::Init()
 }
 
 void GL1Render::SetupObject(Object* object) {}
+void GL1Render::SetupParticle(Emitter* emitter) {}
 
 void GL1Render::SetupLight(Light* light) {}
 
@@ -57,18 +54,25 @@ void GL1Render::DrawObjects(const std::vector<Object*>* objects)
   glColor3f(color.r, color.g, color.b);
   for (Object* object: *(objects))
   {
-    for (auto* mesh: object->GetMeshes())
-    {
-      for (Vertex vertex: *(mesh->GetVertList()))
-      {
-        vertex.position = object->GetModelMatrix() * vertex.position;
-        glColor3f(vertex.color.r, vertex.color.g, vertex.color.b);
-        glVertex3f(vertex.position.x, vertex.position.y, vertex.position.z);
-      }
-    }
+    DrawObject(object);
   }
   glEnd();
 }
+
+void GL1Render::DrawObject(Object* object)
+{
+  for (auto* mesh: object->GetMeshes())
+  {
+    for (Vertex vertex: *(mesh->GetVertList()))
+    {
+      vertex.position = object->GetModelMatrix() * vertex.position;
+      glColor3f(vertex.color.r, vertex.color.g, vertex.color.b);
+      glVertex3f(vertex.position.x, vertex.position.y, vertex.position.z);
+    }
+  }
+}
+
+void GL1Render::DrawParticles(Emitter* emitter) {}
 
 bool GL1Render::IsClosed()
 {

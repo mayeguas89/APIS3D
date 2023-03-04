@@ -1,10 +1,10 @@
-#include "asian_town.h"
-#include "camera_keyboard.h"
-#include "cube_text.h"
+#include "column.h"
+#include "emitter.h"
 #include "factory_engine.h"
 #include "flash_light.h"
 #include "light.h"
-#include "orbital_light.h"
+#include "particle.h"
+#include "rotate_camera.h"
 #include "system.h"
 
 int main(int argc, char const* argv[])
@@ -12,76 +12,83 @@ int main(int argc, char const* argv[])
   FactoryEngine::SetRenderBackend(FactoryEngine::RenderBackend::GL4Render);
   FactoryEngine::SetInputBackend(FactoryEngine::InputBackend::GLFWInputManager);
 
-  System system;
+  System::Init();
 
-  AsianTown asian_town;
-  asian_town.LoadDataFromFile("data/bunny.msh");
-  asian_town.SetScaling(glm::vec4(1.5f, 1.5f, 1.5f, 1.f));
-  asian_town.SetRotation(glm::vec4(glm::half_pi<float>(), 0.f, 0.f, 0.f));
+  Column column;
 
-  // CubeText asian_town;
-
-  Light* directional_light = new Light(Light::Type::kDirectional,
-                                       glm::vec3(1.f, 1.f, 1.f),
-                                       glm::vec3(1.f, 1.f, 1.f),
-                                       glm::vec3(1.f, 1.f, 1.f),
-                                       0.f,
-                                       1.f,
-                                       1.f,
-                                       1.f,
-                                       1.f);
-  directional_light->SetLinearAttenuation(1.f);
+  try
+  {
+    column.LoadDataFromFile("data/column/column.msh");
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << '\n';
+    return -1;
+  }
+  column.SetScaling(glm::vec4(0.01f, 0.01f, 0.01f, 1.f));
 
   Light* point_light = new Light(Light::Type::kPoint,
-                                 glm::vec3(0.f, .3f, 0.f),
-                                 glm::vec3(.5f, .33f, .7f),
-                                 glm::vec3(.1f, .1f, 1.f),
+                                 glm::vec3(0.f, 15.f, 1.f),
+                                 glm::vec3(0.f, -1.f, -1.f),
+                                 glm::vec3(0.5f, 0.5f, 0.5f),
                                  0.f,
                                  1.f,
                                  1.f,
                                  1.f,
                                  1.f);
-  point_light->SetLinearAttenuation(.5f);
 
-  Light* orbital_light = new OrbitalLight(glm::vec3(0.25f, 0.25f, 0.25f),
-                                          glm::vec3(1.f, 1.f, 1.f),
-                                          glm::vec3(1.f, 1.f, 1.f),
-                                          1.f,
-                                          1.f,
-                                          1.f,
-                                          1.f);
+  point_light->SetLinearAttenuation(0.1f);
 
-  orbital_light->SetLinearAttenuation(1.f);
-  Light* flash_light = new FlashLight(glm::vec3(.5f, .5f, .5f),
-                                      glm::vec3(-1.f, -1.f, -1.f),
-                                      glm::vec3(.1f, 1.f, .1f),
-                                      60.f,
-                                      1.f,
-                                      1.f,
-                                      1.f,
-                                      1.f);
+  System::SetAmbient(glm::vec3(0.1f, 0.1f, 0.1f));
 
-  System::SetAmbient(glm::vec3(0.2f, 0.2f, 0.2f));
-  System::AddLight(directional_light);
-  System::AddLight(orbital_light);
   System::AddLight(point_light);
-  System::AddLight(flash_light);
 
-  System::SetCalculateLight(true);
+  Camera* rotate_camera = new RotateCamera(Camera::ProjectionType::Perspective,
+                                           glm::vec3(0.f, 10.f, 25.f),
+                                           glm::vec3(0.f, 3.f, 0.f),
+                                           glm::vec3(0.f, 1.f, 0.f),
+                                           glm::quarter_pi<float>());
 
-  Camera* camera_keyboard = new CameraKeyboard(Camera::ProjectionType::Perspective,
-                                               glm::vec3(0.f, 1.f, 1.f),
-                                               glm::vec3(0.f, -1.f, -1.f),
-                                               glm::vec3(0.f, 1.f, 0.f));
-  system.SetCamera(camera_keyboard);
-  system.AddObject(&asian_town);
-  system.AddObject(std::move(directional_light->GetCube()));
-  system.AddObject(std::move(orbital_light->GetCube()));
-  system.AddObject(std::move(point_light->GetCube()));
-  system.AddObject(std::move(flash_light->GetCube()));
-  system.MainLoop();
+  Emitter smoke_emmiter_one("data/column/smoke.msh",
+                            glm::vec3{-0.5f, 6.5f, -0.5f},
+                            glm::vec3{0.5f, 6.5f, 0.5f},
+                            glm::vec2{1.f, 5.f},
+                            glm::vec2{0.5f, 1.f},
+                            glm::vec2{glm::pi<float>() / 6.f, glm::pi<float>() / 3.f},
+                            glm::vec2{30.f, 50.f},
+                            glm::vec3{-0.1, 1, -0.1},
+                            glm::vec3{0.1, 4, 0.1},
+                            true);
 
-  delete camera_keyboard;
+  Emitter fire_emitter_one("data/column/flame.msh",
+                           glm::vec3{-0.5f, 6.5f, -0.5f},
+                           glm::vec3{0.5f, 6.5f, 0.5f},
+                           glm::vec2{0.5f, 0.5f},
+                           glm::vec2{1.f, 1.f},
+                           glm::vec2{0., 0.},
+                           glm::vec2{100.f, 150.f},
+                           glm::vec3{-1., 5., -1.},
+                           glm::vec3{1., 5., 1.},
+                           false);
+
+  System::AddEmitter(&fire_emitter_one);
+  System::AddEmitter(&smoke_emmiter_one);
+  System::SetCamera(rotate_camera);
+  System::AddObject(&column);
+  System::AddObject(point_light->GetCube());
+
+  try
+  {
+    System::MainLoop();
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << '\n';
+  }
+  System::End();
+
+  delete rotate_camera;
+  delete point_light;
 
   return 0;
 }

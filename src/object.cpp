@@ -14,3 +14,11 @@ void Object::AddMesh(Mesh3D* mesh)
 {
   meshes_.push_back(mesh);
 }
+
+void Object::SetAlpha(float alpha)
+{
+  for (auto mesh: meshes_)
+  {
+    mesh->GetMaterial()->SetAlpha(alpha);
+  }
+}

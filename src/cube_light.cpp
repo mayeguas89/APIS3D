@@ -6,7 +6,7 @@
 
 #include "factory_engine.h"
 
-CubeLight::CubeLight(const glm::vec3 color)
+CubeLight::CubeLight(const glm::vec3& color)
 {
   auto material = FactoryEngine::GetNewMaterial();
 
@@ -102,7 +102,7 @@ CubeLight::CubeLight(const glm::vec3 color)
   AddMesh(mesh);
 }
 
-void CubeLight::SetColor(glm::vec3 color)
+void CubeLight::SetColor(const glm::vec3& color)
 {
   for (auto mesh: meshes_)
   {

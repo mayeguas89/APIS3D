@@ -43,6 +43,6 @@ void GLTexture::Bind()
 {
   if (id_ == 0)
     return;
-  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, id_);
+  glActiveTexture(GL_TEXTURE0);
 }

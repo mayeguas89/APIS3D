@@ -27,6 +27,7 @@ private:
   void CameraMenu();
   void ObjectsMenu();
   void LightsMenu();
+  void SceneMenu();
   void AddMenu();
 
   struct ObjectData

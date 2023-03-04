@@ -19,12 +19,18 @@ link_directories(
 add_executable(APIS3D 
     src/APIS3D.cpp
     src/asian_town.cpp
+    src/billboard.cpp
     src/camera.cpp
     src/camera_keyboard.cpp
+    src/column.cpp
+    src/cube_light.cpp 
     src/cube_text.cpp
+    src/directional_light.cpp 
+    src/emitter.cpp
     src/entity.cpp
     src/factory_engine.cpp
     src/imgui_app.cpp
+    src/flash_light.cpp
     src/gl1_render.cpp
     src/gl4_render.cpp
     src/gl_texture.cpp
@@ -34,14 +40,17 @@ add_executable(APIS3D
     src/light.cpp
     src/material.cpp
     src/mesh3d.cpp
+    src/particle.cpp
     src/object.cpp
     src/object3d.cpp
     src/render.cpp
+    src/rotate_camera.cpp
     src/system.cpp
     src/texture.cpp
     src/time_manager.cpp
     src/triangle_rot.cpp
-        src/cube_light.cpp src/cube_light.h src/orbital_light.cpp src/orbital_light.h src/directional_light.cpp src/directional_light.h src/flash_light.cpp src/flash_light.h)
+    src/orbital_light.cpp
+  )
 
 target_include_directories(
     APIS3D 

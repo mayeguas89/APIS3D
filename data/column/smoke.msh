@@ -1,0 +1,19 @@
+<mesh>
+	<buffers>
+		<buffer>
+			<material>
+				<texture>data/smoke.png</texture>
+				<vShader>data/particles.vertex</vShader>
+				<fShader>data/particles.fragment</fShader>
+				<light>false</light>
+				<blendMode>alpha</blendMode>
+				<culling>false</culling>
+				<depthWrite>false</depthWrite>
+			</material>
+			<indices>0,1,2,0,2,3</indices>
+		    <normals normalCompCount="3">0,0,-1,0,0,-1,0,0,-1,0,0,-1</normals>
+			<coords vertexCompCount="3">-0.5,-0.5,0.0,-0.5,0.5,0.0,0.5,0.5,0.0,0.5,-0.5,0.0</coords>
+			<texCoords texCoordCompCount="2">0.000000,0.000000,  0.000000,1.000000,1.000000,1.000000,1.000000,0.000000</texCoords>
+		</buffer>
+	</buffers>
+</mesh>

@@ -51,13 +51,11 @@ void GLFWInputManager::KeyManager(GLFWwindow* window, int key, int scancode, int
   {
     case GLFW_PRESS:
     {
-      std::cout << "Evento de press de tecla\n";
       keyState_[key] = true;
       break;
     }
     case GLFW_RELEASE:
     {
-      std::cout << "Evento de release de tecla\n";
       keyState_[key] = false;
       break;
     }
@@ -73,8 +71,6 @@ void GLFWInputManager::MouseManager(GLFWwindow* window, double x_pos, double y_p
 
   pos_x_ = x_pos;
   pos_y_ = y_pos;
-
-  std::cout << "Mouse position (" << x_pos << ", " << y_pos << ")" << std::endl;
 
   static float yaw = -90.f;
   static float pitch = 0.f;
@@ -101,7 +97,6 @@ void GLFWInputManager::ScrollManager(GLFWwindow* window, double x_offset, double
     fov_ = 1.f;
   else if (fov_ > 90.f)
     fov_ = 90.f;
-  std::cout << "Mouse scroll (" << x_offset << ", " << y_offset << ")" << std::endl;
 }
 
 void GLFWInputManager::MouseKeyManager(GLFWwindow* window, int button, int action, int mods)
@@ -109,11 +104,9 @@ void GLFWInputManager::MouseKeyManager(GLFWwindow* window, int button, int actio
   switch (action)
   {
     case GLFW_PRESS:
-      std::cout << "Evento de press de tecla de raton\n";
       keyState_[button] = true;
       break;
     case GLFW_RELEASE:
-      std::cout << "Evento de release de tecla de raton\n";
       keyState_[button] = false;
       break;
     default:

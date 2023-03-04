@@ -53,7 +53,55 @@ void GLSLMaterial::Prepare()
   // De momento sabemos las variables harcodeadas
   // Luego podemos obtener de alguna forma el nombre de las variables
 
-  render_program_->SetInt("shininess", shininess_);
+  // Guardamos o no los datos de profundidad en el buffer de profundidad que esta activo siempre
+  if (IsDepthTestEnabled())
+  {
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+  }
+  else
+  {
+    glDisable(GL_DEPTH_TEST);
+  }
 
+  if (IsCullingEnabled())
+  {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+  }
+  else
+  {
+    glDisable(GL_CULL_FACE);
+  }
+
+  switch (GetBlendMode())
+  {
+    case BlendMode::Solid:
+    {
+      glBlendFunc(GL_ONE, GL_ZERO);
+      break;
+    }
+    case BlendMode::Add:
+    {
+      glBlendFunc(GL_ONE, GL_ONE);
+      break;
+    }
+    case BlendMode::Mul:
+    {
+      glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      break;
+    }
+    case BlendMode::Alpha:
+    {
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      break;
+    }
+    default:
+      break;
+  }
+
+  render_program_->SetInt("shininess", shininess_);
+  render_program_->SetInt("computeLight", (int)IsLightEnabled());
+  render_program_->SetFloat("alpha", alpha_);
   render_program_->SetVariables();
 }

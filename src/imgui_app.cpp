@@ -38,6 +38,7 @@ void ImguiApp::Init(GLFWwindow* window)
 
 void ImguiApp::Update()
 {
+  SceneMenu();
   CameraMenu();
   ObjectsMenu();
   LightsMenu();
@@ -106,15 +107,25 @@ void ImguiApp::CameraMenu()
   static float camera_speed = 0.1f;
   static float near_plane = 0.1f;
   static float far_plane = 100.f;
+  static float look_at[] = {System::GetCamera()->GetLookAt().x,
+                            System::GetCamera()->GetLookAt().y,
+                            System::GetCamera()->GetLookAt().z};
+  static float translation[] = {System::GetCamera()->GetPosition().x,
+                                System::GetCamera()->GetPosition().y,
+                                System::GetCamera()->GetPosition().z};
   if (ImGui::CollapsingHeader("Camera"))
   {
     System::GetCamera()->SetSpeed(camera_speed);
     System::SetNearPlane(near_plane);
     System::SetFarPlane(far_plane);
+    System::GetCamera()->SetLookAt(glm::vec3(look_at[0], look_at[1], look_at[2]));
+    System::GetCamera()->SetPosition(glm::vec4(translation[0], translation[1], translation[2], 1.f));
 
     ImGui::SliderFloat("CameraSpeed", &camera_speed, 0.0, 5.0);
     ImGui::SliderFloat("NearPlane", &near_plane, 0.001f, 10.0f);
     ImGui::SliderFloat("FarPlane", &far_plane, 100.0f, 200.f);
+    ImGui::SliderFloat3("Look At", look_at, -10, 10);
+    ImGui::SliderFloat3("Camera Position", translation, -20, 20);
   }
 }
 
@@ -138,8 +149,8 @@ void ImguiApp::ObjectsMenu()
         object->SetEnabled(data.enabled);
 
         ImGui::Checkbox("Toggle ON/OFF", &data.enabled);
-        ImGui::SliderFloat3("Position", &data.translation[0], -10.0, 10.0);
-        ImGui::SliderFloat3("Rotation", &data.rotation[0], 0, 2 * glm::pi<float>());
+        ImGui::SliderFloat3("Position", &data.translation[0], -100.0, 100.0);
+        ImGui::SliderFloat3("Rotation", &data.rotation[0], -2 * glm::pi<float>(), 2 * glm::pi<float>());
         ImGui::SliderFloat3("Scale", &data.scale[0], -10.0, 10.0);
         ImGui::TreePop();
       }
@@ -207,8 +218,8 @@ void ImguiApp::LightsMenu()
         ImGui::Checkbox("Toggle ON/OFF", &data.enabled);
 
         if (light->GetType() != (int)Light::Type::kDirectional)
-          ImGui::SliderFloat3("Position", &data.position[0], -2.f, 2.f);
-        ImGui::SliderFloat3("Rotation", &data.rotation[0], 0.f, 2 * glm::pi<float>());
+          ImGui::SliderFloat3("Position", &data.position[0], -100.f, 100.f);
+        ImGui::SliderFloat3("Rotation", &data.rotation[0], -2 * glm::pi<float>(), 2 * glm::pi<float>());
         ImGui::ColorEdit3("Color", (float*)&data.color);
         if (light->GetType() == (int)Light::Type::kFocal)
           ImGui::SliderFloat("CutOffAngle", &data.cut_off_angle, 0.f, 360.f);
@@ -220,6 +231,17 @@ void ImguiApp::LightsMenu()
       }
     }
   }
+}
+
+void ImguiApp::SceneMenu()
+{
+  static ImVec4 clear_color = ImVec4(System::GetClearColor().r,
+                                     System::GetClearColor().g,
+                                     System::GetClearColor().b,
+                                     System::GetClearColor().a);
+  System::SetClearColor(glm::vec4{clear_color.x, clear_color.y, clear_color.z, clear_color.w});
+
+  ImGui::ColorEdit3("Clear color", (float*)&clear_color);
 }
 
 void ImguiApp::AddMenu() {}

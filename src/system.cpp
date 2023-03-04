@@ -13,19 +13,17 @@ std::vector<Object*>* System::objects_ = nullptr;
 std::vector<Light*> System::lights_;
 glm::vec3 System::ambient_ = glm::vec3(1.f);
 
-System::System()
-{
-  Init();
-  objects_ = new std::vector<Object*>();
-  end_ = false;
-}
-
-System::~System()
+void System::End()
 {
   if (render_)
     delete render_;
   if (input_manager_)
     delete input_manager_;
+}
+
+void System::SetupParticle(Emitter* emitter)
+{
+  render_->SetupParticle(emitter);
 }
 
 void System::AddObject(Object* object)
@@ -34,6 +32,11 @@ void System::AddObject(Object* object)
     return;
   render_->SetupObject(object);
   objects_->push_back(std::move(object));
+}
+
+void System::AddEmitter(Emitter* emitter)
+{
+  emitters_.push_back(std::move(emitter));
 }
 
 void System::Exit()
@@ -64,12 +67,20 @@ void System::MainLoop()
 
     // Actualiza Objetos
     for (Object* object: *objects_)
-    {
       object->Update(TimeManager::deltaTime);
-    }
 
     // Dibuja objectos
     render_->DrawObjects(objects_);
+
+    // Ordena particular en los emisores
+    for (auto emitter: emitters_)
+      emitter->Update(TimeManager::deltaTime);
+
+    // Pinta particular del emisor
+    for (auto emitter: emitters_)
+    {
+      render_->DrawParticles(emitter);
+    }
 
     // Intercambiar el front y el back buffer
     render_->SwapBuffers();
@@ -146,6 +157,8 @@ void System::SetNearPlane(float value)
 
 void System::Init()
 {
+  objects_ = new std::vector<Object*>();
+
   input_manager_ = FactoryEngine::GetNewInputManager();
   input_manager_->Init();
 
@@ -184,12 +197,27 @@ float System::GetAmbientIntensity()
   return ambient_intensity_;
 }
 
-bool System::GetCalculateLight()
+const glm::vec4& System::GetClearColor()
 {
-  return calculate_light_;
+  return render_->GetClearColor();
 }
 
-void System::SetCalculateLight(bool calculateLight)
+void System::SetClearColor(const glm::vec4& color)
 {
-  calculate_light_ = calculateLight;
+  render_->SetClearColor(color);
+}
+
+void System::AddMesh(const std::string& filename, Mesh3D* mesh)
+{
+  if (auto it = mesh_map_.find(filename); it == mesh_map_.end())
+    mesh_map_[filename] = {{std::move(mesh)}};
+  else
+    mesh_map_[filename].push_back(std::move(mesh));
+}
+
+const std::vector<Mesh3D*>& System::GetMesh(const std::string& filename)
+{
+  if (auto it = mesh_map_.find(filename); it != mesh_map_.end())
+    return it->second;
+  return {};
 }

@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iosfwd>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
