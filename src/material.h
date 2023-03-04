@@ -57,7 +57,7 @@ protected:
   glm::vec3 color_;
   uint8_t shininess_;
   bool light_enabled_ = true;
-  bool culling_enabled_ = true;
+  bool culling_enabled_ = false;
   bool depth_test_enabled_ = true;
   float alpha_ = 1.0f;
   BlendMode blend_mode_ = BlendMode::None;

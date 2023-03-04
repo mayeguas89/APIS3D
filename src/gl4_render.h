@@ -23,8 +23,8 @@ class GL4Render: public GL1Render
     // Buffer objects para las matrices modelo de los objetos
     GLuint vbm;
 
-    // Buffer objects para las texturas de los vertices
-    GLuint vbt;
+    // Buffer objects para las alphas de los objetos
+    GLuint vba;
   };
 
 public:

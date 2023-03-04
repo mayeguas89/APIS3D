@@ -11,7 +11,7 @@
 class System
 {
 public:
-  static const int kMaxParticles = 1000;
+  static const int kMaxParticles = 100;
   static void SetupParticle(Emitter* emitter);
   static void AddObject(Object* object);
   static void AddEmitter(Emitter* emitter);

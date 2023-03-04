@@ -18,9 +18,12 @@ public:
 
   bool IsDead();
 
+  float GetAlpha();
+
 private:
   glm::vec3 velocity_;
   double lifetime_;
   bool autofade_;
   double initial_lifetime_;
+  float alpha_ = 1.0f;
 };
