@@ -215,9 +215,22 @@ void System::AddMesh(const std::string& filename, Mesh3D* mesh)
     mesh_map_[filename].push_back(std::move(mesh));
 }
 
+void System::AddTexture(const std::string& filename, Texture* texture)
+{
+  if (auto it = texture_map_.find(filename); it == texture_map_.end())
+    texture_map_[filename] = std::move(texture);
+}
+
 const std::vector<Mesh3D*>& System::GetMesh(const std::string& filename)
 {
   if (auto it = mesh_map_.find(filename); it != mesh_map_.end())
     return it->second;
   return {};
+}
+
+Texture* System::GetTexture(const std::string& filename)
+{
+  if (auto it = texture_map_.find(filename); it != texture_map_.end())
+    return it->second;
+  return nullptr;
 }

@@ -15,8 +15,6 @@ Object3D::Object3D(): Object() {}
 
 void Object3D::LoadDataFromFile(const std::string& filename)
 {
-  std::unordered_map<std::string, Texture*> textures;
-
   if (const auto meshes = System::GetMesh(filename); !meshes.empty())
   {
     for (auto mesh: meshes)
@@ -26,27 +24,9 @@ void Object3D::LoadDataFromFile(const std::string& filename)
 
   if (filename.ends_with("msh"))
   {
-    auto directory = filename.substr(0, filename.find_last_of('/'));
-    pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file(filename.c_str());
-
-    if (!result)
-    {
-      std::string error_msg = "Error reading the file " + filename + "\nError: " + result.description();
-      throw std::runtime_error(error_msg);
-    }
-
-    auto buffers_node = doc.child("mesh").child("buffers");
-
-    for (pugi::xml_node buffer: buffers_node.children("buffer"))
-    {
-      auto material = utils::ProcessMaterial(buffer, textures, directory);
-      auto mesh = utils::ProcessMesh(buffer, material);
-
-      System::AddMesh(filename, mesh);
-
+    auto meshes = utils::GetMeshesFromMshFile(filename);
+    for (auto mesh: meshes)
       AddMesh(mesh);
-    }
   }
   else
   {
@@ -139,16 +119,15 @@ void Object3D::LoadDataFromFile(const std::string& filename)
 
           // Añadimos la textura al material
           auto texture_filename = directory + "/" + std::string(str.C_Str());
-          Texture* texture = nullptr;
           // Si la textura está en nuestro mapa de texturas la añadimos
-          if (textures.find(texture_filename) == textures.end())
+          Texture* texture = System::GetTexture(std::string(str.C_Str()));
+          if (texture == nullptr)
           {
             texture = FactoryEngine::GetNewTexture();
-            textures[texture_filename] = texture;
+            System::AddTexture(str.C_Str(), texture);
             texture->Load(texture_filename);
             texture->Bind();
           }
-          texture = textures[texture_filename];
           my_material->SetTexture(texture);
           my_mesh->SetMaterial(my_material);
         }

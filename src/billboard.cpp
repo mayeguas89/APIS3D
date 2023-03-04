@@ -4,7 +4,7 @@
 #include "system.h"
 #include "utils.h"
 
-Billboard::Billboard(float spin): spin_{spin} {}
+Billboard::Billboard(float spin): Object(), spin_{spin} {}
 
 void Billboard::Update(float delta_time)
 {
@@ -45,30 +45,10 @@ void Billboard::LoadDataFromFile(const std::string& filename)
     return;
   }
 
-  std::unordered_map<std::string, Texture*> textures;
-
   if (filename.ends_with("msh"))
   {
-    auto directory = filename.substr(0, filename.find_last_of('/'));
-    pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file(filename.c_str());
-
-    if (!result)
-    {
-      std::string error_msg = "Error reading the file " + filename + "\nError: " + result.description();
-      throw std::runtime_error(error_msg);
-    }
-
-    auto buffers_node = doc.child("mesh").child("buffers");
-
-    for (pugi::xml_node buffer: buffers_node.children("buffer"))
-    {
-      auto material = utils::ProcessMaterial(buffer, textures, directory);
-      auto mesh = utils::ProcessMesh(buffer, material);
-
-      System::AddMesh(filename, mesh);
-
+    auto meshes = utils::GetMeshesFromMshFile(filename);
+    for (auto mesh: meshes)
       AddMesh(mesh);
-    }
   }
 }

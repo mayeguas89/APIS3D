@@ -31,9 +31,7 @@ std::vector<T> SplitString(const std::string& str, char delim)
   return elems;
 }
 
-inline Material* ProcessMaterial(pugi::xml_node buffer,
-                                 std::unordered_map<std::string, Texture*>& textures,
-                                 const std::string& directory)
+inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& directory)
 {
   glm::vec4 material_color = glm::vec4(1.f, 1.f, 1.f, 1.f);
 
@@ -107,14 +105,17 @@ inline Material* ProcessMaterial(pugi::xml_node buffer,
   {
     // Añadimos la textura al material
     auto texture_filename = buffer.child("material").child("texture").text().as_string();
-    Texture* texture = nullptr;
-    if (textures.find(texture_filename) == textures.end())
+    std::string string_texture_filename{texture_filename};
+    auto texture_file =
+      string_texture_filename.substr(string_texture_filename.find_last_of('/'), string_texture_filename.back());
+
+    Texture* texture = System::GetTexture(texture_file);
+
+    if (texture == nullptr)
     {
       texture = FactoryEngine::GetNewTexture();
-      textures[texture_filename] = texture;
-      std::string string_texture_filename{texture_filename};
-      auto texture_file =
-        string_texture_filename.substr(string_texture_filename.find_last_of('/'), string_texture_filename.back());
+      System::AddTexture(texture_file, texture);
+
       if (!texture->Load(directory + texture_file))
       {
         std::string error_msg = "Error reading the texture file " + directory + texture_file + "\n";
@@ -122,16 +123,14 @@ inline Material* ProcessMaterial(pugi::xml_node buffer,
       }
       texture->Bind();
     }
-    texture = textures[texture_filename];
+
     material->SetTexture(texture);
   }
   return material;
 }
 
-inline Mesh3D* ProcessMesh(pugi::xml_node buffer, Material* material)
+inline void ProcessMesh(pugi::xml_node buffer, Mesh3D* mesh)
 {
-  auto mesh = new Mesh3D();
-
   if (auto attrib = buffer.child("coords"); attrib != nullptr)
   {
     auto pos_coords_list = utils::SplitString<float>(attrib.text().as_string(), ',');
@@ -145,9 +144,23 @@ inline Mesh3D* ProcessMesh(pugi::xml_node buffer, Material* material)
       v.position.z = *coord++;
       v.position.w = 1.0f;
 
-      v.color = glm::vec4(material->GetColor(), 1.0f);
+      v.color = glm::vec4(mesh->GetMaterial()->GetColor(), 1.0f);
 
       mesh->AddVertex(v);
+    }
+  }
+
+  if (auto attrib = buffer.child("tangents"); attrib != nullptr)
+  {
+    auto tangent_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+    auto tangent = tangent_list.begin();
+    for (auto it = mesh->GetVertList()->begin(); it != mesh->GetVertList()->end() && tangent != tangent_list.end();
+         it++)
+    {
+      it->tangent.x = *tangent++;
+      it->tangent.y = *tangent++;
+      it->tangent.z = *tangent++;
+      it->tangent.w = 0.0f;
     }
   }
 
@@ -177,14 +190,48 @@ inline Mesh3D* ProcessMesh(pugi::xml_node buffer, Material* material)
     }
   }
 
-  for (auto index: utils::SplitString<unsigned int>(buffer.child("indices").text().as_string(), ','))
+  if (auto attrib = buffer.child("indices"); attrib != nullptr)
   {
-    mesh->AddIndex(index);
+    auto index_list = utils::SplitString<unsigned int>(attrib.text().as_string(), ',');
+    for (auto index: index_list)
+    {
+      mesh->AddIndex(index);
+    }
+  }
+}
+
+inline std::vector<Mesh3D*> GetMeshesFromMshFile(const std::string filename)
+{
+  std::vector<Mesh3D*> to_return;
+
+  auto directory = filename.substr(0, filename.find_last_of('/'));
+  pugi::xml_document doc;
+  pugi::xml_parse_result result = doc.load_file(filename.c_str());
+
+  if (!result)
+  {
+    std::string error_msg = "Error reading the file " + filename + "\nError: " + result.description();
+    throw std::runtime_error(error_msg);
   }
 
-  mesh->SetMaterial(material);
+  auto buffers_node = doc.child("mesh").child("buffers");
 
-  return mesh;
+  for (pugi::xml_node buffer: buffers_node.children("buffer"))
+  {
+    auto mesh = new Mesh3D();
+
+    auto material = utils::ProcessMaterial(buffer, directory);
+
+    mesh->SetMaterial(material);
+
+    utils::ProcessMesh(buffer, mesh);
+
+    System::AddMesh(filename, mesh);
+
+    to_return.push_back(mesh);
+  }
+
+  return to_return;
 }
 
 }

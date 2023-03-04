@@ -32,6 +32,7 @@ void GL1Render::Init()
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
+  glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
   glfwSetWindowSizeCallback(window_, &System::WindowResizeCallback);
 

@@ -43,7 +43,9 @@ public:
   static bool GetCalculateLight();
   static void SetCalculateLight(bool calculateLight);
   static void AddMesh(const std::string& filename, Mesh3D* mesh);
+  static void AddTexture(const std::string& filename, Texture* texture);
   static const std::vector<Mesh3D*>& GetMesh(const std::string& filename);
+  static Texture* GetTexture(const std::string& filename);
 
   static void Init();
   static void End();
@@ -67,6 +69,7 @@ private:
   inline static float ambient_intensity_ = 1.f;
   inline static bool calculate_light_ = false;
   inline static std::unordered_map<std::string, std::vector<Mesh3D*>> mesh_map_;
+  inline static std::unordered_map<std::string, Texture*> texture_map_;
   inline static std::vector<Emitter*> emitters_;
 
   inline static bool end_ = false;
