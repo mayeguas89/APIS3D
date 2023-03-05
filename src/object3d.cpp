@@ -128,7 +128,7 @@ void Object3D::LoadDataFromFile(const std::string& filename)
             texture->Load({{texture_filename}});
             texture->Bind();
           }
-          my_material->SetTexture(texture);
+          my_material->SetBaseTexture(texture);
           my_mesh->SetMaterial(my_material);
         }
 

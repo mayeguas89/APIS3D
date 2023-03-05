@@ -143,7 +143,12 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
           throw std::runtime_error("Error reading the cubeMap texture files\n");
         texture->Bind((unsigned int)Texture::Type::kCubeMap);
       }
-      material->SetTexture(texture);
+
+      if (material->GetReflection())
+        material->SetReflectionTexture(texture);
+      else if (material->GetRefraction())
+        material->SetRefractionTexture(texture);
+      material->SetBaseTexture(texture);
     }
     else
     {
@@ -168,7 +173,7 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
         texture->Bind((unsigned int)Texture::Type::kColor2D);
       }
 
-      material->SetTexture(texture);
+      material->SetBaseTexture(texture);
     }
   }
 
@@ -195,7 +200,7 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
       texture->Bind((unsigned int)Texture::Type::kNormal);
     }
 
-    material->SetTexture(texture);
+    material->SetNormalTexture(texture);
   }
 
   return material;

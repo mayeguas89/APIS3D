@@ -6,7 +6,7 @@
 				<color>1,1,1,1</color>
 				<refraction>true</refraction>
 				<light>false</light>
-				<texture cubeMap="true">data/sky_left.png,data/sky_right.png,data/sky_front.png,data/sky_back.png,data/sky_top.png,data/sky_bottom.png</texture>
+				<texture cubeMap="true">data/sky_right.png,data/sky_left.png,data/sky_top.png,data/sky_bottom.png,data/sky_front.png,data/sky_back.png</texture>
 				<refractCoef>0.9</refractCoef>
 				<shininess>0</shininess>
 				<depthWrite>true</depthWrite>

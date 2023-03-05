@@ -32,7 +32,7 @@ TriangleRot::TriangleRot(): Object()
     program_map["data/program.vertex"] = RenderType::Vertex;
     program_map["data/program.fragment"] = RenderType::Fragment;
     material->LoadPrograms(program_map);
-    material->SetTexture(texture);
+    material->SetBaseTexture(texture);
 
     mesh->SetMaterial(material);
   }

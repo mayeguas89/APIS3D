@@ -43,9 +43,10 @@ private:
     bool enabled = true;
     float position[4] = {0.0, 0.0, 0.0, 0.0};
     float rotation[4] = {0.0, 0.0, 0.0, 0.0};
+    float direction[4] = {0.0, 0.0, 0.0, 0.0};
     ImVec4 color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     float cut_off_angle = 12.5f;
-    float linear_attenuation = 0.f;
+    float distance_range = 50.0f;
     float ambient_contribution = 1.f;
     float difuse_contribution = 1.f;
     float specular_contribution = 1.f;

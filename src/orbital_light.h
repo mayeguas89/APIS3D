@@ -1,19 +1,19 @@
 #pragma once
-#include "light.h"
+#include "point_light.h"
 
-class OrbitalLight: public Light
+class OrbitalLight: public PointLight
 {
 public:
-  OrbitalLight(const glm::vec3& position,
-               const glm::vec3& direction,
-               const glm::vec3& color,
-               float linear_attenuation,
+  OrbitalLight(const glm::vec3& color,
                float ambient_contribution,
                float difuse_contribution,
-               float specular_contribution);
+               float specular_contribution,
+               float light_range,
+               const glm::vec3& position,
+               float orbitation_speed = glm::quarter_pi<float>());
   void Update(float delta_time) override;
 
 private:
   // Un cuarto de vuelta por segundo
-  inline static float kOrbitationSpeed = glm::quarter_pi<float>();
+  float orbitation_speed_;
 };

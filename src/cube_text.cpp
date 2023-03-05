@@ -29,9 +29,9 @@ CubeText::CubeText(): Object3D()
   material_top->SetShininess(255);
 
   material_front->LoadPrograms(program_map);
-  material_front->SetTexture(texture_front);
+  material_front->SetBaseTexture(texture_front);
   material_top->LoadPrograms(program_map);
-  material_top->SetTexture(texture_top);
+  material_top->SetBaseTexture(texture_top);
 
   // Creacion de vertices
   Vertex v0;

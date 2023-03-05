@@ -17,8 +17,14 @@ public:
 
   Material();
   ~Material();
-  Texture* GetTexture();
-  void SetTexture(Texture* texture);
+  Texture* GetBaseTexture();
+  void SetBaseTexture(Texture* texture);
+  Texture* GetNormalTexture();
+  void SetNormalTexture(Texture* texture);
+  Texture* GetReflectionTexture();
+  void SetReflectionTexture(Texture* texture);
+  Texture* GetRefractionTexture();
+  void SetRefractionTexture(Texture* texture);
 
   /**
    * @brief Metodo que recibe una lista de programas, los pasa al render program para que los compile y los linke
@@ -59,8 +65,11 @@ public:
   void SetRefractionCoefficient(float value);
 
 protected:
-  RenderProgram* render_program_;
-  Texture* texture_;
+  RenderProgram* render_program_ = nullptr;
+  Texture* base_texture_ = nullptr;
+  Texture* normal_texture_ = nullptr;
+  Texture* reflection_texture_ = nullptr;
+  Texture* refraction_texture_ = nullptr;
   glm::vec3 color_;
   uint8_t shininess_;
   bool light_enabled_ = true;

@@ -57,8 +57,8 @@ void GLTexture::Bind(unsigned int index)
 {
   if (id_ == 0)
     return;
-  glActiveTexture(GL_TEXTURE0 + index);
   (type_ == Type::kCubeMap) ? glBindTexture(GL_TEXTURE_CUBE_MAP, id_) : glBindTexture(GL_TEXTURE_2D, id_);
+  glActiveTexture(GL_TEXTURE0 + index);
 }
 
 bool GLTexture::LoadTextureCubeMap(const std::vector<std::string>& filenames)

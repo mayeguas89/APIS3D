@@ -37,6 +37,6 @@ protected:
   glm::vec3 look_at_;
   glm::vec3 radius_;
   float angle_;
-  float camera_speed_;
+  float camera_speed_ = 0.01f;
   ProjectionType projection_type_;
 };

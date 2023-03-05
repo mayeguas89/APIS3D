@@ -3,27 +3,20 @@
 //
 
 #include "orbital_light.h"
-OrbitalLight::OrbitalLight(const glm::vec3& position,
-                           const glm::vec3& direction,
-                           const glm::vec3& color,
-                           float linear_attenuation,
+OrbitalLight::OrbitalLight(const glm::vec3& color,
                            float ambient_contribution,
                            float difuse_contribution,
-                           float specular_contribution):
-  Light(Light::Type::kPoint,
-        position,
-        direction,
-        color,
-        0.f,
-        linear_attenuation,
-        ambient_contribution,
-        difuse_contribution,
-        specular_contribution)
+                           float specular_contribution,
+                           float light_range,
+                           const glm::vec3& position,
+                           float orbitation_speed):
+  PointLight(color, ambient_contribution, difuse_contribution, specular_contribution, light_range, position),
+  orbitation_speed_{orbitation_speed}
 {}
 
 void OrbitalLight::Update(float delta_time)
 {
-  rotation_.y += delta_time * kOrbitationSpeed;
+  rotation_.y += delta_time * orbitation_speed_;
 
   glm::mat4 model = glm::translate(glm::mat4(1.f), glm::vec3(position_));
 

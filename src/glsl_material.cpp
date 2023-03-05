@@ -99,31 +99,46 @@ void GLSLMaterial::Prepare()
   }
 
   render_program_->SetInt("shininess", shininess_);
-  render_program_->SetInt("computeLight", (int)IsLightEnabled());
+  render_program_->SetInt("computeLight", light_enabled_);
   render_program_->SetFloat("alpha", alpha_);
 
-  if (texture_ == nullptr)
+  render_program_->SetInt("computeReflection", reflection_enabled_);
+  render_program_->SetInt("computeRefraction", refraction_enabled_);
+  render_program_->SetFloat("refractCoef", refraction_coefficient_);
+
+  if (base_texture_ == nullptr)
   {
-    render_program_->SetInt("hasTexture", 0);
     render_program_->SetInt("colorTexture", 0);
-    render_program_->SetInt("cubeTexture", 0);
-    render_program_->SetInt("isCubeMap", 0);
+
+    if (reflection_texture_ || refraction_texture_)
+    {
+      auto texture = (reflection_texture_) ? reflection_texture_ : refraction_texture_;
+      render_program_->SetInt("hasTexture", 1);
+      render_program_->SetInt("cubeTexture", 1);
+      texture->Bind((int)Texture::Type::kCubeMap);
+      glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    }
+    else
+    {
+      render_program_->SetInt("hasTexture", 0);
+      render_program_->SetInt("cubeTexture", 0);
+    }
   }
   else
   {
     render_program_->SetInt("hasTexture", 1);
 
-    switch (texture_->GetType())
+    switch (base_texture_->GetType())
     {
       case Texture::Type::kCubeMap:
-        texture_->Bind((int)Texture::Type::kCubeMap);
+        base_texture_->Bind((int)Texture::Type::kCubeMap);
         render_program_->SetInt("colorTexture", 0);
         render_program_->SetInt("cubeTexture", 1);
         render_program_->SetInt("isCubeMap", 1);
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
         break;
       case Texture::Type::kColor2D:
-        texture_->Bind((int)Texture::Type::kColor2D);
+        base_texture_->Bind((int)Texture::Type::kColor2D);
         render_program_->SetInt("colorTexture", 1);
         render_program_->SetInt("cubeTexture", 0);
         render_program_->SetInt("isCubeMap", 0);

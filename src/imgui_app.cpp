@@ -34,6 +34,7 @@ void ImguiApp::Init(GLFWwindow* window)
   ambient_light_data_.color.y = System::GetAmbient().g;
   ambient_light_data_.color.z = System::GetAmbient().b;
   ambient_light_data_.color.w = 1.f;
+  ambient_light_data_.intensity = System::GetAmbientIntensity();
 }
 
 void ImguiApp::Update()
@@ -72,14 +73,14 @@ void ImguiApp::AddLight(Light* light)
   data.position[0] = light_position.x;
   data.position[1] = light_position.y;
   data.position[2] = light_position.z;
-  // auto light_direction = light->GetDirection();
-  // data.direction[0] = light_direction.x;
-  // data.direction[1] = light_direction.y;
-  // data.direction[2] = light_direction.z;
+  auto light_direction = light->GetDirection();
+  data.direction[0] = light_direction.x;
+  data.direction[1] = light_direction.y;
+  data.direction[2] = light_direction.z;
   auto light_color = light->GetColor();
   data.color = ImVec4(light_color.x, light_color.y, light_color.z, 1.0f);
   data.cut_off_angle = light->GetCutOff();
-  data.linear_attenuation = light->GetLinearAttenuation();
+  data.distance_range = light->GetLightRange();
   data.ambient_contribution = light->GetAmbientContribution();
   data.difuse_contribution = light->GetDifuseContribution();
   data.specular_contribution = light->GetSpecularContribution();
@@ -179,6 +180,7 @@ void ImguiApp::LightsMenu()
     {
       System::SetAmbient(
         glm::vec3(ambient_light_data_.color.x, ambient_light_data_.color.y, ambient_light_data_.color.z));
+      System::SetAmbientIntensity(ambient_light_data_.intensity);
       ImGui::ColorEdit3("Color", (float*)&ambient_light_data_.color);
       ImGui::SliderFloat("Intensity", &ambient_light_data_.intensity, 0.f, 1.f);
       ImGui::TreePop();
@@ -192,15 +194,48 @@ void ImguiApp::LightsMenu()
         auto light = lights_.at(i);
         auto& data = light_data_.at(i);
 
-        glm::vec4 position_vec(data.position[0], data.position[1], data.position[2], 1.f);
-        light->SetPosition(position_vec);
-        glm::vec4 rotation_vec(data.rotation[0], data.rotation[1], data.rotation[2], 1.f);
-        light->SetRotation(rotation_vec);
+        if (light->GetType() == (int)Light::Type::kDirectional)
+        {
+          glm::vec4 rotation_vec(data.rotation[0], data.rotation[1], data.rotation[2], 1.f);
+          light->SetRotation(rotation_vec);
+
+          auto dir = light->GetDirection();
+          data.direction[0] = dir.x;
+          data.direction[1] = dir.y;
+          data.direction[2] = dir.z;
+
+          auto rot = light->GetRotation();
+          data.rotation[0] = rot.x;
+          data.rotation[1] = rot.y;
+          data.rotation[2] = rot.z;
+        }
+        else if (light->GetType() == (int)Light::Type::kPoint)
+        {
+          light->SetLightRange(data.distance_range);
+          glm::vec4 position_vec(data.position[0], data.position[1], data.position[2], 1.f);
+          light->SetPosition(position_vec);
+        }
+        else if (light->GetType() == (int)Light::Type::kFocal)
+        {
+          light->SetLightRange(data.distance_range);
+          light->SetCutOff(data.cut_off_angle);
+          glm::vec4 position_vec(data.position[0], data.position[1], data.position[2], 1.f);
+          light->SetPosition(position_vec);
+
+          auto dir = light->GetDirection();
+          data.direction[0] = dir.x;
+          data.direction[1] = dir.y;
+          data.direction[2] = dir.z;
+
+          auto rot = light->GetRotation();
+          data.rotation[0] = rot.x;
+          data.rotation[1] = rot.y;
+          data.rotation[2] = rot.z;
+        }
+
         glm::vec4 color(data.color.x, data.color.y, data.color.z, 1.f);
         light->SetColor(color);
 
-        light->SetCutOff(data.cut_off_angle);
-        light->SetLinearAttenuation(data.linear_attenuation);
         light->SetAmbientContribution(data.ambient_contribution);
         light->SetDifuseContribution(data.difuse_contribution);
         light->SetSpecularContribution(data.specular_contribution);
@@ -219,11 +254,23 @@ void ImguiApp::LightsMenu()
 
         if (light->GetType() != (int)Light::Type::kDirectional)
           ImGui::SliderFloat3("Position", &data.position[0], -100.f, 100.f);
-        ImGui::SliderFloat3("Rotation", &data.rotation[0], -2 * glm::pi<float>(), 2 * glm::pi<float>());
+
+        if (light->GetType() == (int)Light::Type::kDirectional || light->GetType() == (int)Light::Type::kFocal)
+        {
+          ImGui::SliderFloat3("Rotation", &data.rotation[0], -2 * glm::pi<float>(), 2 * glm::pi<float>());
+          ImGui::SliderFloat3("Direction", &data.direction[0], -1.0f, 1.0f);
+        }
+
         ImGui::ColorEdit3("Color", (float*)&data.color);
+
         if (light->GetType() == (int)Light::Type::kFocal)
           ImGui::SliderFloat("CutOffAngle", &data.cut_off_angle, 0.f, 360.f);
-        ImGui::SliderFloat("LinearAttenuation", &data.linear_attenuation, 0.f, 1.f);
+
+        if (light->GetType() == (int)Light::Type::kPoint || light->GetType() != (int)Light::Type::kFocal)
+        {
+          ImGui::SliderFloat("Distance Range", &data.distance_range, 1.f, 100.f);
+        }
+
         ImGui::SliderFloat("AmbienContribution", &data.ambient_contribution, 0.f, 1.f);
         ImGui::SliderFloat("DifuseContribution", &data.difuse_contribution, 0.f, 1.f);
         ImGui::SliderFloat("SpecularContribution", &data.specular_contribution, 0.f, 1.f);

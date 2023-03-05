@@ -41,6 +41,7 @@ add_executable(APIS3D
     src/material.cpp
     src/mesh3d.cpp
     src/particle.cpp
+    src/point_light.cpp
     src/object.cpp
     src/object3d.cpp
     src/render.cpp

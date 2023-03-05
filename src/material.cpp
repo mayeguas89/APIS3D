@@ -1,27 +1,37 @@
 #include "material.h"
 
-Material::Material()
-{
-  render_program_ = nullptr;
-  texture_ = nullptr;
-}
+Material::Material() {}
 
 Material::~Material()
 {
   if (render_program_)
     delete render_program_;
-  if (texture_)
-    delete texture_;
+  if (base_texture_)
+    delete base_texture_;
+  if (normal_texture_)
+    delete normal_texture_;
+  if (reflection_texture_)
+    delete reflection_texture_;
+  if (refraction_texture_)
+    delete refraction_texture_;
 }
 
-Texture* Material::GetTexture()
+Texture* Material::GetBaseTexture()
 {
-  return texture_;
+  return base_texture_;
 }
 
-void Material::SetTexture(Texture* texture)
+void Material::SetBaseTexture(Texture* texture)
 {
-  texture_ = texture;
+  base_texture_ = texture;
+}
+Texture* Material::GetNormalTexture()
+{
+  return normal_texture_;
+}
+void Material::SetNormalTexture(Texture* texture)
+{
+  normal_texture_ = texture;
 }
 const glm::vec3& Material::GetColor() const
 {
@@ -95,12 +105,12 @@ void Material::SetReflection(bool value)
 
 bool Material::GetRefraction()
 {
-  return refraction_coefficient_;
+  return refraction_enabled_;
 }
 
 void Material::SetRefraction(bool value)
 {
-  refraction_coefficient_ = value;
+  refraction_enabled_ = value;
 }
 
 float Material::GetRefractionCoefficient()
@@ -111,4 +121,21 @@ float Material::GetRefractionCoefficient()
 void Material::SetRefractionCoefficient(float value)
 {
   refraction_coefficient_ = value;
+}
+
+Texture* Material::GetReflectionTexture()
+{
+  return reflection_texture_;
+}
+void Material::SetReflectionTexture(Texture* texture)
+{
+  reflection_texture_ = texture;
+}
+Texture* Material::GetRefractionTexture()
+{
+  return refraction_texture_;
+}
+void Material::SetRefractionTexture(Texture* texture)
+{
+  refraction_texture_ = texture;
 }

@@ -14,14 +14,12 @@ out vec4 fColor;
 out vec4 fNormal;
 out vec4 fPos;
 out vec2 fTextCoord;
-out vec3 fTextCube;
 
 void main() {
-    gl_Position = P * V * M * vPos;
     fColor = vColor;
-    fTextCoord = vTexture;
-
     fNormal = inverse(transpose(M))*vNormal;
     fPos = M * vPos;
-    fTextCube = fPos.xyz;
+    fTextCoord = vTexture;
+
+    gl_Position = P * V * fPos;
 }

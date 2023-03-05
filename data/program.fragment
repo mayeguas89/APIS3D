@@ -1,14 +1,40 @@
 #version 330
 #extension GL_NV_shadow_samplers_cube : enable
+#extension GL_ARB_explicit_uniform_location : enable
+
 // Lights
-#define MAX_NUMBER_OF_LIGHTS 8
-uniform int computeLight;
+#define MAX_NUMBER_OF_LIGHTS 1
+
+layout(location = 1) uniform int computeLight;
+// Color de la luz ambiente
+layout(location = 2) uniform vec3 ambient;
+layout(location = 3) uniform float ambientIntensity;
+
+// Brillo del material
+layout(location = 4) uniform int shininess;
+layout(location = 5) uniform float alpha;
+
+// CameraPosition
+layout(location = 6) uniform vec3 cameraPosition;
+
+// Texture
+layout(location = 7) uniform int hasTexture;
+layout(location = 8) uniform int isCubeMap;
+layout(location = 9) uniform sampler2D colorTexture;
+layout(location = 10) uniform samplerCube cubeTexture;
+layout(location = 11) uniform sampler2D normalTexture;
+layout(location = 12) uniform int computeReflection;
+layout(location = 13) uniform int computeRefraction;
+layout(location = 14) uniform float refractCoef;
+
 struct LightSource
 {
     int Type;
     vec3 Position;
     vec4 Direction;
-    float Attenuation;
+    float ConstantAttenuation;
+    float LinearAttenuation;
+    float QuadraticAttenuation;
     vec3 Color;
     // Para spotLights cos(phi)
     float Cutoff;
@@ -16,37 +42,37 @@ struct LightSource
     float DifuseContribution;
     float SpecularContribution;
 };
-uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
+layout(location = 15) uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
 
-// Color de la luz ambiente
-uniform vec3 ambient;
-uniform float ambientIntensity;
-
-// Brillo del material
-uniform int shininess;
-uniform float alpha;
-
-// CameraPosition
-uniform vec3 cameraPosition;
-
-// Texture
-uniform int hasTexture;
-uniform int isCubeMap;
-uniform sampler2D colorTexture;
-uniform samplerCube cubeTexture;
-uniform samplerCube normalTexture;
 
 // Input
 in vec4 fColor;
 in vec2 fTexture;
 in vec4 fNormal;
 in vec4 fPos;
-in vec3 fTextCube;
 
 // Output
 out vec4 FragColor;
 
+float CalculateAttenuation(float distance, float const_atten, float lin_atten, float quad_atten)
+{
+    return 1.0f / (const_atten + lin_atten * distance + quad_atten * (distance * distance)); 
+}
+
 void main() {
+
+    vec3 fTextCube = fPos.xyz;
+    
+    if(computeReflection == 1)
+    {
+        vec3 I = vec3(normalize(fPos.xyz - cameraPosition));
+        fTextCube = reflect(I, vec3(normalize(fNormal)));
+    }
+    else if(computeRefraction == 1)
+    {
+        vec3 I = vec3(normalize(fPos.xyz - cameraPosition));
+        fTextCube = refract(I, normalize(fNormal.xyz), refractCoef);
+    }
 
     vec4 baseColor = fColor;
     
@@ -54,7 +80,7 @@ void main() {
     {
         if(isCubeMap == 1)
         {
-            baseColor = textureCube(cubeTexture, fTextCube);   
+            baseColor = vec4(textureCube(cubeTexture, fTextCube).rgb, 1.f);   
         }
         else
         {
@@ -95,6 +121,13 @@ void main() {
                 }
             }
 
+            float distance = length(Lights[i].Position-fPos.xyz);
+            distance = 1.0;
+            float attenuation = Lights[i].ConstantAttenuation;
+            attenuation += Lights[i].LinearAttenuation * distance;
+            attenuation += Lights[i].QuadraticAttenuation * distance * distance;
+            attenuation = 1.0 / (attenuation);
+
             vec3 N = normalize(fNormal.xyz);
 
             // Componente difusa
@@ -110,16 +143,17 @@ void main() {
             vec3 light = ambient * Lights[i].AmbientContribution * ambientIntensity;
             light += diffuse * Lights[i].DifuseContribution;
             light += specular * Lights[i].SpecularContribution;
-            light *= Lights[i].Attenuation;
+            light *= attenuation;
             light *= Lights[i].Color;
             totalLight += light;
         }
         FragColor = vec4(totalLight, 1.0f) * baseColor;
+        FragColor.a = FragColor.a * 1.f;
     }
     else
     {
         FragColor = baseColor;
-        FragColor.a = FragColor.a * alpha;
+        FragColor.a = FragColor.a * 1.f;
     }
 
 }

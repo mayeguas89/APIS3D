@@ -155,7 +155,13 @@ void GL4Render::DrawObject(Object* object)
       throw std::runtime_error("Mesh Id not binded in any buffer object, call Setup object on this object first");
     auto buffer = it->second;
     glBindVertexArray(buffer.bo_id);
+
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+                 sizeof(Vertex) * mesh->GetVertList()->size(),
+                 mesh->GetVertList()->data(),
+                 GL_STATIC_DRAW);
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
 
     mesh->GetMaterial()->Prepare();

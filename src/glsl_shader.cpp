@@ -197,9 +197,19 @@ void GLSLShader::SetVariables()
       glUniform1i(variable_list_[key], light->GetType());
     }
 
-    if (auto key = "Lights[" + index + "].Attenuation"; variable_list_.find(key) != variable_list_.end())
+    if (auto key = "Lights[" + index + "].ConstantAttenuation"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], light->GetConstantAttenuation());
+    }
+
+    if (auto key = "Lights[" + index + "].LinearAttenuation"; variable_list_.find(key) != variable_list_.end())
     {
       glUniform1f(variable_list_[key], light->GetLinearAttenuation());
+    }
+
+    if (auto key = "Lights[" + index + "].QuadraticAttenuation"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], light->GetQuadraticAttenuation());
     }
 
     if (auto key = "Lights[" + index + "].AmbientContribution"; variable_list_.find(key) != variable_list_.end())

@@ -13,24 +13,25 @@ public:
     kFocal
   };
 
-  Light(Type light_type,
-        const glm::vec3& position,
-        const glm::vec3& direction,
-        const glm::vec3& color,
-        float cutoff_angle_degrees,
-        float linear_attenuation,
+  Light(const glm::vec3& color,
         float ambient_contribution,
         float difuse_contribution,
         float specular_contribution);
 
   virtual ~Light() = default;
-
   void SetPosition(const glm::vec4& vect4);
   void SetRotation(const glm::vec4& vect4);
 
   int GetType()
   {
     return (int)light_type_;
+  }
+
+  void SetLightRange(float value);
+
+  float GetLightRange()
+  {
+    return distance_range_;
   }
 
   float GetLinearAttenuation()
@@ -43,14 +44,34 @@ public:
     linear_attenuation_ = value;
   }
 
-  float GetCutOff() const
+  float GetConstantAttenuation()
   {
-    return cut_off_;
+    return constant_attenuation_;
   }
 
-  void SetCutOff(float cut_off)
+  void SetConstantAttenuation(float value)
   {
-    cut_off_ = cut_off;
+    constant_attenuation_ = value;
+  }
+
+  float GetQuadraticAttenuation()
+  {
+    return quadratic_attenuation_;
+  }
+
+  void SetQuadraticAttenuation(float value)
+  {
+    quadratic_attenuation_ = value;
+  }
+
+  float GetCutOff() const
+  {
+    return cut_off_angle_in_degrees_;
+  }
+
+  void SetCutOff(float cut_off_angle_in_degrees)
+  {
+    cut_off_angle_in_degrees_ = cut_off_angle_in_degrees;
   }
 
   void SetEnabled(bool value)
@@ -77,14 +98,18 @@ public:
   void SetSpecularContribution(float specularContribution);
 
 protected:
+  inline static const glm::vec3 kCubeScaling = glm::vec3{0.1f, 0.1f, 0.1f};
   bool is_on_;
   Type light_type_;
   glm::vec3 color_;
   glm::vec3 direction_;
-  float cut_off_;
-  CubeLight* cube_;
+  float cut_off_angle_in_degrees_;
+  CubeLight* cube_ = nullptr;
+  float constant_attenuation_ = 1.f;
   float linear_attenuation_ = 0.f;
+  float quadratic_attenuation_ = 0.f;
   float ambient_contribution_ = 1.f;
+  float distance_range_ = 0.f;
 
   float difuse_contribution_ = 1.f;
   float specular_contribution_ = 1.f;
