@@ -31,7 +31,7 @@ public:
 
 protected:
   virtual void ComputeViewMatrix() = 0;
-  glm::mat4 view_mtx_;
+  glm::mat4 view_mtx_ = glm::mat4(0.f);
   glm::mat4 projection_mtx_;
   glm::vec3 up_;
   glm::vec3 look_at_;

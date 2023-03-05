@@ -14,11 +14,11 @@ CubeText::CubeText(): Object3D()
     throw std::runtime_error("Selected backend does not support materials");
 
   auto* texture_front = FactoryEngine::GetNewTexture();
-  texture_front->Load("data/front.png");
+  texture_front->Load({{"data/front.png"}});
   texture_front->Bind();
 
   auto* texture_top = FactoryEngine::GetNewTexture();
-  texture_top->Load("data/top.png");
+  texture_top->Load({{"data/top.png"}});
   texture_top->Bind();
 
   std::unordered_map<std::string, RenderType> program_map;

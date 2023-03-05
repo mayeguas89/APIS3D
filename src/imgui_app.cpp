@@ -104,9 +104,9 @@ void ImguiApp::EndFrame()
 
 void ImguiApp::CameraMenu()
 {
-  static float camera_speed = 0.1f;
-  static float near_plane = 0.1f;
-  static float far_plane = 100.f;
+  static float camera_speed = System::GetCamera()->GetSpeed();
+  static float near_plane = System::GetNearPlane();
+  static float far_plane = System::GetFarPlane();
   static float look_at[] = {System::GetCamera()->GetLookAt().x,
                             System::GetCamera()->GetLookAt().y,
                             System::GetCamera()->GetLookAt().z};
@@ -123,7 +123,7 @@ void ImguiApp::CameraMenu()
 
     ImGui::SliderFloat("CameraSpeed", &camera_speed, 0.0, 5.0);
     ImGui::SliderFloat("NearPlane", &near_plane, 0.001f, 10.0f);
-    ImGui::SliderFloat("FarPlane", &far_plane, 100.0f, 200.f);
+    ImGui::SliderFloat("FarPlane", &far_plane, 100.0f, 500.f);
     ImGui::SliderFloat3("Look At", look_at, -10, 10);
     ImGui::SliderFloat3("Camera Position", translation, -20, 20);
   }

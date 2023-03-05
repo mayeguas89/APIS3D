@@ -51,6 +51,13 @@ public:
   void SetAlpha(float alpha);
   float GetAlpha();
 
+  bool GetReflection();
+  void SetReflection(bool value);
+  bool GetRefraction();
+  void SetRefraction(bool value);
+  float GetRefractionCoefficient();
+  void SetRefractionCoefficient(float value);
+
 protected:
   RenderProgram* render_program_;
   Texture* texture_;
@@ -59,6 +66,10 @@ protected:
   bool light_enabled_ = true;
   bool culling_enabled_ = false;
   bool depth_test_enabled_ = true;
+  bool reflection_enabled_ = false;
+  bool refraction_enabled_ = false;
+  float refraction_coefficient_ = 1.0;
+
   float alpha_ = 1.0f;
   BlendMode blend_mode_ = BlendMode::None;
 };

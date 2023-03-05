@@ -116,7 +116,7 @@ void GLSLShader::SetVariables()
                           GL_FLOAT,
                           GL_FALSE,
                           sizeof(Vertex),
-                          (void*)(4 * sizeof(glm::vec4)));
+                          (void*)(3 * sizeof(glm::vec4)));
   }
 
   if (variable_list_.find("vTexture") != variable_list_.end())
@@ -146,11 +146,6 @@ void GLSLShader::SetVariables()
       // Make it instanced
       glVertexAttribDivisor(variable_list_["mModelMatrix"] + i, 1);
     }
-  }
-
-  if (variable_list_.find("textUnit") != variable_list_.end())
-  {
-    glUniform1i(variable_list_["textUnit"], 0);
   }
 
   // ---------------------Ambient Lights----------------------

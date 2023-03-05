@@ -6,7 +6,7 @@
 				<depthWrite>false</depthWrite>
 				<light>false</light>
 				<color>1,1,1,1</color>
-				<texture cubeMap="true" >data/sky_left.png,data/sky_right.png,data/sky_front.png,data/sky_back.png,data/sky_top.png,data/sky_bottom.png</texture>
+				<texture cubeMap="true">data/sky_right.png,data/sky_left.png,data/sky_top.png,data/sky_bottom.png,data/sky_front.png,data/sky_back.png</texture>
 				<shininess>0</shininess>
 				<vShader>data/program.vertex</vShader>
 				<fShader>data/program.fragment</fShader>

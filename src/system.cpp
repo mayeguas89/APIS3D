@@ -7,7 +7,7 @@ glm::mat4* System::current_object_model_matrix_ = nullptr;
 Camera* System::camera_ = nullptr;
 Render* System::render_ = nullptr;
 InputManager* System::input_manager_ = nullptr;
-float System::far_plane_ = 100.f;
+float System::far_plane_ = 300.f;
 float System::near_plane_ = 0.1f;
 std::vector<Object*>* System::objects_ = nullptr;
 std::vector<Light*> System::lights_;

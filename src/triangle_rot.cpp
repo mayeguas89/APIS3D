@@ -25,17 +25,12 @@ TriangleRot::TriangleRot(): Object()
   if (auto* material = FactoryEngine::GetNewMaterial(); material)
   {
     auto* texture = FactoryEngine::GetNewTexture();
-    texture->Load(
-      "C:/Users/mayeg/Documents/U-TAD/Master/ApisTridimensionales/MyAPIS3D/build/Debug/data/front.png");
+    texture->Load({{"data/front.png"}});
     texture->Bind();
 
     std::unordered_map<std::string, RenderType> program_map;
-    program_map
-      ["C:/Users/mayeg/Documents/U-TAD/Master/ApisTridimensionales/MyAPIS3D/build/Debug/data/program.vertex"] =
-        RenderType::Vertex;
-    program_map
-      ["C:/Users/mayeg/Documents/U-TAD/Master/ApisTridimensionales/MyAPIS3D/build/Debug/data/program.fragment"] =
-        RenderType::Fragment;
+    program_map["data/program.vertex"] = RenderType::Vertex;
+    program_map["data/program.fragment"] = RenderType::Fragment;
     material->LoadPrograms(program_map);
     material->SetTexture(texture);
 

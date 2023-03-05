@@ -1,9 +1,7 @@
-#include "column.h"
-#include "emitter.h"
+#include "camera_keyboard.h"
+#include "cube_map.h"
 #include "factory_engine.h"
-#include "flash_light.h"
 #include "light.h"
-#include "particle.h"
 #include "rotate_camera.h"
 #include "system.h"
 
@@ -14,18 +12,18 @@ int main(int argc, char const* argv[])
 
   System::Init();
 
-  Column column;
+  CubeMap skybox;
 
   try
   {
-    column.LoadDataFromFile("data/column/column.msh");
+    skybox.LoadDataFromFile("data/normal_textures/skybox.msh");
   }
   catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
     return -1;
   }
-  column.SetScaling(glm::vec4(0.01f, 0.01f, 0.01f, 1.f));
+  skybox.SetScaling(glm::vec4(100.0f, 100.0f, 100.0f, 100.f));
 
   Light* point_light = new Light(Light::Type::kPoint,
                                  glm::vec3(0.f, 15.f, 1.f),
@@ -44,38 +42,19 @@ int main(int argc, char const* argv[])
   System::AddLight(point_light);
 
   Camera* rotate_camera = new RotateCamera(Camera::ProjectionType::Perspective,
-                                           glm::vec3(0.f, 10.f, 25.f),
-                                           glm::vec3(0.f, 3.f, 0.f),
+                                           glm::vec3(0.f, 0.f, 3.f),
+                                           glm::vec3(0.f, 0.f, 0.f),
                                            glm::vec3(0.f, 1.f, 0.f),
-                                           glm::quarter_pi<float>());
+                                           0.1f);
 
-  Emitter smoke_emmiter_one("data/column/smoke.msh",
-                            glm::vec3{-0.5f, 6.5f, -0.5f},
-                            glm::vec3{0.5f, 6.5f, 0.5f},
-                            glm::vec2{1.f, 5.f},
-                            glm::vec2{0.5f, 1.f},
-                            glm::vec2{glm::pi<float>() / 6.f, glm::pi<float>() / 3.f},
-                            glm::vec2{30.f, 50.f},
-                            glm::vec3{-0.1, 1, -0.1},
-                            glm::vec3{0.1, 4, 0.1},
-                            true);
+  // Camera* rotate_camera = new CameraKeyboard(Camera::ProjectionType::Perspective,
+  //                                            glm::vec3(0.f, 0.f, 3.f),
+  //                                            glm::vec3(0.f, 0.f, -1.f),
+  //                                            glm::vec3(0.f, 1.f, 0.f));
 
-  Emitter fire_emitter_one("data/column/flame.msh",
-                           glm::vec3{-0.5f, 6.5f, -0.5f},
-                           glm::vec3{0.5f, 6.5f, 0.5f},
-                           glm::vec2{0.5f, 0.5f},
-                           glm::vec2{1.f, 1.f},
-                           glm::vec2{0., 0.},
-                           glm::vec2{100.f, 150.f},
-                           glm::vec3{-1., 5., -1.},
-                           glm::vec3{1., 5., 1.},
-                           false);
-
-  System::AddEmitter(&fire_emitter_one);
-  System::AddEmitter(&smoke_emmiter_one);
   System::SetCamera(rotate_camera);
-  System::AddObject(&column);
-  System::AddObject(point_light->GetCube());
+  System::AddObject(&skybox);
+  // System::AddObject(point_light->GetCube());
 
   try
   {

@@ -1,7 +1,4 @@
 #version 330
-//layout (location = 0) in vec4 vPos;
-//layout (location = 1) in vec4 vColor;
-//layout (location = 2) in vec2 vTexture;
 
 uniform mat4 P;
 uniform mat4 V;
@@ -10,12 +7,14 @@ uniform mat4 M;
 attribute vec4 vPos;
 attribute vec4 vColor;
 attribute vec4 vNormal;
+attribute vec4 vTangent;
 attribute vec2 vTexture;
 
 out vec4 fColor;
 out vec4 fNormal;
 out vec4 fPos;
 out vec2 fTextCoord;
+out vec3 fTextCube;
 
 void main() {
     gl_Position = P * V * M * vPos;
@@ -24,4 +23,5 @@ void main() {
 
     fNormal = inverse(transpose(M))*vNormal;
     fPos = M * vPos;
+    fTextCube = fPos.xyz;
 }

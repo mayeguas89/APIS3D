@@ -1,10 +1,8 @@
 #version 330
-out vec4 FragColor;
-
+#extension GL_NV_shadow_samplers_cube : enable
+// Lights
 #define MAX_NUMBER_OF_LIGHTS 8
-
-uniform sampler2D textUnit;
-
+uniform int computeLight;
 struct LightSource
 {
     int Type;
@@ -18,7 +16,6 @@ struct LightSource
     float DifuseContribution;
     float SpecularContribution;
 };
-
 uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
 
 // Color de la luz ambiente
@@ -27,21 +24,43 @@ uniform float ambientIntensity;
 
 // Brillo del material
 uniform int shininess;
-
 uniform float alpha;
 
 // CameraPosition
 uniform vec3 cameraPosition;
 
-// Variable que controla si pintar o no la luz
-uniform int computeLight;
+// Texture
+uniform int hasTexture;
+uniform int isCubeMap;
+uniform sampler2D colorTexture;
+uniform samplerCube cubeTexture;
+uniform samplerCube normalTexture;
 
+// Input
 in vec4 fColor;
-in vec2 fTextCoord;
+in vec2 fTexture;
 in vec4 fNormal;
 in vec4 fPos;
+in vec3 fTextCube;
+
+// Output
+out vec4 FragColor;
 
 void main() {
+
+    vec4 baseColor = fColor;
+    
+    if(hasTexture == 1)
+    {
+        if(isCubeMap == 1)
+        {
+            baseColor = textureCube(cubeTexture, fTextCube);   
+        }
+        else
+        {
+            baseColor = texture2D(colorTexture, fTexture);   
+        }
+    }
 
     if (computeLight == 1)
     {
@@ -95,11 +114,11 @@ void main() {
             light *= Lights[i].Color;
             totalLight += light;
         }
-        FragColor = vec4(totalLight, 1.0f) * texture2D(textUnit, fTextCoord);
+        FragColor = vec4(totalLight, 1.0f) * baseColor;
     }
     else
     {
-        FragColor = texture2D(textUnit, fTextCoord) * fColor;
+        FragColor = baseColor;
         FragColor.a = FragColor.a * alpha;
     }
 

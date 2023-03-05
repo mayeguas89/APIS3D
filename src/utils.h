@@ -33,6 +33,10 @@ std::vector<T> SplitString(const std::string& str, char delim)
 
 inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& directory)
 {
+  auto material_node = buffer.child("material");
+  if (!material_node)
+    return nullptr;
+
   glm::vec4 material_color = glm::vec4(1.f, 1.f, 1.f, 1.f);
 
   // Creamos material
@@ -41,7 +45,7 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
     throw std::runtime_error("Selected backend does not support materials");
 
   // Material with color
-  if (auto attrib = buffer.child("material").child("color"); attrib != nullptr)
+  if (auto attrib = material_node.child("color"); attrib != nullptr)
   {
     auto color_list = utils::SplitString<float>(attrib.text().as_string(), ',');
     auto the_color = color_list.begin();
@@ -56,28 +60,42 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
 
   material->SetColor(material_color);
 
-  // Shininess
-  if (auto attrib = buffer.child("material").child("shininess"); attrib != nullptr)
+  if (auto attrib = material_node.child("shininess"); attrib != nullptr)
   {
     material->SetShininess(attrib.text().as_int());
   }
 
-  if (auto attrib = buffer.child("material").child("light"); attrib != nullptr)
+  if (auto attrib = material_node.child("light"); attrib != nullptr)
   {
     material->SetLightEnabled(attrib.text().as_bool());
   }
 
-  if (auto attrib = buffer.child("material").child("culling"); attrib != nullptr)
+  if (auto attrib = material_node.child("culling"); attrib != nullptr)
   {
     material->SetCullingEnabled(attrib.text().as_bool());
   }
 
-  if (auto attrib = buffer.child("material").child("depthWrite"); attrib != nullptr)
+  if (auto attrib = material_node.child("depthWrite"); attrib != nullptr)
   {
     material->SetDepthTestEnabled(attrib.text().as_bool());
   }
 
-  if (auto attrib = buffer.child("material").child("blendMode"); attrib != nullptr)
+  if (auto attrib = material_node.child("refraction"); attrib != nullptr)
+  {
+    material->SetRefraction(attrib.text().as_bool());
+
+    if (auto attrib = material_node.child("refractCoef"); attrib != nullptr)
+      material->SetRefractionCoefficient(attrib.text().as_float());
+    else
+      std::cout << "Material found with refraction activated but without a refraction coeficient\n";
+  }
+
+  if (auto attrib = material_node.child("reflection"); attrib != nullptr)
+  {
+    material->SetReflection(attrib.text().as_bool());
+  }
+
+  if (auto attrib = material_node.child("blendMode"); attrib != nullptr)
   {
     std::string blend_as_string = attrib.text().as_string();
     Material::BlendMode blend_mode = Material::BlendMode::Solid;
@@ -91,8 +109,8 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
   }
 
   // Usamos los shaders de vertices y de los fragmentos
-  auto vextex_shader_filename = buffer.child("material").child("vShader").text().as_string();
-  auto fragment_shader_filename = buffer.child("material").child("fShader").text().as_string();
+  auto vextex_shader_filename = material_node.child("vShader").text().as_string();
+  auto fragment_shader_filename = material_node.child("fShader").text().as_string();
 
   std::unordered_map<std::string, RenderType> program_map;
   program_map[vextex_shader_filename] = RenderType::Vertex;
@@ -101,10 +119,63 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
   material->LoadPrograms(program_map);
 
   // Material with texture
-  if (auto attrib = buffer.child("material").child("texture"); attrib != nullptr)
+  if (auto child_node = material_node.child("texture"); child_node != nullptr)
+  {
+    if (auto cube_map_attrib = child_node.attribute("cubeMap");
+        cube_map_attrib != nullptr && cube_map_attrib.as_bool())
+    {
+      std::vector<std::string> texture_filenames;
+      auto filenames = utils::SplitString<std::string>(child_node.text().as_string(), ',');
+      auto texture_file = filenames.at(0).substr(filenames.at(0).find_last_of('/'), filenames.at(0).back());
+      Texture* texture = System::GetTexture(texture_file);
+      if (texture == nullptr)
+      {
+        texture = FactoryEngine::GetNewTexture();
+        System::AddTexture(texture_file, texture);
+
+        for (auto& filename: filenames)
+        {
+          auto texture_file = filename.substr(filename.find_last_of('/'), filename.back());
+          texture_filenames.push_back(directory + texture_file);
+        }
+
+        if (!texture->Load(texture_filenames, Texture::Type::kCubeMap))
+          throw std::runtime_error("Error reading the cubeMap texture files\n");
+        texture->Bind((unsigned int)Texture::Type::kCubeMap);
+      }
+      material->SetTexture(texture);
+    }
+    else
+    {
+      // Añadimos la textura al material
+      auto texture_filename = child_node.text().as_string();
+      std::string string_texture_filename{texture_filename};
+      auto texture_file =
+        string_texture_filename.substr(string_texture_filename.find_last_of('/'), string_texture_filename.back());
+
+      Texture* texture = System::GetTexture(texture_file);
+
+      if (texture == nullptr)
+      {
+        texture = FactoryEngine::GetNewTexture();
+        System::AddTexture(texture_file, texture);
+
+        if (!texture->Load({{directory + texture_file}}))
+        {
+          std::string error_msg = "Error reading the texture file " + directory + texture_file + "\n";
+          throw std::runtime_error(error_msg);
+        }
+        texture->Bind((unsigned int)Texture::Type::kColor2D);
+      }
+
+      material->SetTexture(texture);
+    }
+  }
+
+  if (auto child_node = material_node.child("normalTexture"); child_node != nullptr)
   {
     // Añadimos la textura al material
-    auto texture_filename = buffer.child("material").child("texture").text().as_string();
+    auto texture_filename = child_node.text().as_string();
     std::string string_texture_filename{texture_filename};
     auto texture_file =
       string_texture_filename.substr(string_texture_filename.find_last_of('/'), string_texture_filename.back());
@@ -116,16 +187,17 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
       texture = FactoryEngine::GetNewTexture();
       System::AddTexture(texture_file, texture);
 
-      if (!texture->Load(directory + texture_file))
+      if (!texture->Load({{directory + texture_file}}, Texture::Type::kNormal))
       {
         std::string error_msg = "Error reading the texture file " + directory + texture_file + "\n";
         throw std::runtime_error(error_msg);
       }
-      texture->Bind();
+      texture->Bind((unsigned int)Texture::Type::kNormal);
     }
 
     material->SetTexture(texture);
   }
+
   return material;
 }
 
@@ -233,5 +305,4 @@ inline std::vector<Mesh3D*> GetMeshesFromMshFile(const std::string filename)
 
   return to_return;
 }
-
 }

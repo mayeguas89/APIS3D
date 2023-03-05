@@ -2,6 +2,8 @@
 
 #include "system.h"
 
+#include <glm/gtx/string_cast.hpp>
+
 RotateCamera::RotateCamera(ProjectionType type,
                            glm::vec3 position,
                            glm::vec3 look_at,
@@ -42,4 +44,5 @@ void RotateCamera::ComputeProjectionMatrix(ProjectionType type)
 void RotateCamera::ComputeViewMatrix()
 {
   view_mtx_ = glm::lookAt(glm::vec3(position_), look_at_, up_);
+  // std::cout << glm::to_string(view_mtx_) << std::endl;
 }

@@ -47,8 +47,6 @@ void GLSLMaterial::LoadPrograms(std::unordered_map<std::string, RenderType>& pro
  */
 void GLSLMaterial::Prepare()
 {
-  if (texture_)
-    texture_->Bind();
   render_program_->UseProgram();
   // De momento sabemos las variables harcodeadas
   // Luego podemos obtener de alguna forma el nombre de las variables
@@ -64,15 +62,15 @@ void GLSLMaterial::Prepare()
     glDisable(GL_DEPTH_TEST);
   }
 
-  if (IsCullingEnabled())
-  {
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-  }
-  else
-  {
-    glDisable(GL_CULL_FACE);
-  }
+  // if (IsCullingEnabled())
+  // {
+  //   glEnable(GL_CULL_FACE);
+  //   glCullFace(GL_BACK);
+  // }
+  // else
+  // {
+  //   glDisable(GL_CULL_FACE);
+  // }
 
   switch (GetBlendMode())
   {
@@ -103,5 +101,39 @@ void GLSLMaterial::Prepare()
   render_program_->SetInt("shininess", shininess_);
   render_program_->SetInt("computeLight", (int)IsLightEnabled());
   render_program_->SetFloat("alpha", alpha_);
+
+  if (texture_ == nullptr)
+  {
+    render_program_->SetInt("hasTexture", 0);
+    render_program_->SetInt("colorTexture", 0);
+    render_program_->SetInt("cubeTexture", 0);
+    render_program_->SetInt("isCubeMap", 0);
+  }
+  else
+  {
+    render_program_->SetInt("hasTexture", 1);
+
+    switch (texture_->GetType())
+    {
+      case Texture::Type::kCubeMap:
+        texture_->Bind((int)Texture::Type::kCubeMap);
+        render_program_->SetInt("colorTexture", 0);
+        render_program_->SetInt("cubeTexture", 1);
+        render_program_->SetInt("isCubeMap", 1);
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+        break;
+      case Texture::Type::kColor2D:
+        texture_->Bind((int)Texture::Type::kColor2D);
+        render_program_->SetInt("colorTexture", 1);
+        render_program_->SetInt("cubeTexture", 0);
+        render_program_->SetInt("isCubeMap", 0);
+        glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+        break;
+      case Texture::Type::kNone:
+      case Texture::Type::kNormal:
+        break;
+    }
+  }
+
   render_program_->SetVariables();
 }

@@ -82,3 +82,33 @@ float Material::GetAlpha()
 {
   return alpha_;
 }
+
+bool Material::GetReflection()
+{
+  return reflection_enabled_;
+}
+
+void Material::SetReflection(bool value)
+{
+  reflection_enabled_ = value;
+}
+
+bool Material::GetRefraction()
+{
+  return refraction_coefficient_;
+}
+
+void Material::SetRefraction(bool value)
+{
+  refraction_coefficient_ = value;
+}
+
+float Material::GetRefractionCoefficient()
+{
+  return refraction_coefficient_;
+}
+
+void Material::SetRefractionCoefficient(float value)
+{
+  refraction_coefficient_ = value;
+}
