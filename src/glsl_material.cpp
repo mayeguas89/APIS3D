@@ -115,13 +115,13 @@ void GLSLMaterial::Prepare()
       auto texture = (reflection_texture_) ? reflection_texture_ : refraction_texture_;
       render_program_->SetInt("hasTexture", 1);
       render_program_->SetInt("cubeTexture", 1);
-      texture->Bind((int)Texture::Type::kCubeMap);
+      texture->Bind(1);
       glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     }
     else
     {
       render_program_->SetInt("hasTexture", 0);
-      render_program_->SetInt("cubeTexture", 0);
+      render_program_->SetInt("cubeTexture", 1);
     }
   }
   else
@@ -131,23 +131,34 @@ void GLSLMaterial::Prepare()
     switch (base_texture_->GetType())
     {
       case Texture::Type::kCubeMap:
-        base_texture_->Bind((int)Texture::Type::kCubeMap);
+        base_texture_->Bind(1);
+        render_program_->SetInt("isCubeMap", 1);
+        // Samplers
         render_program_->SetInt("colorTexture", 0);
         render_program_->SetInt("cubeTexture", 1);
-        render_program_->SetInt("isCubeMap", 1);
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
         break;
       case Texture::Type::kColor2D:
-        base_texture_->Bind((int)Texture::Type::kColor2D);
-        render_program_->SetInt("colorTexture", 1);
-        render_program_->SetInt("cubeTexture", 0);
+        base_texture_->Bind(0);
         render_program_->SetInt("isCubeMap", 0);
+        // Samplers
+        render_program_->SetInt("colorTexture", 0);
+        render_program_->SetInt("cubeTexture", 1);
         glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
         break;
       case Texture::Type::kNone:
       case Texture::Type::kNormal:
         break;
     }
+  }
+
+  render_program_->SetInt("computeNormalTexture", 0);
+  render_program_->SetInt("normalTexture", 2);
+  if (normal_texture_)
+  {
+    normal_texture_->Bind(2);
+    render_program_->SetInt("computeNormalTexture", 1);
+    render_program_->SetInt("normalTexture", 2);
   }
 
   render_program_->SetVariables();

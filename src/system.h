@@ -23,6 +23,7 @@ public:
   static const glm::vec3& GetAmbient();
   static void SetAmbientIntensity(float value);
   static float GetAmbientIntensity();
+  static void SetupAmbient();
 
   static void Exit();
 

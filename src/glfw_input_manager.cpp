@@ -7,7 +7,7 @@ double GLFWInputManager::old_pos_x_ = 0.;
 double GLFWInputManager::old_pos_y_ = 0.;
 double GLFWInputManager::scroll_y_ = 0.;
 double GLFWInputManager::scroll_x_ = 0.;
-double GLFWInputManager::fov_ = 85.;
+double GLFWInputManager::fov_ = 45.;
 glm::vec3 GLFWInputManager::rotation_direction_ = glm::vec3(0.f, 0.f, 0.f);
 
 GLFWInputManager::GLFWInputManager() {}

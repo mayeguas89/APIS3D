@@ -14,12 +14,18 @@ out vec4 fColor;
 out vec4 fNormal;
 out vec4 fPos;
 out vec2 fTextCoord;
+out mat3 TBN;
 
 void main() {
     fColor = vColor;
-    fNormal = inverse(transpose(M))*vNormal;
     fPos = M * vPos;
     fTextCoord = vTexture;
 
     gl_Position = P * V * fPos;
+
+    mat4 invTM = inverse(transpose(M));
+    fNormal = invTM *vNormal;
+    vec3 tan = normalize((invTM * vTangent).xyz);
+    vec3 bitan = cross(tan.xyz, normalize(fNormal.xyz));
+    TBN = transpose(mat3(tan, bitan, normalize(fNormal.xyz)));
 }

@@ -196,3 +196,8 @@ void GL4Render::DrawObject(Object* object)
                    nullptr);
   }
 }
+
+void GL4Render::SetupAmbient()
+{
+  imgui_app_.SetupAmbient();
+}

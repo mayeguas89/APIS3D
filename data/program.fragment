@@ -25,6 +25,7 @@ layout(location = 11) uniform sampler2D normalTexture;
 layout(location = 12) uniform int computeReflection;
 layout(location = 13) uniform int computeRefraction;
 layout(location = 14) uniform float refractCoef;
+layout(location = 15) uniform int computeNormalTexture;
 
 #define MAX_NUMBER_OF_LIGHTS 8
 struct LightSource
@@ -43,22 +44,18 @@ struct LightSource
     float DifuseContribution;
     float SpecularContribution;
 };
-layout(location = 15) uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
+layout(location = 16) uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
 
 
 // Input
 in vec4 fColor;
-in vec2 fTexture;
+in vec2 fTextCoord;
 in vec4 fNormal;
 in vec4 fPos;
+in mat3 TBN;
 
 // Output
 out vec4 FragColor;
-
-float CalculateAttenuation(float distance, float const_atten, float lin_atten, float quad_atten)
-{
-    return 1.0f / (const_atten + lin_atten * distance + quad_atten * (distance * distance)); 
-}
 
 void main() {
 
@@ -75,6 +72,15 @@ void main() {
         fTextCube = refract(I, normalize(fNormal.xyz), refractCoef);
     }
 
+    vec3 normal = normalize(fNormal.xyz);
+    
+    if(computeNormalTexture == 1)
+    {
+        vec3 normalTextValue = texture2D(normalTexture, fTextCoord).xyz;
+        normalTextValue = (normalTextValue*2.0f)-1.f;
+        normal = -TBN * normalTextValue;
+    }
+
     vec4 baseColor = fColor;
     
     if(hasTexture == 1)
@@ -85,7 +91,7 @@ void main() {
         }
         else
         {
-            baseColor = texture2D(colorTexture, fTexture);   
+            baseColor = texture2D(colorTexture, fTextCoord);   
         }
     }
 
@@ -124,13 +130,14 @@ void main() {
                 }
             }
 
+            // attenuation
             float distance = length(Lights[i].Position-fPos.xyz);
             float attenuation = Lights[i].ConstantAttenuation;
             attenuation += Lights[i].LinearAttenuation * distance;
             attenuation += Lights[i].QuadraticAttenuation * distance * distance;
             attenuation = 1.0 / (attenuation);
 
-            vec3 N = normalize(fNormal.xyz);
+            vec3 N = normal;
 
             // Componente difusa
             float diffuse = max(dot(L, N), 0.f);
@@ -150,7 +157,7 @@ void main() {
             totalLight += light;
         }
         FragColor = vec4(totalLight, 1.0f) * baseColor;
-        FragColor.a = FragColor.a * 1.f;
+        FragColor.a = FragColor.a * alpha;
     }
     else
     {

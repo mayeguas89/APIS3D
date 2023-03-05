@@ -22,6 +22,7 @@ public:
   void AddLight(Light* light);
   void StartFrame();
   void EndFrame();
+  void SetupAmbient();
 
 private:
   void CameraMenu();

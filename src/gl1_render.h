@@ -22,6 +22,7 @@ public:
   void DrawLines(const std::vector<Line*>& lines) override;
   bool IsClosed() override;
   void SetSize(int width, int height) override;
+  void SetupAmbient() override;
 
   void SetKeyCallback(void (*callback)(GLFWwindow* window, int key, int scancode, int action, int mods));
   void SetCursorPositionCallback(void (*callback)(GLFWwindow* window, double x_key, double y_pos));

@@ -37,12 +37,6 @@ void ImguiApp::Init(GLFWwindow* window)
 
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
-
-  ambient_light_data_.color.x = System::GetAmbient().r;
-  ambient_light_data_.color.y = System::GetAmbient().g;
-  ambient_light_data_.color.z = System::GetAmbient().b;
-  ambient_light_data_.color.w = 1.f;
-  ambient_light_data_.intensity = System::GetAmbientIntensity();
 }
 
 void ImguiApp::Update()
@@ -111,6 +105,15 @@ void ImguiApp::EndFrame()
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void ImguiApp::SetupAmbient()
+{
+  ambient_light_data_.color.x = System::GetAmbient().r;
+  ambient_light_data_.color.y = System::GetAmbient().g;
+  ambient_light_data_.color.z = System::GetAmbient().b;
+  ambient_light_data_.color.w = 1.f;
+  ambient_light_data_.intensity = System::GetAmbientIntensity();
+}
+
 void ImguiApp::CameraMenu()
 {
   static float camera_speed = System::GetCamera()->GetSpeed();
@@ -162,9 +165,9 @@ void ImguiApp::ObjectsMenu()
         ImGui::InputFloat("PositionX", &data.translation[0], 0.1f, 1.f, "%.2f");
         ImGui::InputFloat("PositionY", &data.translation[1], 0.1f, 1.f, "%.2f");
         ImGui::InputFloat("PositionZ", &data.translation[2], 0.1f, 1.f, "%.2f");
-        ImGui::SliderFloat("RotationX", &data.rotation[0], 0.1f, 1.f, "%.2f");
-        ImGui::SliderFloat("RotationY", &data.rotation[1], 0.1f, 1.f, "%.2f");
-        ImGui::SliderFloat("RotationZ", &data.rotation[2], 0.1f, 1.f, "%.2f");
+        ImGui::InputFloat("RotationX", &data.rotation[0], 0.1f, 1.f, "%.2f");
+        ImGui::InputFloat("RotationY", &data.rotation[1], 0.1f, 1.f, "%.2f");
+        ImGui::InputFloat("RotationZ", &data.rotation[2], 0.1f, 1.f, "%.2f");
         ImGui::InputFloat3("Scale", &data.scale[0], "%.2f");
         ImGui::TreePop();
       }
@@ -201,8 +204,8 @@ void ImguiApp::LightsMenu()
 
     for (size_t i = 0; i < lights_.size(); i++)
     {
-      auto light_txt_ = "Light" + std::to_string(i);
-      if (ImGui::TreeNode(light_txt_.c_str()))
+      auto light_txt = "Light" + std::to_string(i);
+      if (ImGui::TreeNode(light_txt.c_str()))
       {
         auto light = lights_.at(i);
         auto& data = light_data_.at(i);
@@ -225,14 +228,14 @@ void ImguiApp::LightsMenu()
         }
         else if (light->GetType() == (int)Light::Type::kPoint)
         {
-          Clamp(&data.distance_range, 0., 100.f, 1);
+          Clamp(&data.distance_range, 0., 1000.f, 1);
           light->SetLightRange(data.distance_range);
           glm::vec4 position_vec(data.position[0], data.position[1], data.position[2], 1.f);
           light->SetPosition(position_vec);
         }
         else if (light->GetType() == (int)Light::Type::kFocal)
         {
-          Clamp(&data.distance_range, 0.f, 100.f, 1);
+          Clamp(&data.distance_range, 0.f, 1000.f, 1);
           Clamp(&data.cut_off_angle, 0.f, glm::degrees(glm::two_thirds<float>() * glm::two_pi<float>()), 1);
 
           light->SetLightRange(data.distance_range);

@@ -24,6 +24,7 @@ public:
   virtual void SetupParticle(Emitter* emitter) = 0;
   virtual void RemoveObject(Object* object) = 0;
   virtual void SetupLight(Light* light) = 0;
+  virtual void SetupAmbient() = 0;
   virtual void DrawObjects(const std::vector<Object*>* objects) = 0;
   virtual void DrawObject(Object* object) = 0;
   virtual void DrawParticles(Emitter* emitter) = 0;

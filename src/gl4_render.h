@@ -40,6 +40,7 @@ public:
   void DrawLines(const std::vector<Line*>& lines) override;
   void DrawObjects(const std::vector<Object*>* objects) override;
   void DrawObject(Object* object) override;
+  void SetupAmbient() override;
 
 private:
   // Vamos a acceder a los elementos por ids de cada objeto

@@ -208,6 +208,11 @@ float System::GetAmbientIntensity()
   return ambient_intensity_;
 }
 
+void System::SetupAmbient()
+{
+  render_->SetupAmbient();
+}
+
 const glm::vec4& System::GetClearColor()
 {
   return render_->GetClearColor();

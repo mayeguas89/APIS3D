@@ -16,8 +16,7 @@ link_directories(
     ${CMAKE_SOURCE_DIR}/externalLibs/glfw/lib
 )
 
-add_executable(APIS3D 
-    src/APIS3D.cpp
+add_library(engine SHARED STATIC
     src/asian_town.cpp
     src/billboard.cpp
     src/camera.cpp
@@ -55,8 +54,8 @@ add_executable(APIS3D
   )
 
 target_include_directories(
-    APIS3D 
-    PRIVATE 
+    engine 
+    PUBLIC 
     src
     ${CMAKE_SOURCE_DIR}/externalLibs/glad/inc
     ${CMAKE_SOURCE_DIR}/externalLibs/glfw/inc
@@ -66,17 +65,41 @@ target_include_directories(
 )
 
 target_link_libraries(
-  APIS3D 
-  PRIVATE
+  engine 
+  PUBLIC
   glfw3
   imgui
   pugixml
   ${ASSIMP_LIBRARY}
 )
 
-add_custom_command(TARGET APIS3D POST_BUILD
+add_custom_command(TARGET engine POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data.
 )
-add_custom_command(TARGET APIS3D POST_BUILD
+add_custom_command(TARGET engine POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/externalLibs/assimp/bin/Debug/assimp-vc142-mtd.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+add_executable(NormalMapping 
+  src/normal_mapping.cpp
+)
+
+target_link_libraries(
+  NormalMapping PRIVATE engine
+)
+
+add_executable(Totem 
+  src/totem.cpp
+)
+
+target_link_libraries(
+  Totem PRIVATE engine
+)
+
+add_executable(Rabbit 
+  src/rabbit.cpp
+)
+
+target_link_libraries(
+  Rabbit PRIVATE engine
 )
