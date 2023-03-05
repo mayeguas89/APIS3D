@@ -62,43 +62,23 @@ CubeLight::CubeLight(const glm::vec3& color)
   // Front face
   auto mesh = new Mesh3D();
   mesh->SetMaterial(material);
-  mesh->AddTriangle(v0, 0, v1, 1, v2, 2);
-  mesh->AddTriangle(v0, 0, v2, 2, v3, 3);
-  AddMesh(mesh);
-
-  // Right Face
-  mesh = new Mesh3D();
-  mesh->SetMaterial(material);
-  mesh->AddTriangle(v3, 0, v2, 1, v4, 2);
-  mesh->AddTriangle(v3, 0, v4, 2, v5, 3);
-  AddMesh(mesh);
-
-  // Back Face
-  mesh = new Mesh3D();
-  mesh->SetMaterial(material);
-  mesh->AddTriangle(v7, 0, v6, 1, v4, 2);
-  mesh->AddTriangle(v7, 0, v4, 2, v5, 3);
-  AddMesh(mesh);
-
-  // Left Face
-  mesh = new Mesh3D();
-  mesh->SetMaterial(material);
-  mesh->AddTriangle(v0, 0, v7, 1, v6, 2);
-  mesh->AddTriangle(v0, 0, v6, 2, v1, 3);
-  AddMesh(mesh);
-
-  // Top Face
-  mesh = new Mesh3D();
-  mesh->SetMaterial(material);
-  mesh->AddTriangle(v1, 0, v6, 1, v4, 2);
-  mesh->AddTriangle(v1, 0, v4, 2, v2, 3);
-  AddMesh(mesh);
-
-  // Bottom Face
-  mesh = new Mesh3D();
-  mesh->SetMaterial(material);
-  mesh->AddTriangle(v0, 0, v7, 1, v5, 2);
-  mesh->AddTriangle(v0, 0, v5, 2, v3, 3);
+  std::vector<Vertex> vs = {v0, v1, v2, v3, v4, v5, v6, v7};
+  for (const auto v: vs)
+  {
+    mesh->AddVertex(v);
+  }
+  // clang-format off
+  std::vector<int> indexes = {0,1,2,0,2,3,
+                              3,2,4,3,4,5,
+                              7,6,4,7,4,5,
+                              0,7,6,0,6,1,
+                              1,6,4,0,2,3,
+                              0,7,5,0,5,3};
+  // clang-format on
+  for (const auto index: indexes)
+  {
+    mesh->AddIndex(index);
+  }
   AddMesh(mesh);
 }
 
