@@ -76,6 +76,30 @@ void GL4Render::SetupObject(Object* object)
 
 void GL4Render::RemoveObject(Object* object) {}
 
+void GL4Render::DrawLines(const std::vector<Line*>& lines)
+{
+  for (auto line: lines)
+  {
+    System::SetModelMatrix(&(line->GetModelMatrix()));
+    for (auto mesh: line->GetMeshes())
+    {
+      auto it = buffer_object_list_.find(mesh->GetMeshId());
+      if (it == buffer_object_list_.end())
+      {
+        throw std::runtime_error(
+          "Mesh Id not binded in any buffer object, call Setup object on this object first");
+      }
+
+      auto buffer = it->second;
+      glBindVertexArray(buffer.bo_id);
+      glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
+      mesh->GetMaterial()->Prepare();
+      glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(mesh->GetVertIndexesList()->size()));
+    }
+  }
+}
+
 void GL4Render::DrawParticles(Emitter* emitter)
 {
   for (auto mesh: emitter->GetModelParticle()->GetMeshes())

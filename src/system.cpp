@@ -11,6 +11,7 @@ float System::far_plane_ = 300.f;
 float System::near_plane_ = 0.1f;
 std::vector<Object*>* System::objects_ = nullptr;
 std::vector<Light*> System::lights_;
+std::vector<Line*> System::lines_;
 glm::vec3 System::ambient_ = glm::vec3(1.f);
 
 void System::End()
@@ -24,6 +25,12 @@ void System::End()
 void System::SetupParticle(Emitter* emitter)
 {
   render_->SetupParticle(emitter);
+}
+
+void System::AddLine(Line* line)
+{
+  lines_.push_back(std::move(line));
+  render_->SetupObject(line);
 }
 
 void System::AddObject(Object* object)
@@ -81,6 +88,10 @@ void System::MainLoop()
     {
       render_->DrawParticles(emitter);
     }
+
+    for (auto line: lines_)
+      line->Update(TimeManager::deltaTime);
+    render_->DrawLines(lines_);
 
     // Intercambiar el front y el back buffer
     render_->SwapBuffers();

@@ -4,6 +4,7 @@
 #include "common.h"
 #include "emitter.h"
 #include "light.h"
+#include "line.h"
 #include "object.h"
 class Render
 {
@@ -26,6 +27,7 @@ public:
   virtual void DrawObjects(const std::vector<Object*>* objects) = 0;
   virtual void DrawObject(Object* object) = 0;
   virtual void DrawParticles(Emitter* emitter) = 0;
+  virtual void DrawLines(const std::vector<Line*>& lines) = 0;
   virtual bool IsClosed() = 0;
   virtual void Clear() = 0;
   virtual void SwapBuffers() = 0;

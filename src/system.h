@@ -13,6 +13,7 @@ class System
 public:
   static const int kMaxParticles = 100;
   static void SetupParticle(Emitter* emitter);
+  static void AddLine(Line* line);
   static void AddObject(Object* object);
   static void AddEmitter(Emitter* emitter);
   static void AddLight(Light* light);
@@ -65,6 +66,7 @@ private:
   static InputManager* input_manager_;
   static std::vector<Object*>* objects_;
   static std::vector<Light*> lights_;
+  static std::vector<Line*> lines_;
   static glm::vec3 ambient_;
   inline static float ambient_intensity_ = 1.f;
   inline static bool calculate_light_ = false;

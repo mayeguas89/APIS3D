@@ -2,6 +2,14 @@
 
 #include "system.h"
 
+void Clamp(float* value, float min, float max, int num_values = 3)
+{
+  for (size_t i = 0; i < num_values; i++)
+  {
+    value[i] = std::clamp(value[i], min, max);
+  }
+}
+
 ImguiApp::ImguiApp()
 {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -143,6 +151,7 @@ void ImguiApp::ObjectsMenu()
         auto& data = objects_data_.at(i);
         glm::vec4 position_vec(data.translation[0], data.translation[1], data.translation[2], 1.f);
         object->SetPosition(position_vec);
+        Clamp(data.rotation, -glm::pi<float>(), glm::pi<float>());
         glm::vec4 rotation_vec(data.rotation[0], data.rotation[1], data.rotation[2], 1.f);
         object->SetRotation(rotation_vec);
         glm::vec4 scaling_vec(data.scale[0], data.scale[1], data.scale[2], 1.f);
@@ -150,9 +159,13 @@ void ImguiApp::ObjectsMenu()
         object->SetEnabled(data.enabled);
 
         ImGui::Checkbox("Toggle ON/OFF", &data.enabled);
-        ImGui::SliderFloat3("Position", &data.translation[0], -100.0, 100.0);
-        ImGui::SliderFloat3("Rotation", &data.rotation[0], -2 * glm::pi<float>(), 2 * glm::pi<float>());
-        ImGui::SliderFloat3("Scale", &data.scale[0], -10.0, 10.0);
+        ImGui::InputFloat("PositionX", &data.translation[0], 0.1f, 1.f, "%.2f");
+        ImGui::InputFloat("PositionY", &data.translation[1], 0.1f, 1.f, "%.2f");
+        ImGui::InputFloat("PositionZ", &data.translation[2], 0.1f, 1.f, "%.2f");
+        ImGui::SliderFloat("RotationX", &data.rotation[0], 0.1f, 1.f, "%.2f");
+        ImGui::SliderFloat("RotationY", &data.rotation[1], 0.1f, 1.f, "%.2f");
+        ImGui::SliderFloat("RotationZ", &data.rotation[2], 0.1f, 1.f, "%.2f");
+        ImGui::InputFloat3("Scale", &data.scale[0], "%.2f");
         ImGui::TreePop();
       }
     }
@@ -196,6 +209,7 @@ void ImguiApp::LightsMenu()
 
         if (light->GetType() == (int)Light::Type::kDirectional)
         {
+          Clamp(data.rotation, -glm::pi<float>(), glm::pi<float>());
           glm::vec4 rotation_vec(data.rotation[0], data.rotation[1], data.rotation[2], 1.f);
           light->SetRotation(rotation_vec);
 
@@ -211,16 +225,24 @@ void ImguiApp::LightsMenu()
         }
         else if (light->GetType() == (int)Light::Type::kPoint)
         {
+          Clamp(&data.distance_range, 0., 100.f, 1);
           light->SetLightRange(data.distance_range);
           glm::vec4 position_vec(data.position[0], data.position[1], data.position[2], 1.f);
           light->SetPosition(position_vec);
         }
         else if (light->GetType() == (int)Light::Type::kFocal)
         {
+          Clamp(&data.distance_range, 0.f, 100.f, 1);
+          Clamp(&data.cut_off_angle, 0.f, glm::degrees(glm::two_thirds<float>() * glm::two_pi<float>()), 1);
+
           light->SetLightRange(data.distance_range);
           light->SetCutOff(data.cut_off_angle);
           glm::vec4 position_vec(data.position[0], data.position[1], data.position[2], 1.f);
           light->SetPosition(position_vec);
+
+          Clamp(data.rotation, -glm::pi<float>(), glm::pi<float>());
+          glm::vec4 rotation_vec(data.rotation[0], data.rotation[1], data.rotation[2], 1.f);
+          light->SetRotation(rotation_vec);
 
           auto dir = light->GetDirection();
           data.direction[0] = dir.x;
@@ -235,6 +257,10 @@ void ImguiApp::LightsMenu()
 
         glm::vec4 color(data.color.x, data.color.y, data.color.z, 1.f);
         light->SetColor(color);
+
+        Clamp(&data.ambient_contribution, 0., 1.f, 1);
+        Clamp(&data.difuse_contribution, 0., 1.f, 1);
+        Clamp(&data.specular_contribution, 0., 1.f, 1);
 
         light->SetAmbientContribution(data.ambient_contribution);
         light->SetDifuseContribution(data.difuse_contribution);
@@ -252,28 +278,32 @@ void ImguiApp::LightsMenu()
         ImGui::TextColored(data.color, light_type.c_str());
         ImGui::Checkbox("Toggle ON/OFF", &data.enabled);
 
-        if (light->GetType() != (int)Light::Type::kDirectional)
-          ImGui::SliderFloat3("Position", &data.position[0], -100.f, 100.f);
-
         if (light->GetType() == (int)Light::Type::kDirectional || light->GetType() == (int)Light::Type::kFocal)
         {
-          ImGui::SliderFloat3("Rotation", &data.rotation[0], -2 * glm::pi<float>(), 2 * glm::pi<float>());
-          ImGui::SliderFloat3("Direction", &data.direction[0], -1.0f, 1.0f);
+          ImGui::InputFloat("RotationX", &data.rotation[0], 0.1f, 1.f, "%.2f");
+          ImGui::InputFloat("RotationY", &data.rotation[1], 0.1f, 1.f, "%.2f");
+          ImGui::InputFloat("RotationZ", &data.rotation[2], 0.1f, 1.f, "%.2f");
+          ImGui::InputFloat("DirectionX", &data.direction[0], 0.1f, 1.f, "%.2f");
+          ImGui::InputFloat("DirectionY", &data.direction[1], 0.1f, 1.f, "%.2f");
+          ImGui::InputFloat("DirectionZ", &data.direction[2], 0.1f, 1.f, "%.2f");
         }
 
         ImGui::ColorEdit3("Color", (float*)&data.color);
 
         if (light->GetType() == (int)Light::Type::kFocal)
-          ImGui::SliderFloat("CutOffAngle", &data.cut_off_angle, 0.f, 360.f);
+          ImGui::InputFloat("CutOffAngle", &data.cut_off_angle, 0.1f, 1.f, "%.2f");
 
-        if (light->GetType() == (int)Light::Type::kPoint || light->GetType() != (int)Light::Type::kFocal)
+        if (light->GetType() == (int)Light::Type::kPoint || light->GetType() == (int)Light::Type::kFocal)
         {
-          ImGui::SliderFloat("Distance Range", &data.distance_range, 1.f, 100.f);
+          ImGui::InputFloat("Distance Range", &data.distance_range, 1.f, 100.f);
+          ImGui::InputFloat("PositionX", &data.position[0], 0.1f, 1.f, "%.2f");
+          ImGui::InputFloat("PositionY", &data.position[1], 0.1f, 1.f, "%.2f");
+          ImGui::InputFloat("PositionZ", &data.position[2], 0.1f, 1.f, "%.2f");
         }
 
-        ImGui::SliderFloat("AmbienContribution", &data.ambient_contribution, 0.f, 1.f);
-        ImGui::SliderFloat("DifuseContribution", &data.difuse_contribution, 0.f, 1.f);
-        ImGui::SliderFloat("SpecularContribution", &data.specular_contribution, 0.f, 1.f);
+        ImGui::InputFloat("Ambient Contribution", &data.ambient_contribution, 0.f, 1.f);
+        ImGui::InputFloat("Difuse Contribution", &data.difuse_contribution, 0.f, 1.f);
+        ImGui::InputFloat("Specular Contribution", &data.specular_contribution, 0.f, 1.f);
         ImGui::TreePop();
       }
     }

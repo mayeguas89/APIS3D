@@ -189,7 +189,16 @@ void GLSLShader::SetVariables()
       {
         glUniform3fv(variable_list_[key], 1, &glm::vec3(0.f, 0.f, 0.f)[0]);
       }
+      if (auto key = "Lights[" + index + "].IsActive"; variable_list_.find(key) != variable_list_.end())
+      {
+        SetInt(key, 0);
+      }
       continue;
+    }
+
+    if (auto key = "Lights[" + index + "].IsActive"; variable_list_.find(key) != variable_list_.end())
+    {
+      SetInt(key, 1);
     }
 
     if (auto key = "Lights[" + index + "].Type"; variable_list_.find(key) != variable_list_.end())

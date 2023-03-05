@@ -19,6 +19,7 @@ public:
   void DrawObjects(const std::vector<Object*>* objects) override;
   void DrawObject(Object* object) override;
   void DrawParticles(Emitter* emitter) override;
+  void DrawLines(const std::vector<Line*>& lines) override;
   bool IsClosed() override;
   void SetSize(int width, int height) override;
 

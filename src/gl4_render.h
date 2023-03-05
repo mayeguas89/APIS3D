@@ -37,6 +37,7 @@ public:
   void SetupLight(Light* light) override;
   void RemoveObject(Object* object) override;
   void DrawParticles(Emitter* emitter) override;
+  void DrawLines(const std::vector<Line*>& lines) override;
   void DrawObjects(const std::vector<Object*>* objects) override;
   void DrawObject(Object* object) override;
 

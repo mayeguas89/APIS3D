@@ -95,27 +95,22 @@ void CubeLight::SetColor(const glm::vec3& color)
 
 void CubeLight::LoadDataFromFile(const std::string& filename) {}
 
-void CubeLight::Update(float delta_time)
+void CubeLight::Update(float delta_time) {}
+
+void CubeLight::SetLine(const glm::vec3& direction)
 {
-  //  // La matriz modelo se calcula a partir de la composicion de la transformacion de traslacion, rotacion y escalado
-  //
-  //  // La primera siempre se inicializa con la matriz identidad
-  //  glm::mat4 model = glm::translate(glm::mat4(1.f), glm::vec3(position_));
-  //
-  //  // Ahora rotamos la matriz en cada uno de los ejes x,y,z el angulo indicado en el vector de rotacion
-  //
-  //  // Rotacion eje x
-  //  model = glm::rotate(model, rotation_.x, glm::vec3(1.0f, 0.f, 0.f));
-  //  // Rotacion eje y
-  //  model = glm::rotate(model, rotation_.y, glm::vec3(0.0f, 1.f, 0.f));
-  //  // Rotacion eje z
-  //  model = glm::rotate(model, rotation_.z, glm::vec3(0.0f, 0.f, 1.f));
-  //
-  //  model = glm::translate(model, glm::vec3(position_));
-  //
-  //  // Por ultimo aplicamos el escalado
-  //  model = glm::scale(model, glm::vec3(scaling_));
-  //
-  //  // Seteamos la matriz modelo a nuestro modelo
-  //  model_mtx_ = model;
+  line_ = new Line(glm::vec3{0.0}, direction, glm::vec3{meshes_.at(0)->GetVertList()->at(0).color});
+  line_->SetPosition(position_);
+}
+
+Line* CubeLight::GetLine()
+{
+  return line_;
+}
+
+void CubeLight::SetPosition(const glm::vec4& position)
+{
+  position_ = position;
+  if (line_)
+    line_->SetPosition(position_);
 }

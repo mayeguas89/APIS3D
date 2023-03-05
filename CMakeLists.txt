@@ -38,6 +38,7 @@ add_executable(APIS3D
     src/glsl_material.cpp
     src/glsl_shader.cpp
     src/light.cpp
+    src/line.cpp
     src/material.cpp
     src/mesh3d.cpp
     src/particle.cpp

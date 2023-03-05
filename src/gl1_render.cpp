@@ -75,6 +75,8 @@ void GL1Render::DrawObject(Object* object)
 
 void GL1Render::DrawParticles(Emitter* emitter) {}
 
+void GL1Render::DrawLines(const std::vector<Line*>& lines) {}
+
 bool GL1Render::IsClosed()
 {
   return glfwWindowShouldClose(window_);

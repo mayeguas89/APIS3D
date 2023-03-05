@@ -3,7 +3,6 @@
 #extension GL_ARB_explicit_uniform_location : enable
 
 // Lights
-#define MAX_NUMBER_OF_LIGHTS 1
 
 layout(location = 1) uniform int computeLight;
 // Color de la luz ambiente
@@ -27,8 +26,10 @@ layout(location = 12) uniform int computeReflection;
 layout(location = 13) uniform int computeRefraction;
 layout(location = 14) uniform float refractCoef;
 
+#define MAX_NUMBER_OF_LIGHTS 8
 struct LightSource
 {
+    int IsActive;
     int Type;
     vec3 Position;
     vec4 Direction;
@@ -93,12 +94,14 @@ void main() {
         vec3 totalLight = vec3(0.f);
         for (int i=0;i<MAX_NUMBER_OF_LIGHTS;i++)
         {
+            if(Lights[i].IsActive ==  0)
+                continue;
             vec3 L = vec3(1.f);
 
             // Directional
             if (Lights[i].Type == 0)
             {
-                L = normalize(Lights[i].Direction.xyz);
+                L = normalize(-Lights[i].Direction.xyz);
             }
             // Point light
             else if (Lights[i].Type == 1)
@@ -111,7 +114,7 @@ void main() {
                 // Vector pointing from light to framgent position
                 L = normalize(Lights[i].Position-fPos.xyz);
                 // Calculate the cos of the angle between the light direction and L
-                float cos_theta = max(dot(normalize(Lights[i].Direction.xyz), L), 0.0);
+                float cos_theta = max(dot(normalize(-Lights[i].Direction.xyz), L), 0.0);
                 // If the fragment does not received light from the focal light, give only ambient
                 if (cos_theta < Lights[i].Cutoff)
                 {
@@ -122,7 +125,6 @@ void main() {
             }
 
             float distance = length(Lights[i].Position-fPos.xyz);
-            distance = 1.0;
             float attenuation = Lights[i].ConstantAttenuation;
             attenuation += Lights[i].LinearAttenuation * distance;
             attenuation += Lights[i].QuadraticAttenuation * distance * distance;

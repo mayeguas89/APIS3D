@@ -20,7 +20,7 @@ void Light::SetPosition(const glm::vec4& vect4)
 {
   if (cube_ == nullptr)
     cube_ = new CubeLight(color_);
-  cube_->SetPosition(position_);
+
   cube_->SetScaling(glm::vec4{kCubeScaling, 1.f});
   Entity::SetPosition(vect4);
   if (cube_)
@@ -58,6 +58,8 @@ const glm::vec3& Light::GetDirection() const
 void Light::SetDirection(const glm::vec3& direction)
 {
   direction_ = direction;
+  if (light_type_ == Type::kFocal && cube_->GetLine() == nullptr)
+    cube_->SetLine(direction_);
 }
 
 void Light::Update(float delta_time)
@@ -81,7 +83,13 @@ void Light::Update(float delta_time)
 
   // Seteamos la matriz modelo a nuestro modelo
   if (cube_)
+  {
     cube_->SetModelMatrix(glm::scale(model, kCubeScaling));
+    if (auto line = cube_->GetLine(); line)
+    {
+      line->SetModelMatrix(model_mtx_);
+    }
+  }
 }
 
 CubeLight* Light::GetCube()
