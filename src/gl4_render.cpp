@@ -63,7 +63,7 @@ void GL4Render::SetupObject(Object* object)
     glBufferData(GL_ARRAY_BUFFER,
                  sizeof(Vertex) * mesh->GetVertList()->size(),
                  mesh->GetVertList()->data(),
-                 GL_STATIC_DRAW);
+                 GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo.idxbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -133,7 +133,7 @@ void GL4Render::DrawParticles(Emitter* emitter)
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vba);
     glBufferData(GL_ARRAY_BUFFER,
-                 emitter->GetParticleAlphaList().size() * sizeof(glm::mat4),
+                 emitter->GetParticleAlphaList().size() * sizeof(float),
                  emitter->GetParticleAlphaList().data(),
                  GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(7);
@@ -181,10 +181,7 @@ void GL4Render::DrawObject(Object* object)
     glBindVertexArray(buffer.bo_id);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 sizeof(Vertex) * mesh->GetVertList()->size(),
-                 mesh->GetVertList()->data(),
-                 GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0x00, sizeof(Vertex), mesh->GetVertList()->data());
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.idxbo);
 

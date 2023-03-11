@@ -208,73 +208,82 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
 
 inline void ProcessMesh(pugi::xml_node buffer, Mesh3D* mesh)
 {
+  std::vector<float> coord_list;
+  auto coord_it = coord_list.end();
+  std::vector<float> tangent_list;
+  auto tangent_it = coord_list.end();
+  std::vector<float> norm_list;
+  auto norm_it = norm_list.end();
+  std::vector<float> texture_coords_list;
+  auto texture_it = texture_coords_list.end();
+  std::vector<unsigned int> index_list;
+  auto index_it = index_list.end();
+
   if (auto attrib = buffer.child("coords"); attrib != nullptr)
   {
-    auto pos_coords_list = utils::SplitString<float>(attrib.text().as_string(), ',');
-    auto coord = pos_coords_list.begin();
-
-    while (coord != pos_coords_list.end())
-    {
-      Vertex v;
-      v.position.x = *coord++;
-      v.position.y = *coord++;
-      v.position.z = *coord++;
-      v.position.w = 1.0f;
-
-      v.color = glm::vec4(mesh->GetMaterial()->GetColor(), 1.0f);
-
-      mesh->AddVertex(v);
-    }
+    coord_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+    coord_it = coord_list.begin();
   }
-
   if (auto attrib = buffer.child("tangents"); attrib != nullptr)
   {
-    auto tangent_list = utils::SplitString<float>(attrib.text().as_string(), ',');
-    auto tangent = tangent_list.begin();
-    for (auto it = mesh->GetVertList()->begin(); it != mesh->GetVertList()->end() && tangent != tangent_list.end();
-         it++)
-    {
-      it->tangent.x = *tangent++;
-      it->tangent.y = *tangent++;
-      it->tangent.z = *tangent++;
-      it->tangent.w = 0.0f;
-    }
+    tangent_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+    tangent_it = tangent_list.begin();
   }
-
   if (auto attrib = buffer.child("normals"); attrib != nullptr)
   {
-    auto norm_list = utils::SplitString<float>(attrib.text().as_string(), ',');
-    auto norm = norm_list.begin();
-    for (auto it = mesh->GetVertList()->begin(); it != mesh->GetVertList()->end() && norm != norm_list.end(); it++)
-    {
-      it->normal.x = *norm++;
-      it->normal.y = *norm++;
-      it->normal.z = *norm++;
-      it->normal.w = 0.0f;
-    }
+    norm_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+    norm_it = norm_list.begin();
   }
 
   if (auto attrib = buffer.child("texCoords"); attrib != nullptr)
   {
-    auto texture_coords_list = utils::SplitString<float>(attrib.text().as_string(), ',');
-    auto text = texture_coords_list.begin();
-    for (auto it = mesh->GetVertList()->begin();
-         it != mesh->GetVertList()->end() && text != texture_coords_list.end();
-         it++)
-    {
-      it->texture_coordinates.x = *text++;
-      it->texture_coordinates.y = *text++;
-    }
+    texture_coords_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+    texture_it = texture_coords_list.begin();
   }
 
   if (auto attrib = buffer.child("indices"); attrib != nullptr)
   {
-    auto index_list = utils::SplitString<unsigned int>(attrib.text().as_string(), ',');
-    for (auto index: index_list)
-    {
-      mesh->AddIndex(index);
-    }
+    index_list = utils::SplitString<unsigned int>(attrib.text().as_string(), ',');
+    index_it = index_list.begin();
   }
+
+  for (; coord_it != coord_list.end();)
+  {
+    Vertex v;
+    v.position.x = *coord_it++;
+    v.position.y = *coord_it++;
+    v.position.z = *coord_it++;
+    v.position.w = 1.0f;
+
+    v.color = glm::vec4(mesh->GetMaterial()->GetColor(), 1.0f);
+
+    if (!tangent_list.empty() && tangent_it != tangent_list.end())
+    {
+      v.tangent.x = *tangent_it++;
+      v.tangent.y = *tangent_it++;
+      v.tangent.z = *tangent_it++;
+      v.tangent.w = 0.0f;
+    }
+
+    if (!norm_list.empty() && norm_it != norm_list.end())
+    {
+      v.normal.x = *norm_it++;
+      v.normal.y = *norm_it++;
+      v.normal.z = *norm_it++;
+      v.normal.w = 0.0f;
+    }
+
+    if (!texture_coords_list.empty() && texture_it != texture_coords_list.end())
+    {
+      v.texture_coordinates.x = *texture_it++;
+      v.texture_coordinates.y = *texture_it++;
+    }
+
+    mesh->AddVertex(v);
+  }
+
+  for (; index_it != index_list.end();)
+    mesh->AddIndex(*index_it++);
 }
 
 inline std::vector<Mesh3D*> GetMeshesFromMshFile(const std::string filename)

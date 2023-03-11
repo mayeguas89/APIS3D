@@ -3,6 +3,7 @@
 #include "directional_light.h"
 #include "factory_engine.h"
 #include "flash_light.h"
+#include "free_camera.h"
 #include "orbital_light.h"
 #include "point_light.h"
 #include "rotate_camera.h"
@@ -64,8 +65,8 @@ int main(int argc, char const* argv[])
                                       0.5f,
                                       0.5f,
                                       10.f,
-                                      glm::vec3(.5f, .5f, .5f),
-                                      glm::vec3(-0.6f, 0.f, -0.8f),
+                                      glm::vec3(0.f, 0.f, 1.f),
+                                      glm::vec3(0.0f, 0.f, -1.0f),
                                       45.f);
 
   System::AddLight(flash_light);
@@ -77,11 +78,16 @@ int main(int argc, char const* argv[])
   //                                          0.1f);
 
   Camera* rotate_camera = new CameraKeyboard(Camera::ProjectionType::Perspective,
-                                             glm::vec3(0.f, 1.f, 1.f),
-                                             glm::vec3(0.f, -1.f, -1.f),
+                                             glm::vec3(0.f, 0.f, 1.f),
+                                             glm::vec3(0.f, 0.f, -1.f),
                                              glm::vec3(0.f, 1.f, 0.f));
+  Camera* free_camera = new FreeCamera(Camera::ProjectionType::Perspective,
+                                       glm::vec3(0.f, 0.f, 1.f),
+                                       glm::vec3(0.f, 0.f, -1.f),
+                                       glm::vec3(0.f, 1.f, 0.f),
+                                       2.f);
 
-  System::SetCamera(rotate_camera);
+  System::SetCamera(free_camera);
   System::AddObject(&rabbit);
   System::AddObject(&rabbit_two);
   System::AddObject(point_light->GetCube());
@@ -100,6 +106,7 @@ int main(int argc, char const* argv[])
   System::End();
 
   delete rotate_camera;
+  delete free_camera;
   delete point_light;
 
   return 0;

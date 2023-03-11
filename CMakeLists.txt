@@ -28,6 +28,7 @@ add_library(engine SHARED STATIC
     src/emitter.cpp
     src/entity.cpp
     src/factory_engine.cpp
+    src/free_camera.cpp
     src/imgui_app.cpp
     src/flash_light.cpp
     src/gl1_render.cpp

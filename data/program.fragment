@@ -120,7 +120,7 @@ void main() {
                 // Vector pointing from light to framgent position
                 L = normalize(Lights[i].Position-fPos.xyz);
                 // Calculate the cos of the angle between the light direction and L
-                float cos_theta = max(dot(normalize(-Lights[i].Direction.xyz), L), 0.0);
+                float cos_theta = max(dot(normalize(Lights[i].Direction.xyz), L), 0.0);
                 // If the fragment does not received light from the focal light, give only ambient
                 if (cos_theta < Lights[i].Cutoff)
                 {

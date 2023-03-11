@@ -125,19 +125,32 @@ void ImguiApp::CameraMenu()
   static float translation[] = {System::GetCamera()->GetPosition().x,
                                 System::GetCamera()->GetPosition().y,
                                 System::GetCamera()->GetPosition().z};
+  auto camera = System::GetCamera();
   if (ImGui::CollapsingHeader("Camera"))
   {
-    System::GetCamera()->SetSpeed(camera_speed);
+    camera->SetSpeed(camera_speed);
     System::SetNearPlane(near_plane);
     System::SetFarPlane(far_plane);
-    System::GetCamera()->SetLookAt(glm::vec3(look_at[0], look_at[1], look_at[2]));
-    System::GetCamera()->SetPosition(glm::vec4(translation[0], translation[1], translation[2], 1.f));
+    camera->SetLookAt(glm::vec3(look_at[0], look_at[1], look_at[2]));
+    camera->SetPosition(glm::vec4(translation[0], translation[1], translation[2], 1.f));
 
     ImGui::SliderFloat("CameraSpeed", &camera_speed, 0.0, 5.0);
     ImGui::SliderFloat("NearPlane", &near_plane, 0.001f, 10.0f);
     ImGui::SliderFloat("FarPlane", &far_plane, 100.0f, 500.f);
-    ImGui::SliderFloat3("Look At", look_at, -10, 10);
-    ImGui::SliderFloat3("Camera Position", translation, -20, 20);
+    ImGui::SliderFloat3("Look At", look_at, -100, 100);
+    ImGui::SliderFloat3("Camera Position", translation, -200, 200);
+  }
+  else
+  {
+    look_at[0] = camera->GetLookAt().x;
+    look_at[1] = camera->GetLookAt().y;
+    look_at[2] = camera->GetLookAt().z;
+    translation[0] = camera->GetPosition().x;
+    translation[1] = camera->GetPosition().y;
+    translation[2] = camera->GetPosition().z;
+    near_plane = System::GetNearPlane();
+    far_plane = System::GetFarPlane();
+    camera_speed = camera->GetSpeed();
   }
 }
 

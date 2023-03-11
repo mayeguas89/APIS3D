@@ -1,0 +1,20 @@
+<mesh>
+<buffers>
+	<buffer>
+		<material>
+			<texture colorFB="true">null</texture>
+			<vShader>data/program.vertex</vShader>
+			<fShader>data/program.fragment</fShader>
+			<light>false</light>
+			<culling>false</culling>
+			
+		</material>
+		<indices>0,1,2,0,2,3</indices>
+		<normals normalCompCount="3">0,0,-1,0,0,-1,0,0,-1,0,0,-1</normals>
+
+		<coords vertexCompCount="3">-0.5,-0.5,0.0,-0.5,0.5,0.0,0.5,0.5,0.0,0.5,-0.5,0.0</coords>
+		<texCoords texCoordCompCount="2">0.000000,0.000000,  0.000000,1.000000,1.000000,1.000000,1.000000,0.000000</texCoords>
+		
+	</buffer>
+</buffers>
+</mesh>
