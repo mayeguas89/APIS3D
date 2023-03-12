@@ -55,6 +55,12 @@ public:
 
   static void SetClearColor(const glm::vec4& color);
 
+  static void SetShadowsCamera(Light* light);
+  static Camera* GetShadowsCamera();
+
+  static void SetShadowsEnabled(bool value);
+  static bool GetShadowsEnabled();
+
 private:
   static float near_plane_;
   static float far_plane_;
@@ -74,6 +80,9 @@ private:
   inline static std::unordered_map<std::string, std::vector<Mesh3D*>> mesh_map_;
   inline static std::unordered_map<std::string, Texture*> texture_map_;
   inline static std::vector<Emitter*> emitters_;
+  inline static bool shadows_enabled_ = false;
 
   inline static bool end_ = false;
+
+  inline static Camera* ortographic_camera_ = nullptr;
 };

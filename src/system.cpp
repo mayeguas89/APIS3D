@@ -1,6 +1,7 @@
 #include "system.h"
 
 #include "factory_engine.h"
+#include "shadow_calculation_camera.h"
 #include "time_manager.h"
 
 glm::mat4* System::current_object_model_matrix_ = nullptr;
@@ -20,6 +21,34 @@ void System::End()
     delete render_;
   if (input_manager_)
     delete input_manager_;
+  if (ortographic_camera_)
+    delete ortographic_camera_;
+}
+
+void System::SetShadowsCamera(Light* light)
+{
+  if (ortographic_camera_ != nullptr)
+    delete ortographic_camera_;
+
+  ortographic_camera_ =
+    new ShadowCalculationCamera(light->GetPosition(), light->GetDirection(), glm::vec3{0.f, 1.f, 0.f});
+}
+
+Camera* System::GetShadowsCamera()
+{
+  if (ortographic_camera_ != nullptr)
+    return ortographic_camera_;
+  return nullptr;
+}
+
+void System::SetShadowsEnabled(bool value)
+{
+  shadows_enabled_ = value;
+}
+
+bool System::GetShadowsEnabled()
+{
+  return shadows_enabled_;
 }
 
 void System::SetupParticle(Emitter* emitter)
