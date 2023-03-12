@@ -11,6 +11,8 @@ public:
     kColor2D = 0,
     kCubeMap = 1,
     kNormal = 2,
+    kDepthFb = 3,
+    kColorFb = 4,
     kNone
   };
 
