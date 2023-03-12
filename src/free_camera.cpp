@@ -2,16 +2,12 @@
 
 #include "system.h"
 
-FreeCamera::FreeCamera(ProjectionType type,
-                       glm::vec3 position,
-                       glm::vec3 look_at,
-                       glm::vec3 up,
-                       float camera_speed):
-  Camera(type, position, look_at, up)
+FreeCamera::FreeCamera(glm::vec3 position, glm::vec3 look_at, glm::vec3 up, float camera_speed):
+  Camera(Camera::ProjectionType::Perspective, position, look_at, up)
 {
   camera_speed_ = camera_speed;
   angle_ = glm::radians((float)System::GetInputManager()->GetYScroll());
-  ComputeProjectionMatrix(type);
+  ComputeProjectionMatrix(projection_type_);
 }
 
 void FreeCamera::Update(float delta_time)

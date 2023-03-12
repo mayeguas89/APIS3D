@@ -6,6 +6,8 @@ Material::~Material()
 {
   if (render_program_)
     delete render_program_;
+  if (shadow_program_)
+    delete shadow_program_;
   if (base_texture_)
     delete base_texture_;
   if (normal_texture_)

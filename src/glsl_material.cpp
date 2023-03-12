@@ -1,16 +1,15 @@
 #include "glsl_material.h"
 
 #include "glsl_shader.h"
+#include "system.h"
 
 GLSLMaterial::GLSLMaterial(): Material()
 {
   render_program_ = new GLSLShader();
+  shadow_program_ = nullptr;
 }
 
-GLSLMaterial::~GLSLMaterial()
-{
-  // delete render_program_;
-}
+GLSLMaterial::~GLSLMaterial() {}
 
 /**
  * @brief Metodo que recibe una lista de programas, los pasa al render program para que los compile y los linke
@@ -46,6 +45,28 @@ void GLSLMaterial::LoadPrograms(std::unordered_map<std::string, RenderType>& pro
  * 
  */
 void GLSLMaterial::Prepare()
+{
+  if (System::GetRenderType() == System::RenderType::kShadow)
+    PrepareShadowVariables();
+  else
+    PrepareColorVariables();
+}
+
+void GLSLMaterial::PrepareShadowVariables()
+{
+  if (shadow_program_ == nullptr)
+  {
+    shadow_program_ = new GLSLShader();
+    LoadShadowPrograms();
+  }
+  shadow_program_->UseProgram();
+  auto ortho_camera = System::GetShadowsCamera();
+  shadow_program_->SetMat4("mProjOrtho", ortho_camera->GetProjectionMatrix());
+  shadow_program_->SetMat4("mViewOrtho", ortho_camera->GetViewMatrix());
+  shadow_program_->SetVariables();
+}
+
+void GLSLMaterial::PrepareColorVariables()
 {
   render_program_->UseProgram();
   // De momento sabemos las variables harcodeadas
@@ -154,12 +175,66 @@ void GLSLMaterial::Prepare()
 
   render_program_->SetInt("computeNormalTexture", 0);
   render_program_->SetInt("normalTexture", 2);
-  if (normal_texture_)
+  if (normal_texture_ != nullptr)
   {
     normal_texture_->Bind(2);
     render_program_->SetInt("computeNormalTexture", 1);
     render_program_->SetInt("normalTexture", 2);
   }
 
+  render_program_->SetInt("shadowTexture", 3);
+  render_program_->SetInt("computeShadows", 0);
+  if (System::GetShadowsEnabled())
+  {
+    render_program_->SetInt("computeShadows", 1);
+    auto ortho_camera = System::GetShadowsCamera();
+    // clang-format off
+    glm::mat4 depth_bias_mat(
+      0.5f, 0.0f, 0.0f, 0.0f,
+      0.0f, 0.5f, 0.0f, 0.0f,
+      0.0f, 0.0f, 0.5f, 0.0f,
+      0.5f, 0.5f, 0.5f, 1.0f
+    );
+    // clang-format on
+    depth_bias_mat = depth_bias_mat * ortho_camera->GetProjectionMatrix() * ortho_camera->GetViewMatrix();
+
+    render_program_->SetMat4("DepthVP", depth_bias_mat);
+    render_program_->SetVec3("shadowLightDirection", ortho_camera->GetLookAt());
+  }
+
+  // render_program_->SetInt("")
+  // if (frame_buffer_texture_ != nullptr)
+  // {
+
+  // }
+
   render_program_->SetVariables();
+}
+
+void GLSLMaterial::LoadShadowPrograms()
+{
+  std::unordered_map<std::string, RenderType> program_map;
+  program_map[kShadowVertexProgram] = RenderType::Vertex;
+  program_map[kShadowFragmentProgram] = RenderType::Fragment;
+  for (auto it = program_map.begin(); it != program_map.end(); it++)
+  {
+    // Comprobamos si el fichero existe
+    if (!std::filesystem::exists(it->first))
+      continue;
+
+    // Detectar errores en compilacion del shader
+    if (auto success = shadow_program_->SetProgram(it->first, it->second); !success)
+      std::cout << shadow_program_->GetErrorMsg();
+  }
+
+  // Si hay algun error en los shader no continuamos
+  if (!shadow_program_->GetErrorMsg().empty())
+    return;
+
+  // Si hay algun error en el linkado no continuamos
+  if (!shadow_program_->LinkPrograms())
+  {
+    std::cout << shadow_program_->GetErrorMsg();
+    return;
+  }
 }

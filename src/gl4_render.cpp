@@ -1,16 +1,21 @@
 #include "gl4_render.h"
 
+#include "gl_texture_framebuffer.h"
 #include "system.h"
 #include "vertex.h"
 
 GL4Render::GL4Render(int width, int height): GL1Render{width, height} {}
 
-GL4Render::~GL4Render() {}
+GL4Render::~GL4Render()
+{
+  delete depth_texture_;
+}
 
 void GL4Render::Init()
 {
   GL1Render::Init();
   imgui_app_.Init(window_);
+  depth_texture_ = new GLTextureFrameBuffer(GLTextureFrameBuffer::FBType::kDepthFb, width_, height_);
 }
 
 void GL4Render::SetupLight(Light* light)
@@ -153,8 +158,32 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   imgui_app_.StartFrame();
   imgui_app_.Update();
 
+  if (System::GetShadowsEnabled())
+  {
+    glBindFramebuffer(GL_FRAMEBUFFER, reinterpret_cast<GLTextureFrameBuffer*>(depth_texture_)->GetFrameBufferId());
+    glViewport(0, 0, (int)depth_texture_->GetSize().x, (int)depth_texture_->GetSize().y);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    unsigned int draw_buf = GL_COLOR_ATTACHMENT0;
+    glDrawBuffers(1, &draw_buf);
+
+    System::SetRenderType(System::RenderType::kShadow);
+    for (size_t i = 0; i < objects->size(); i++)
+      DrawObject(objects->at(i));
+    System::SetRenderType(System::RenderType::kColor);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, width_, height_);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    unsigned int draw_buf2 = GL_COLOR_ATTACHMENT0;
+    glDrawBuffers(1, &draw_buf2);
+  }
+
   for (size_t i = 0; i < objects->size(); i++)
+  {
+    if (System::GetShadowsEnabled())
+      depth_texture_->Bind(3);
     DrawObject(objects->at(i));
+  }
 
   imgui_app_.EndFrame();
 }

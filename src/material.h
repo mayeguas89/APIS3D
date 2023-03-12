@@ -65,7 +65,8 @@ public:
   void SetRefractionCoefficient(float value);
 
 protected:
-  RenderProgram* render_program_ = nullptr;
+  RenderProgram* render_program_;
+  RenderProgram* shadow_program_;
   Texture* base_texture_ = nullptr;
   Texture* normal_texture_ = nullptr;
   Texture* reflection_texture_ = nullptr;

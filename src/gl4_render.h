@@ -3,6 +3,7 @@
 #define GLAD_ONLY_HEADER
 #include "gl1_render.h"
 #include "imgui_app.h"
+#include "texture.h"
 class GL4Render: public GL1Render
 {
   /**
@@ -46,4 +47,6 @@ private:
   // Vamos a acceder a los elementos por ids de cada objeto
   std::unordered_map<int, VBO> buffer_object_list_;
   ImguiApp imgui_app_;
+
+  Texture* depth_texture_ = nullptr;
 };

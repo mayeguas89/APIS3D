@@ -26,10 +26,18 @@ GLTextureFrameBuffer::GLTextureFrameBuffer(FBType type, int width, int height): 
   }
 }
 
+void GLTextureFrameBuffer::Bind(unsigned int index)
+{
+  if (id_ == 0)
+    return;
+  glActiveTexture(GL_TEXTURE0 + index);
+  glBindTexture(GL_TEXTURE_2D, id_);
+}
+
 void GLTextureFrameBuffer::CreateTexture()
 {
   // Create the texture for the fb
-  glGenFramebuffers(1, &id_);
+  glGenTextures(1, &id_);
   glBindTexture(GL_TEXTURE_2D, id_);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -41,8 +49,8 @@ void GLTextureFrameBuffer::CreateTexture()
       glTexImage2D(GL_TEXTURE_2D,
                    0,
                    GL_DEPTH_COMPONENT24,
-                   width,
-                   height,
+                   (int)size_.x,
+                   (int)size_.y,
                    0,
                    GL_DEPTH_COMPONENT,
                    GL_UNSIGNED_BYTE,
@@ -50,7 +58,7 @@ void GLTextureFrameBuffer::CreateTexture()
 
       break;
     case GLTextureFrameBuffer::FBType::kColorFb:
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int)size_.x, (int)size_.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     default:
       break;
   }
@@ -70,7 +78,7 @@ void GLTextureFrameBuffer::AttachFrameBuffer()
       unsigned int fb_depth_id;
       glGenRenderbuffers(1, &fb_depth_id);
       glBindRenderbuffer(GL_RENDERBUFFER, fb_depth_id);
-      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, (int)size_.x, (int)size_.u);
+      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, (int)size_.x, (int)size_.y);
       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fb_depth_id);
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, id_, 0);
     default:

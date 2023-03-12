@@ -109,11 +109,11 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
   }
 
   // Usamos los shaders de vertices y de los fragmentos
-  auto vextex_shader_filename = material_node.child("vShader").text().as_string();
+  auto vertex_shader_filename = material_node.child("vShader").text().as_string();
   auto fragment_shader_filename = material_node.child("fShader").text().as_string();
 
   std::unordered_map<std::string, RenderType> program_map;
-  program_map[vextex_shader_filename] = RenderType::Vertex;
+  program_map[vertex_shader_filename] = RenderType::Vertex;
   program_map[fragment_shader_filename] = RenderType::Fragment;
 
   material->LoadPrograms(program_map);
@@ -141,7 +141,6 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
 
         if (!texture->Load(texture_filenames, Texture::Type::kCubeMap))
           throw std::runtime_error("Error reading the cubeMap texture files\n");
-        texture->Bind((unsigned int)Texture::Type::kCubeMap);
       }
 
       if (material->GetReflection())
@@ -170,7 +169,6 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
           std::string error_msg = "Error reading the texture file " + directory + texture_file + "\n";
           throw std::runtime_error(error_msg);
         }
-        texture->Bind((unsigned int)Texture::Type::kColor2D);
       }
 
       material->SetBaseTexture(texture);

@@ -30,8 +30,7 @@ void System::SetShadowsCamera(Light* light)
   if (ortographic_camera_ != nullptr)
     delete ortographic_camera_;
 
-  ortographic_camera_ =
-    new ShadowCalculationCamera(light->GetPosition(), light->GetDirection(), glm::vec3{0.f, 1.f, 0.f});
+  ortographic_camera_ = new ShadowCalculationCamera(light);
 }
 
 Camera* System::GetShadowsCamera()
@@ -49,6 +48,16 @@ void System::SetShadowsEnabled(bool value)
 bool System::GetShadowsEnabled()
 {
   return shadows_enabled_;
+}
+
+System::RenderType System::GetRenderType()
+{
+  return render_type_;
+}
+
+void System::SetRenderType(System::RenderType type)
+{
+  render_type_ = type;
 }
 
 void System::SetupParticle(Emitter* emitter)
@@ -95,6 +104,10 @@ void System::MainLoop()
 
     // Actualizar la camara
     camera_->Update(TimeManager::deltaTime);
+    if (ortographic_camera_ != nullptr)
+    {
+      ortographic_camera_->Update(TimeManager::deltaTime);
+    }
 
     for (auto light: lights_)
     {

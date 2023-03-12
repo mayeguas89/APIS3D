@@ -26,6 +26,9 @@ layout(location = 12) uniform int computeReflection;
 layout(location = 13) uniform int computeRefraction;
 layout(location = 14) uniform float refractCoef;
 layout(location = 15) uniform int computeNormalTexture;
+layout(location = 16) uniform sampler2D shadowTexture;
+layout(location = 17) uniform int computeShadows;
+layout(location = 18) uniform vec3 shadowLightDirection;
 
 #define MAX_NUMBER_OF_LIGHTS 8
 struct LightSource
@@ -44,7 +47,7 @@ struct LightSource
     float DifuseContribution;
     float SpecularContribution;
 };
-layout(location = 16) uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
+layout(location = 19) uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
 
 
 // Input
@@ -53,6 +56,7 @@ in vec2 fTextCoord;
 in vec4 fNormal;
 in vec4 fPos;
 in mat3 TBN;
+in vec4 fShadowCoord;
 
 // Output
 out vec4 FragColor;
@@ -60,7 +64,9 @@ out vec4 FragColor;
 void main() {
 
     vec3 fTextCube = fPos.xyz;
-    
+    float visibility = 1.0f;
+    vec4 baseColor = fColor;
+
     if(computeReflection == 1)
     {
         vec3 I = vec3(normalize(fPos.xyz - cameraPosition));
@@ -72,6 +78,15 @@ void main() {
         fTextCube = refract(I, normalize(fNormal.xyz), refractCoef);
     }
 
+    if(computeShadows == 1)
+    {
+        float bias = max(0.05f * (1.0f - dot(normalize(fNormal).xyz, normalize(shadowLightDirection))), 0.0005f);
+        if(texture2D(shadowTexture, fShadowCoord.xy).z < fShadowCoord.z - 0.0005f)
+        {
+            visibility = 0.5;
+        }
+    }
+
     vec3 normal = normalize(fNormal.xyz);
     
     if(computeNormalTexture == 1)
@@ -81,7 +96,6 @@ void main() {
         normal = -TBN * normalTextValue;
     }
 
-    vec4 baseColor = fColor;
     
     if(hasTexture == 1)
     {
@@ -150,9 +164,8 @@ void main() {
             float specular = pow(max(dot(R, EYE), 0.f), shininess);
 
             vec3 light = ambient * Lights[i].AmbientContribution * ambientIntensity;
-            light += diffuse * Lights[i].DifuseContribution;
-            light += specular * Lights[i].SpecularContribution;
-            light *= attenuation;
+            light += diffuse * Lights[i].DifuseContribution * attenuation * visibility;
+            light += specular * Lights[i].SpecularContribution * attenuation * visibility;
             light *= Lights[i].Color;
             totalLight += light;
         }

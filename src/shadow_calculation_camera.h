@@ -1,14 +1,15 @@
 #pragma once
 
 #include "camera.h"
-
+#include "light.h"
 class ShadowCalculationCamera: public Camera
 {
 public:
-  ShadowCalculationCamera(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up);
+  ShadowCalculationCamera(Light* light);
   virtual void ComputeProjectionMatrix(ProjectionType type) override;
   void Update(float delta_time) override;
 
 private:
   virtual void ComputeViewMatrix() override;
+  Light* light_;
 };

@@ -1,0 +1,11 @@
+#version 330
+
+attribute vec4 vPos;
+
+uniform mat4 M;
+uniform mat4 mProjOrtho;
+uniform mat4 mViewOrtho;
+
+void main() {
+    gl_Position = mProjOrtho * mViewOrtho * M * vPos;
+}

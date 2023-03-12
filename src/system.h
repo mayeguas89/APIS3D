@@ -11,6 +11,11 @@
 class System
 {
 public:
+  enum class RenderType
+  {
+    kShadow,
+    kColor,
+  };
   static const int kMaxParticles = 100;
   static void SetupParticle(Emitter* emitter);
   static void AddLine(Line* line);
@@ -60,6 +65,8 @@ public:
 
   static void SetShadowsEnabled(bool value);
   static bool GetShadowsEnabled();
+  static void SetRenderType(RenderType type);
+  static RenderType GetRenderType();
 
 private:
   static float near_plane_;
@@ -85,4 +92,6 @@ private:
   inline static bool end_ = false;
 
   inline static Camera* ortographic_camera_ = nullptr;
+
+  inline static RenderType render_type_ = RenderType::kColor;
 };

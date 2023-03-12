@@ -1,9 +1,11 @@
 #include "shadow_calculation_camera.h"
 
-ShadowCalculationCamera::ShadowCalculationCamera(const glm::vec3& position,
-                                                 const glm::vec3& direction,
-                                                 const glm::vec3& up):
-  Camera(Camera::ProjectionType::Orthogonal, position, direction, up)
+ShadowCalculationCamera::ShadowCalculationCamera(Light* light):
+  Camera(Camera::ProjectionType::Orthogonal,
+         glm::vec3{light->GetPosition()},
+         light->GetDirection(),
+         {0.f, 1.f, 0.f}),
+  light_{light}
 {}
 
 void ShadowCalculationCamera::ComputeProjectionMatrix(ProjectionType)
@@ -19,5 +21,5 @@ void ShadowCalculationCamera::Update(float delta_time)
 
 void ShadowCalculationCamera::ComputeViewMatrix()
 {
-  view_mtx_ = glm::lookAt(glm::vec3(position_), look_at_, up_);
+  view_mtx_ = glm::lookAt(glm::vec3(light_->GetPosition()), light_->GetDirection(), up_);
 }

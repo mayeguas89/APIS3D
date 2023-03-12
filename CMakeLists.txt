@@ -34,6 +34,7 @@ add_library(engine SHARED STATIC
     src/gl1_render.cpp
     src/gl4_render.cpp
     src/gl_texture.cpp
+    src/gl_texture_framebuffer.cpp
     src/glfw_input_manager.cpp
     src/glsl_material.cpp
     src/glsl_shader.cpp
@@ -47,6 +48,7 @@ add_library(engine SHARED STATIC
     src/object3d.cpp
     src/render.cpp
     src/rotate_camera.cpp
+    src/shadow_calculation_camera.cpp
     src/system.cpp
     src/texture.cpp
     src/time_manager.cpp
@@ -103,4 +105,12 @@ add_executable(Rabbit
 
 target_link_libraries(
   Rabbit PRIVATE engine
+)
+
+add_executable(ShadowMap 
+  src/shadow_map.cpp
+)
+
+target_link_libraries(
+  ShadowMap PRIVATE engine
 )
