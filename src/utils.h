@@ -1,9 +1,15 @@
 #pragma once
 
 #include "factory_engine.h"
+#include "gl_texture_framebuffer.h"
 #include "material.h"
 #include "mesh3d.h"
 #include "pugixml.hpp"
+#include "stb_image.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 #include <sstream>
 #include <string>
@@ -148,6 +154,13 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
       else if (material->GetRefraction())
         material->SetRefractionTexture(texture);
       material->SetBaseTexture(texture);
+    }
+    else if (auto color_fb_attrib = child_node.attribute("colorFB");
+             color_fb_attrib != nullptr && color_fb_attrib.as_bool())
+    {
+      auto render = System::GetRender();
+      material->SetBaseTexture(
+        new GLTextureFrameBuffer(GLTextureFrameBuffer::FBType::kColorFb, render->GetWidth(), render->GetHeight()));
     }
     else
     {
@@ -314,7 +327,141 @@ inline std::vector<Mesh3D*> GetMeshesFromMshFile(const std::string filename)
 
     to_return.push_back(mesh);
   }
+  return to_return;
+}
 
+inline void ProcessMesh(aiMesh* mesh, Mesh3D* my_mesh)
+{
+  for (int i = 0; i < mesh->mNumVertices; i++)
+  {
+    Vertex v;
+    v.position.x = mesh->mVertices[i].x;
+    v.position.y = mesh->mVertices[i].y;
+    v.position.z = mesh->mVertices[i].z;
+    v.position.w = 1.0f;
+
+    if (mesh->HasNormals())
+    {
+      v.normal.x = mesh->mNormals[i].x;
+      v.normal.y = mesh->mNormals[i].y;
+      v.normal.z = mesh->mNormals[i].z;
+      v.normal.w = 0.0f;
+    }
+
+    if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+    {
+      v.texture_coordinates.x = mesh->mTextureCoords[0][i].x;
+      v.texture_coordinates.y = mesh->mTextureCoords[0][i].y;
+    }
+    else
+    {
+      v.texture_coordinates = glm::vec2(0.0f, 0.0f);
+    }
+
+    if (mesh->HasTangentsAndBitangents())
+    {
+      v.tangent.x = mesh->mTangents[i].x;
+      v.tangent.y = mesh->mTangents[i].y;
+      v.tangent.z = mesh->mTangents[i].z;
+      v.tangent.w = 1.0f;
+    }
+
+    if (mesh->HasVertexColors(0))
+    {
+      v.color.r = mesh->mColors[0][i].r;
+      v.color.g = mesh->mColors[0][i].g;
+      v.color.b = mesh->mColors[0][i].b;
+      v.color.a = mesh->mColors[0][i].a;
+    }
+
+    my_mesh->AddVertex(v);
+  }
+
+  for (unsigned int k = 0; k < mesh->mNumFaces; k++)
+  {
+    aiFace face = mesh->mFaces[k];
+    for (unsigned int l = 0; l < face.mNumIndices; l++)
+      my_mesh->AddIndex(face.mIndices[l]);
+  }
+}
+
+inline Material* ProcessMaterial(aiMesh* mesh, const aiScene* scene, const std::string& directory)
+{
+  stbi_set_flip_vertically_on_load(true);
+  if (mesh->mMaterialIndex >= 0)
+  {
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+    aiString str;
+    material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
+
+    // Creamos material
+    auto my_material = FactoryEngine::GetNewMaterial();
+    if (!my_material)
+      throw std::runtime_error("Selected backend does not support materials");
+    // Usamos los shaders de vertices y de los fragmentos
+    auto vextex_shader_filename = "data/program.vertex";
+    auto fragment_shader_filename = "data/program.fragment";
+
+    std::unordered_map<std::string, RenderType> program_map;
+    program_map[vextex_shader_filename] = RenderType::Vertex;
+    program_map[fragment_shader_filename] = RenderType::Fragment;
+
+    my_material->LoadPrograms(program_map);
+
+    // Añadimos la textura al material
+    auto texture_filename = directory + "/" + std::string(str.C_Str());
+    // Si la textura está en nuestro mapa de texturas la añadimos
+    Texture* texture = System::GetTexture(std::string(str.C_Str()));
+    if (texture == nullptr)
+    {
+      texture = FactoryEngine::GetNewTexture();
+      System::AddTexture(str.C_Str(), texture);
+      texture->Load({{texture_filename}});
+      texture->Bind();
+    }
+    my_material->SetBaseTexture(texture);
+
+    material->GetTexture(aiTextureType_NORMALS, 0, &str);
+    Texture* normal_texture = System::GetTexture(std::string(str.C_Str()));
+    texture_filename = directory + "/" + std::string(str.C_Str());
+    if (normal_texture == nullptr)
+    {
+      normal_texture = FactoryEngine::GetNewTexture();
+      System::AddTexture(str.C_Str(), normal_texture);
+      texture->Load({{texture_filename}});
+      texture->Bind();
+    }
+    my_material->SetNormalTexture(normal_texture);
+
+    return my_material;
+  }
+  return nullptr;
+}
+
+inline std::vector<Mesh3D*> GetMeshesFromAssimp(const std::string filename)
+{
+  std::vector<Mesh3D*> to_return;
+  Assimp::Importer importer;
+  const aiScene* scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
+  if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+  {
+    std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
+    return {};
+  }
+  std::string directory = filename.substr(0, filename.find_last_of('/'));
+  for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
+  {
+    for (unsigned int j = 0; j < scene->mRootNode->mChildren[i]->mNumMeshes; j++)
+    {
+      aiMesh* mesh = scene->mMeshes[scene->mRootNode->mChildren[i]->mMeshes[j]];
+      auto my_mesh = new Mesh3D();
+      ProcessMesh(mesh, my_mesh);
+      auto material = ProcessMaterial(mesh, scene, directory);
+      if (material != nullptr)
+        my_mesh->SetMaterial(material);
+      to_return.push_back(my_mesh);
+    }
+  }
   return to_return;
 }
 }

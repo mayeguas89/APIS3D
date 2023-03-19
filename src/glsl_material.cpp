@@ -160,6 +160,7 @@ void GLSLMaterial::PrepareColorVariables()
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
         break;
       case Texture::Type::kColor2D:
+      case Texture::Type::kColorFb:
         base_texture_->Bind(0);
         render_program_->SetInt("isCubeMap", 0);
         // Samplers
@@ -169,6 +170,7 @@ void GLSLMaterial::PrepareColorVariables()
         break;
       case Texture::Type::kNone:
       case Texture::Type::kNormal:
+      case Texture::Type::kDepthFb:
         break;
     }
   }

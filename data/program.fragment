@@ -78,15 +78,6 @@ void main() {
         fTextCube = refract(I, normalize(fNormal.xyz), refractCoef);
     }
 
-    if(computeShadows == 1)
-    {
-        float bias = max(0.05f * (1.0f - dot(normalize(fNormal).xyz, normalize(shadowLightDirection))), 0.0005f);
-        if(texture2D(shadowTexture, fShadowCoord.xy).z < fShadowCoord.z - 0.0005f)
-        {
-            visibility = 0.5;
-        }
-    }
-
     vec3 normal = normalize(fNormal.xyz);
     
     if(computeNormalTexture == 1)
@@ -97,6 +88,32 @@ void main() {
     }
 
     
+    if(computeShadows == 1)
+    {
+        float bias = 0.0005f;
+
+        //float bias = max(0.005f * (1.0f - dot(normal, normalize(shadowLightDirection))), 0.0005f);
+        //if(texture2D(shadowTexture, fShadowCoord.xy).z < fShadowCoord.z - 0.0005f)
+        //{
+        //    visibility = 0.5;
+        //}
+
+        // PCF 3 steps
+        float shadow = 0.0;
+        vec2 texelSize = 1.0 / textureSize(shadowTexture, 0);
+        for(int x = -1; x <= 1; ++x)
+        {
+            for(int y = -1; y <= 1; ++y)
+            {
+                float pcfDepth = texture2D(shadowTexture, fShadowCoord.xy + vec2(x, y) * texelSize).r; 
+                shadow += fShadowCoord.z - bias > pcfDepth ? 1.0 : 0.0;        
+            }    
+        }
+        shadow /= 9.0;
+        visibility = visibility*(1-shadow);
+
+    }
+
     if(hasTexture == 1)
     {
         if(isCubeMap == 1)

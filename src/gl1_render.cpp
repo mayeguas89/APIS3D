@@ -15,7 +15,7 @@ GL1Render::GL1Render(int width, int height): Render{width, height}
     // Error del so de versionado de librerias
     throw std::runtime_error("ERROR AT INIT GLFWINIT\n");
   }
-  window_ = glfwCreateWindow(width_, height_, "MyWindow", nullptr, nullptr);
+  window_ = glfwCreateWindow(width_, height_, "GraphicsEngine", nullptr, nullptr);
 }
 
 GL1Render::~GL1Render()

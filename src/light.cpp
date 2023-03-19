@@ -57,7 +57,10 @@ const glm::vec3& Light::GetDirection() const
 
 void Light::SetDirection(const glm::vec3& direction)
 {
-  direction_ = direction;
+  direction_ = glm::normalize(direction);
+  rotation_.x = glm::acos(glm::dot(direction_, glm::vec3{1.0f, 0.f, 0.f}));
+  rotation_.y = glm::acos(glm::dot(direction_, glm::vec3{0.0f, 1.f, 0.f}));
+  rotation_.z = glm::acos(glm::dot(direction_, glm::vec3{0.0f, 0.f, 1.f}));
   if (light_type_ == Type::kFocal && cube_->GetLine() == nullptr)
     cube_->SetLine(direction_);
 }

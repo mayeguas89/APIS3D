@@ -158,6 +158,7 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   imgui_app_.StartFrame();
   imgui_app_.Update();
 
+  // Calculate shadowMap
   if (System::GetShadowsEnabled())
   {
     glBindFramebuffer(GL_FRAMEBUFFER, reinterpret_cast<GLTextureFrameBuffer*>(depth_texture_)->GetFrameBufferId());
@@ -178,6 +179,33 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
     glDrawBuffers(1, &draw_buf2);
   }
 
+  // Draw Mirrors
+  if (auto mirrors = System::GetMirrors(); !mirrors.empty())
+  {
+    auto old_camera = System::GetCamera();
+    for (auto mirror: mirrors)
+    {
+      auto mesh = mirror->GetMeshes().at(0);
+      auto real_mirror = reinterpret_cast<Mirror*>(mirror);
+      auto fb_texture = reinterpret_cast<GLTextureFrameBuffer*>(mesh->GetMaterial()->GetBaseTexture());
+      glBindFramebuffer(GL_FRAMEBUFFER, fb_texture->GetFrameBufferId());
+      glViewport(0, 0, (int)fb_texture->GetSize().x, (int)fb_texture->GetSize().y);
+      glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+      unsigned int draw_buf = GL_COLOR_ATTACHMENT0;
+      glDrawBuffers(1, &draw_buf);
+      System::SetCamera(real_mirror->GetCamera());
+      for (size_t i = 0; i < objects->size(); i++)
+        DrawObject(objects->at(i));
+    }
+    System::SetCamera(old_camera);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, width_, height_);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    unsigned int draw_buf2 = GL_COLOR_ATTACHMENT0;
+    glDrawBuffers(1, &draw_buf2);
+  }
+
+  // Draw objects from camera
   for (size_t i = 0; i < objects->size(); i++)
   {
     if (System::GetShadowsEnabled())

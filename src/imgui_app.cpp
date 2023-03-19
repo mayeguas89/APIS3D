@@ -79,6 +79,10 @@ void ImguiApp::AddLight(Light* light)
   data.direction[0] = light_direction.x;
   data.direction[1] = light_direction.y;
   data.direction[2] = light_direction.z;
+  auto light_rotation = light->GetRotation();
+  data.rotation[0] = light_rotation.x;
+  data.rotation[1] = light_rotation.y;
+  data.rotation[2] = light_rotation.z;
   auto light_color = light->GetColor();
   data.color = ImVec4(light_color.x, light_color.y, light_color.z, 1.0f);
   data.cut_off_angle = light->GetCutOff();

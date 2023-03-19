@@ -3,7 +3,7 @@
 		<buffer>
 			<material>
 				<blendMode>alpha</blendMode>
-				<depthWrite>false</depthWrite>
+				<depthWrite>true</depthWrite>
 				<light>false</light>
 				<color>1,1,1,1</color>
 				<texture cubeMap="true">data/posx.jpg,data/negx.jpg,data/posy.jpg,data/negy.jpg,data/posz.jpg,data/negz.jpg</texture>

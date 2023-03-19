@@ -48,7 +48,7 @@ void FreeCamera::Update(float delta_time)
 
     auto right = glm::cross(glm::normalize(glm::vec3(position_) - look_at_), glm::normalize(up_));
     auto rot_pitch = glm::rotate(glm::mat4{1.0f}, pitch, right);
-    auto rot_yaw = glm::rotate(glm::mat4{1.0f}, yaw, glm::vec3(0, 1, 0));
+    auto rot_yaw = glm::rotate(glm::mat4{1.0f}, yaw, up_);
     auto rot = rot_pitch * rot_yaw;
 
     if (first_mouse)

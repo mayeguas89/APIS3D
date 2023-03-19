@@ -42,6 +42,8 @@ add_library(engine SHARED STATIC
     src/line.cpp
     src/material.cpp
     src/mesh3d.cpp
+    src/mirror.cpp
+    src/mirror_camera.cpp
     src/particle.cpp
     src/point_light.cpp
     src/object.cpp

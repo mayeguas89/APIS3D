@@ -292,3 +292,14 @@ Texture* System::GetTexture(const std::string& filename)
     return it->second;
   return nullptr;
 }
+
+void System::AddMirror(Mirror* mirror)
+{
+  mirrors_.push_back(std::move(mirror));
+  AddObject(mirror);
+}
+
+const std::vector<Object*>& System::GetMirrors()
+{
+  return mirrors_;
+}

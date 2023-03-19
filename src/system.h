@@ -5,6 +5,7 @@
 #include "emitter.h"
 #include "input_manager.h"
 #include "light.h"
+#include "mirror.h"
 #include "object.h"
 #include "render.h"
 
@@ -68,6 +69,9 @@ public:
   static void SetRenderType(RenderType type);
   static RenderType GetRenderType();
 
+  static void AddMirror(Mirror* mirror);
+  static const std::vector<Object*>& GetMirrors();
+
 private:
   static float near_plane_;
   static float far_plane_;
@@ -94,4 +98,6 @@ private:
   inline static Camera* ortographic_camera_ = nullptr;
 
   inline static RenderType render_type_ = RenderType::kColor;
+
+  inline static std::vector<Object*> mirrors_;
 };
