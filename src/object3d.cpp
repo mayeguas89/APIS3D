@@ -4,11 +4,11 @@
 #include "pugixml.hpp"
 #include "system.h"
 #include "utils.h"
-
+#ifdef ASSIMP_LOAD_ENABLE
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-
+#endif
 #include <iostream>
 
 Object3D::Object3D(): Object() {}
@@ -40,14 +40,17 @@ void Object3D::LoadDataFromFile(const std::string& filename)
 
     for (pugi::xml_node buffer: buffers_node.children("buffer"))
     {
+      auto mesh = new Mesh3D();
       auto material = utils::ProcessMaterial(buffer, textures, directory);
-      auto mesh = utils::ProcessMesh(buffer, material);
+      mesh->SetMaterial(material);
+      utils::ProcessMesh(buffer, mesh);
 
       System::AddMesh(filename, mesh);
 
       AddMesh(mesh);
     }
   }
+#ifdef ASSIMP_LOAD_ENABLE
   else
   {
     Assimp::Importer importer;
@@ -159,4 +162,5 @@ void Object3D::LoadDataFromFile(const std::string& filename)
       }
     }
   }
+#endif
 }

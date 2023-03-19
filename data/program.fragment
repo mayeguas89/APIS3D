@@ -3,23 +3,30 @@ out vec4 FragColor;
 
 #define MAX_NUMBER_OF_LIGHTS 8
 
+uniform int hasTexture;
 uniform sampler2D textUnit;
 
 struct LightSource
 {
+    int IsActive;
     int Type;
     vec3 Position;
     vec4 Direction;
-    float Attenuation;
+    float ConstantAttenuation;
+    float LinearAttenuation;
+    float QuadraticAttenuation;
     vec3 Color;
     // Para spotLights cos(phi)
     float Cutoff;
+    float AmbientContribution;
+    float DifuseContribution;
+    float SpecularContribution;
 };
-
 uniform LightSource Lights[MAX_NUMBER_OF_LIGHTS];
 
 // Color de la luz ambiente
 uniform vec3 ambient;
+uniform float ambientIntensity;
 
 // Brillo del material
 uniform int shininess;
@@ -39,17 +46,27 @@ in vec4 fPos;
 
 void main() {
 
+    vec4 baseColor = fColor;
+    vec3 normal = fNormal.xyz;
+
+    if(hasTexture == 1)
+    {
+        baseColor = texture2D(textUnit, fTextCoord);
+    }
+
     if (computeLight == 1)
     {
         vec3 totalLight = vec3(0.f);
         for (int i=0;i<MAX_NUMBER_OF_LIGHTS;i++)
         {
+            if(Lights[i].IsActive ==  0)
+                continue;
             vec3 L = vec3(1.f);
 
             // Directional
             if (Lights[i].Type == 0)
             {
-                L = normalize(Lights[i].Direction.xyz);
+                L = normalize(-Lights[i].Direction.xyz);
             }
             // Point light
             else if (Lights[i].Type == 1)
@@ -62,17 +79,24 @@ void main() {
                 // Vector pointing from light to framgent position
                 L = normalize(Lights[i].Position-fPos.xyz);
                 // Calculate the cos of the angle between the light direction and L
-                float cos_theta = max(dot(normalize(Lights[i].Direction.xyz), L), 0.0);
+                float cos_theta = max(dot(normalize(-Lights[i].Direction.xyz), L), 0.0);
                 // If the fragment does not received light from the focal light, give only ambient
                 if (cos_theta < Lights[i].Cutoff)
                 {
-                    vec3 light = ambient * Lights[i].Color;
+                    vec3 light = ambient * Lights[i].AmbientContribution * ambientIntensity * Lights[i].Color;
                     totalLight += light;
                     continue;
                 }
             }
 
-            vec3 N = normalize(fNormal.xyz);
+            // attenuation
+            float distance = length(Lights[i].Position-fPos.xyz);
+            float attenuation = Lights[i].ConstantAttenuation;
+            attenuation += Lights[i].LinearAttenuation * distance;
+            attenuation += Lights[i].QuadraticAttenuation * distance * distance;
+            attenuation = 1.0 / (attenuation);
+
+            vec3 N = normal;
 
             // Componente difusa
             float diffuse = max(dot(L, N), 0.f);
@@ -84,16 +108,20 @@ void main() {
             vec3 EYE = normalize(fPos.xyz - cameraPosition);
             float specular = pow(max(dot(R, EYE), 0.f), shininess);
 
-            vec3 light = ambient + diffuse + specular;
-            light *= Lights[i].Attenuation;
+            vec3 light = ambient * Lights[i].AmbientContribution * ambientIntensity;
+            light += diffuse * Lights[i].DifuseContribution;
+            light += specular * Lights[i].SpecularContribution;
+            light *= attenuation;
             light *= Lights[i].Color;
             totalLight += light;
         }
-        FragColor = vec4(totalLight, 1.0f) * texture2D(textUnit, fTextCoord);
+        totalLight += ambient * ambientIntensity;
+        FragColor = vec4(totalLight, 1.0f) * baseColor;
+        FragColor.a = FragColor.a * alpha;
     }
     else
     {
-        FragColor = texture2D(textUnit, fTextCoord) * fColor;
+        FragColor = baseColor;
         FragColor.a = FragColor.a * alpha;
     }
 

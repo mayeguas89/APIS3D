@@ -42,6 +42,7 @@ add_executable(APIS3D
     src/particle.cpp
     src/object.cpp
     src/object3d.cpp
+    src/point_light.cpp
     src/render.cpp
     src/rotate_camera.cpp
     src/system.cpp
@@ -71,6 +72,7 @@ target_link_libraries(
   ${ASSIMP_LIBRARY}
 )
 
+# target_compile_definitions(APIS3D PUBLIC IMGUI_ENABLE)
 add_custom_command(TARGET APIS3D POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data.
 )

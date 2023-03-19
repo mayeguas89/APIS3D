@@ -2,32 +2,37 @@
 
 #include "system.h"
 #include "vertex.h"
-
+#ifdef IMGUI_ENABLE
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#endif
 
 GL4Render::GL4Render(int width, int height): GL1Render{width, height}
 {
+#ifdef IMGUI_ENABLE
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
+#endif
 }
 
 GL4Render::~GL4Render()
 {
+#ifdef IMGUI_ENABLE
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
+#endif
 }
 
 void GL4Render::Init()
 {
   GL1Render::Init();
-
+#ifdef IMGUI_ENABLE
   const char* glsl_version = "#version 130";
 
   // Setup Platform/Renderer backends
@@ -36,6 +41,7 @@ void GL4Render::Init()
 
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
+#endif
 }
 
 void GL4Render::SetupParticle(Emitter* emitter)
@@ -145,6 +151,7 @@ void GL4Render::DrawParticles(Emitter* emitter)
 
 void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 {
+#ifdef IMGUI_ENABLE
   static float look_at[] = {System::GetCamera()->GetLookAt().x,
                             System::GetCamera()->GetLookAt().y,
                             System::GetCamera()->GetLookAt().z};
@@ -170,7 +177,6 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
     System::GetLights()[0]->GetDirection().y,
     System::GetLights()[0]->GetDirection().z,
   };
-
   // Start the Dear ImGui frame
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
@@ -186,11 +192,11 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   System::GetLights()[0]->SetPosition(glm::vec4{light_position[0], light_position[1], light_position[2], 1.f});
   System::GetLights()[0]->SetRotation(glm::vec4{light_direction[0], light_direction[1], light_direction[2], 1.f});
   System::GetLights()[0]->SetLinearAttenuation(linear_attenuation);
-
+#endif
   // OPENGL
   for (size_t i = 0; i < objects->size(); i++)
     DrawObject(objects->at(i));
-
+#ifdef IMGUI_ENABLE
   // render your GUI
   ImGui::Begin("Triangle Position/Color");
   ImGui::SliderFloat("Camera Speed", &camera_speed, 0.0, 5.0);
@@ -209,11 +215,11 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
   // Render dear imgui into screen
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
 }
 
 void GL4Render::DrawObject(Object* object)
 {
-  // OPENGL
   System::SetModelMatrix(&(object->GetModelMatrix()));
   for (auto mesh: object->GetMeshes())
   {

@@ -20,6 +20,8 @@ public:
   static const std::vector<Light*>& GetLights();
   static void SetAmbient(const glm::vec3& value);
   static const glm::vec3& GetAmbient();
+  static void SetAmbientIntensity(float value);
+  static float GetAmbientIntensity();
 
   static void Exit();
 
@@ -47,6 +49,7 @@ public:
 private:
   static float near_plane_;
   static float far_plane_;
+  inline static float ambient_intensity_ = 1.f;
 
   static glm::mat4* current_object_model_matrix_;
 

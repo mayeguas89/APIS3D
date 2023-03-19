@@ -63,8 +63,10 @@ void Billboard::LoadDataFromFile(const std::string& filename)
 
     for (pugi::xml_node buffer: buffers_node.children("buffer"))
     {
+      auto mesh = new Mesh3D();
       auto material = utils::ProcessMaterial(buffer, textures, directory);
-      auto mesh = utils::ProcessMesh(buffer, material);
+      mesh->SetMaterial(material);
+      utils::ProcessMesh(buffer, mesh);
 
       System::AddMesh(filename, mesh);
 

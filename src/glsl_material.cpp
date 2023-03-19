@@ -101,6 +101,10 @@ void GLSLMaterial::Prepare()
   }
 
   render_program_->SetInt("shininess", shininess_);
+  render_program_->SetFloat("alpha", alpha_);
   render_program_->SetInt("computeLight", (int)IsLightEnabled());
+  render_program_->SetInt("hasTexture", 0);
+  if (texture_)
+    render_program_->SetInt("hasTexture", 1);
   render_program_->SetVariables();
 }

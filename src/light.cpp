@@ -1,25 +1,16 @@
 #include "light.h"
 
-Light::Light(Light::Type light_type,
-             const glm::vec3& position,
-             const glm::vec3& direction,
-             const glm::vec3& color,
-             float cut_angle_degrees):
+Light::Light(const glm::vec3& color,
+             float ambient_contribution,
+             float difuse_contribution,
+             float specular_contribution):
   Entity(),
-  light_type_{light_type},
   color_{color},
-  direction_{direction},
-  cut_off_{glm::cos(glm::radians(cut_angle_degrees))}
-{
-  cube_ = nullptr;
-  position_ = glm::vec4(position, 1.f);
-  if (light_type_ != Type::kDirectional)
-  {
-    cube_ = new CubeLight(color_);
-    cube_->SetPosition(position_);
-    cube_->SetScaling(glm::vec4(0.1f, 0.1f, 0.1f, 1.f));
-  }
-}
+  ambient_contribution_{ambient_contribution},
+  difuse_contribution_{difuse_contribution},
+  specular_contribution_{specular_contribution}
+{}
+
 const glm::vec3& Light::GetColor() const
 {
   return color_;
@@ -27,6 +18,10 @@ const glm::vec3& Light::GetColor() const
 
 void Light::SetPosition(const glm::vec4& vect4)
 {
+  if (cube_ == nullptr)
+    cube_ = new CubeLight(color_);
+
+  cube_->SetScaling(glm::vec4{kCubeScaling, 1.f});
   Entity::SetPosition(vect4);
   if (cube_)
     cube_->SetPosition(vect4);
@@ -39,6 +34,13 @@ void Light::SetRotation(const glm::vec4& vect4)
   direction_.y = glm::sin(vect4.y);
   direction_.z = glm::sin(vect4.x) * glm::cos(vect4.y);
   direction_ = glm::normalize(direction_);
+}
+
+void Light::SetLightRange(float value)
+{
+  distance_range_ = value;
+  linear_attenuation_ = 4.5f / distance_range_;
+  quadratic_attenuation_ = 75.f / (distance_range_ * distance_range_);
 }
 
 void Light::SetColor(const glm::vec3& color)
@@ -79,10 +81,37 @@ void Light::Update(float delta_time)
 
   // Seteamos la matriz modelo a nuestro modelo
   if (cube_)
-    cube_->SetModelMatrix(glm::scale(model, glm::vec3(.2f, .2f, .2f)));
+  {
+    cube_->SetModelMatrix(glm::scale(model, kCubeScaling));
+  }
 }
 
 CubeLight* Light::GetCube()
 {
   return cube_;
+}
+
+float Light::GetAmbientContribution() const
+{
+  return ambient_contribution_;
+}
+void Light::SetAmbientContribution(float ambientContribution)
+{
+  ambient_contribution_ = ambientContribution;
+}
+float Light::GetDifuseContribution() const
+{
+  return difuse_contribution_;
+}
+void Light::SetDifuseContribution(float difuseContribution)
+{
+  difuse_contribution_ = difuseContribution;
+}
+float Light::GetSpecularContribution() const
+{
+  return specular_contribution_;
+}
+void Light::SetSpecularContribution(float specularContribution)
+{
+  specular_contribution_ = specularContribution;
 }

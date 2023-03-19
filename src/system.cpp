@@ -186,6 +186,16 @@ const glm::vec3& System::GetAmbient()
   return ambient_;
 }
 
+void System::SetAmbientIntensity(float value)
+{
+  ambient_intensity_ = value;
+}
+
+float System::GetAmbientIntensity()
+{
+  return ambient_intensity_;
+}
+
 void System::AddMesh(const std::string& filename, Mesh3D* mesh)
 {
   if (auto it = mesh_map_.find(filename); it == mesh_map_.end())

@@ -147,6 +147,11 @@ void GLSLShader::SetVariables()
     glUniform3fv(variable_list_["ambient"], 1, glm::value_ptr(System::GetAmbient()));
   }
 
+  if (variable_list_.find("ambientIntensity") != variable_list_.end())
+  {
+    glUniform1f(variable_list_["ambientIntensity"], System::GetAmbientIntensity());
+  }
+
   // ---------------------Camera----------------------
   Camera* camera = System::GetCamera();
   if (variable_list_.find("cameraPosition") != variable_list_.end())
@@ -164,25 +169,56 @@ void GLSLShader::SetVariables()
   }
 
   // ---------------------Lights----------------------
+
   auto lights = System::GetLights();
   for (auto i = 0; i < lights.size(); i++)
   {
     auto light = lights.at(i);
     std::string index = std::to_string(i);
 
+    if (auto key = "Lights[" + index + "].IsActive"; variable_list_.find(key) != variable_list_.end())
+    {
+      SetInt(key, 1);
+    }
+
     if (auto key = "Lights[" + index + "].Type"; variable_list_.find(key) != variable_list_.end())
     {
       glUniform1i(variable_list_[key], light->GetType());
     }
 
-    if (auto key = "Lights[" + index + "].Attenuation"; variable_list_.find(key) != variable_list_.end())
+    if (auto key = "Lights[" + index + "].ConstantAttenuation"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], light->GetConstantAttenuation());
+    }
+
+    if (auto key = "Lights[" + index + "].LinearAttenuation"; variable_list_.find(key) != variable_list_.end())
     {
       glUniform1f(variable_list_[key], light->GetLinearAttenuation());
     }
 
+    if (auto key = "Lights[" + index + "].QuadraticAttenuation"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], light->GetQuadraticAttenuation());
+    }
+
+    if (auto key = "Lights[" + index + "].AmbientContribution"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], light->GetAmbientContribution());
+    }
+
+    if (auto key = "Lights[" + index + "].SpecularContribution"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], light->GetSpecularContribution());
+    }
+
+    if (auto key = "Lights[" + index + "].DifuseContribution"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], light->GetDifuseContribution());
+    }
+
     if (auto key = "Lights[" + index + "].Cutoff"; variable_list_.find(key) != variable_list_.end())
     {
-      glUniform1f(variable_list_[key], light->GetCutOff());
+      glUniform1f(variable_list_[key], glm::cos(glm::radians(light->GetCutOff())));
     }
 
     if (auto key = "Lights[" + index + "].Direction"; variable_list_.find(key) != variable_list_.end())
