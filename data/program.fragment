@@ -140,7 +140,7 @@ void main() {
             vec3 N = normal;
 
             // Componente difusa
-            float diffuse = max(dot(L, N), 0.f);
+            float diffuse = max(dot(N, L), 0.f);
 
             // Componente especular
             // Vector reflexion de la luz (espejo)

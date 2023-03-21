@@ -2,7 +2,9 @@
 
 #define GLAD_ONLY_HEADER
 #include "gl1_render.h"
+#ifdef IMGUI_ENABLE
 #include "imgui_app.h"
+#endif
 class GL4Render: public GL1Render
 {
   /**
@@ -45,5 +47,7 @@ public:
 private:
   // Vamos a acceder a los elementos por ids de cada objeto
   std::unordered_map<int, VBO> buffer_object_list_;
+#ifdef IMGUI_ENABLE
   ImguiApp imgui_app_;
+#endif
 };

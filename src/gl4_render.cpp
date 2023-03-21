@@ -10,12 +10,16 @@ GL4Render::~GL4Render() {}
 void GL4Render::Init()
 {
   GL1Render::Init();
+#ifdef IMGUI_ENABLE
   imgui_app_.Init(window_);
+#endif
 }
 
 void GL4Render::SetupLight(Light* light)
 {
+#ifdef IMGUI_ENABLE
   imgui_app_.AddLight(std::move(light));
+#endif
 }
 
 void GL4Render::SetupParticle(Emitter* emitter)
@@ -51,7 +55,9 @@ void GL4Render::SetupParticle(Emitter* emitter)
 
 void GL4Render::SetupObject(Object* object)
 {
+#ifdef IMGUI_ENABLE
   imgui_app_.AddObject(std::move(object));
+#endif
   for (auto* mesh: object->GetMeshes())
   {
     VBO vbo;
@@ -150,13 +156,15 @@ void GL4Render::DrawParticles(Emitter* emitter)
 
 void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 {
+#ifdef IMGUI_ENABLE
   imgui_app_.StartFrame();
   imgui_app_.Update();
-
+#endif
   for (size_t i = 0; i < objects->size(); i++)
     DrawObject(objects->at(i));
-
+#ifdef IMGUI_ENABLE
   imgui_app_.EndFrame();
+#endif
 }
 
 void GL4Render::DrawObject(Object* object)
@@ -199,5 +207,7 @@ void GL4Render::DrawObject(Object* object)
 
 void GL4Render::SetupAmbient()
 {
+#ifdef IMGUI_ENABLE
   imgui_app_.SetupAmbient();
+#endif
 }
