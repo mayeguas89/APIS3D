@@ -221,6 +221,11 @@ void GLSLShader::SetVariables()
       glUniform1f(variable_list_[key], glm::cos(glm::radians(light->GetCutOff())));
     }
 
+    if (auto key = "Lights[" + index + "].OuterCutoff"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], glm::cos(glm::radians(light->GetOuterCutOff())));
+    }
+
     if (auto key = "Lights[" + index + "].Direction"; variable_list_.find(key) != variable_list_.end())
     {
       glUniform4fv(variable_list_[key], 1, glm::value_ptr(light->GetDirection()));

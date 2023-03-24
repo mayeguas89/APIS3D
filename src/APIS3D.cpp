@@ -27,21 +27,21 @@ int main(int argc, char const* argv[])
     return -1;
   }
   column.SetScaling(glm::vec4(0.01f, 0.01f, 0.01f, 1.f));
-  // column.SetRotation({0.f, glm::pi<float>(), 0.f, 0.f});
 
-  auto point_light_top = new PointLight({1.f, 1.f, 1.f}, .1f, .5f, .5f, 20.f, glm::vec3(0.f, 10.f, 1.f));
+  auto point_light_top = new PointLight({1.f, 1.f, 1.f}, 0.05f, 0.8f, 1.f, 7.f, glm::vec3(0.f, 5.f, 0.5f));
   auto flash_light_bottom = new FlashLight({1.f, 1.f, 1.f},
-                                           .1f,
-                                           .5f,
-                                           .5f,
-                                           20.f,
+                                           0.f,
+                                           1.f,
+                                           1.f,
+                                           32.f,
                                            glm::vec3(0.f, -3.f, 2.f),
                                            glm::vec3(0.f, 1.f, -1.f),
-                                           35.f);
+                                           12.5f,
+                                           15.f);
   System::SetAmbient(glm::vec3(1.f, 1.f, 1.f));
-  System::SetAmbientIntensity(0.f);
+  System::SetAmbientIntensity(0.15f);
 
-  System::AddLight(point_light_top);
+  // System::AddLight(point_light_top);
   System::AddLight(flash_light_bottom);
 
   Camera* rotate_camera = new RotateCamera(Camera::ProjectionType::Perspective,

@@ -69,9 +69,19 @@ public:
     return cut_off_angle_in_degrees_;
   }
 
+  float GetOuterCutOff() const
+  {
+    return outer_cut_off_angle_in_degrees_;
+  }
+
   void SetCutOff(float cut_off_angle_in_degrees)
   {
     cut_off_angle_in_degrees_ = cut_off_angle_in_degrees;
+  }
+
+  void SetOuterCutOff(float outer_cut_off_angle_in_degrees)
+  {
+    outer_cut_off_angle_in_degrees_ = outer_cut_off_angle_in_degrees;
   }
 
   virtual void Update(float delta_time) override;
@@ -97,6 +107,7 @@ protected:
   glm::vec3 color_;
   glm::vec3 direction_;
   float cut_off_angle_in_degrees_;
+  float outer_cut_off_angle_in_degrees_;
   CubeLight* cube_ = nullptr;
   float constant_attenuation_ = 1.f;
   float linear_attenuation_ = 0.f;

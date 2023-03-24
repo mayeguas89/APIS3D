@@ -22,6 +22,6 @@ void main() {
     fColor = vColor;
     fTextCoord = vTexture;
 
-    fNormal = inverse(transpose(M))*vNormal;
+    fNormal = transpose(inverse(M))*vNormal;
     fPos = M * vPos;
 }

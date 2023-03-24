@@ -18,6 +18,7 @@ struct LightSource
     vec3 Color;
     // Para spotLights cos(phi)
     float Cutoff;
+    float OuterCutoff;
     float AmbientContribution;
     float DifuseContribution;
     float SpecularContribution;
@@ -63,10 +64,20 @@ void main() {
                 continue;
             vec3 L = vec3(1.f);
 
+            // attenuation
+            float distance = length(Lights[i].Position-fPos.xyz);
+            float attenuation = Lights[i].ConstantAttenuation;
+            attenuation += Lights[i].LinearAttenuation * distance;
+            attenuation += Lights[i].QuadraticAttenuation * distance * distance;
+            attenuation = 1.0 / (attenuation);
+
+            float intensity = 1.f;
+
             // Directional
             if (Lights[i].Type == 0)
             {
-                L = normalize(-Lights[i].Direction.xyz);
+                L = normalize(Lights[i].Direction.xyz);
+                attenuation = 1.0f;
             }
             // Point light
             else if (Lights[i].Type == 1)
@@ -78,23 +89,12 @@ void main() {
             {
                 // Vector pointing from light to framgent position
                 L = normalize(Lights[i].Position-fPos.xyz);
+                
                 // Calculate the cos of the angle between the light direction and L
-                float cos_theta = max(dot(normalize(-Lights[i].Direction.xyz), L), 0.0);
-                // If the fragment does not received light from the focal light, give only ambient
-                if (cos_theta < Lights[i].Cutoff)
-                {
-                    vec3 light = ambient * Lights[i].AmbientContribution * ambientIntensity * Lights[i].Color;
-                    totalLight += light;
-                    continue;
-                }
+                float theta = max(dot(normalize(-Lights[i].Direction.xyz), L), 0.0);
+                float epsilon = Lights[i].Cutoff - Lights[i].OuterCutoff;
+                intensity = clamp((theta - Lights[i].OuterCutoff) / epsilon, 0.0, 1.0);
             }
-
-            // attenuation
-            float distance = length(Lights[i].Position-fPos.xyz);
-            float attenuation = Lights[i].ConstantAttenuation;
-            attenuation += Lights[i].LinearAttenuation * distance;
-            attenuation += Lights[i].QuadraticAttenuation * distance * distance;
-            attenuation = 1.0 / (attenuation);
 
             vec3 N = normal;
 
@@ -112,6 +112,7 @@ void main() {
             light += diffuse * Lights[i].DifuseContribution;
             light += specular * Lights[i].SpecularContribution;
             light *= attenuation;
+            light *= intensity;
             light *= Lights[i].Color;
             totalLight += light;
         }
