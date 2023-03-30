@@ -67,7 +67,7 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/externalLibs/assimp/include
 )
 
-target_compile_definitions(engine PUBLIC IMGUI_ENABLE)
+# target_compile_definitions(engine PUBLIC IMGUI_ENABLE)
 
 target_link_libraries(
   engine 
