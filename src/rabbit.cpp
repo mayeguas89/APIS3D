@@ -66,7 +66,8 @@ int main(int argc, char const* argv[])
                                       10.f,
                                       glm::vec3(.5f, .5f, .5f),
                                       glm::vec3(-0.6f, 0.f, -0.8f),
-                                      45.f);
+                                      12.5f,
+                                      17.f);
 
   System::AddLight(flash_light);
 

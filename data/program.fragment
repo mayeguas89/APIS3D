@@ -40,6 +40,7 @@ struct LightSource
     vec3 Color;
     // Para spotLights cos(phi)
     float Cutoff;
+    float OuterCutoff;
     float AmbientContribution;
     float DifuseContribution;
     float SpecularContribution;
@@ -72,7 +73,7 @@ void main() {
         fTextCube = refract(I, normalize(fNormal.xyz), refractCoef);
     }
 
-    vec3 normal = normalize(fNormal.xyz);
+    vec3 normal = fNormal.xyz;
     
     if(computeNormalTexture == 1)
     {
@@ -102,67 +103,72 @@ void main() {
         {
             if(Lights[i].IsActive ==  0)
                 continue;
-            vec3 L = vec3(1.f);
+                
+            vec3 lightDir  = vec3(1.f);
+            vec3 R = vec3(1.f);
+            vec3 N = normalize(normal);
+
+            // attenuation
+            float distance = length(Lights[i].Position - fPos.xyz);
+            float attenuation = 1.0f / (Lights[i].ConstantAttenuation + Lights[i].LinearAttenuation * distance + Lights[i].QuadraticAttenuation * (distance * distance));
+            float intensity = 1.f;
+            
 
             // Directional
             if (Lights[i].Type == 0)
             {
-                L = normalize(-Lights[i].Direction.xyz);
+                lightDir  = normalize(Lights[i].Direction.xyz);
+                // Componente especular
+                // Vector reflexion de la luz (espejo)
+                R = normalize(reflect(-lightDir, N));
+                attenuation = 1.0f;
             }
             // Point light
             else if (Lights[i].Type == 1)
             {
-                L = normalize(Lights[i].Position-fPos.xyz);
+                lightDir  = normalize(Lights[i].Position-fPos.xyz);
+                // Componente especular
+                // Vector reflexion de la luz (espejo)
+                R = normalize(reflect(-lightDir, N));
             }
             // Spot light
             else if (Lights[i].Type == 2)
             {
                 // Vector pointing from light to framgent position
-                L = normalize(Lights[i].Position-fPos.xyz);
+                lightDir = normalize(Lights[i].Position-fPos.xyz);
+                
                 // Calculate the cos of the angle between the light direction and L
-                float cos_theta = max(dot(normalize(-Lights[i].Direction.xyz), L), 0.0);
-                // If the fragment does not received light from the focal light, give only ambient
-                if (cos_theta < Lights[i].Cutoff)
-                {
-                    vec3 light = ambient * Lights[i].AmbientContribution * ambientIntensity * Lights[i].Color;
-                    totalLight += light;
-                    continue;
-                }
+                float theta = max(dot(lightDir, normalize(-Lights[i].Direction.xyz)), 0.0);
+                float epsilon = Lights[i].Cutoff - Lights[i].OuterCutoff;
+                intensity = clamp((theta - Lights[i].OuterCutoff) / epsilon, 0.0, 1.0);
+                
+                // Componente especular
+                // Vector reflexion de la luz (espejo)
+                R = normalize(reflect(N, -lightDir));
             }
 
-            // attenuation
-            float distance = length(Lights[i].Position-fPos.xyz);
-            float attenuation = Lights[i].ConstantAttenuation;
-            attenuation += Lights[i].LinearAttenuation * distance;
-            attenuation += Lights[i].QuadraticAttenuation * distance * distance;
-            attenuation = 1.0 / (attenuation);
-
-            vec3 N = normal;
-
             // Componente difusa
-            float diffuse = max(dot(N, L), 0.f);
+            float diffuse = max(0.f, dot(N, lightDir));
 
-            // Componente especular
-            // Vector reflexion de la luz (espejo)
-            vec3 R = normalize(reflect(L, N));
-
-            vec3 EYE = normalize(fPos.xyz - cameraPosition);
-            float specular = pow(max(dot(R, EYE), 0.f), shininess);
+            vec3 EYE = normalize(cameraPosition - fPos.xyz);
+            float specular = pow(max(0.f, dot(R, EYE)), shininess);
 
             vec3 light = ambient * Lights[i].AmbientContribution * ambientIntensity;
             light += diffuse * Lights[i].DifuseContribution;
             light += specular * Lights[i].SpecularContribution;
             light *= attenuation;
+            light *= intensity;
             light *= Lights[i].Color;
             totalLight += light;
         }
+        totalLight += ambient * ambientIntensity;
         FragColor = vec4(totalLight, 1.0f) * baseColor;
         FragColor.a = FragColor.a * alpha;
     }
     else
     {
         FragColor = baseColor;
-        FragColor.a = FragColor.a * 1.f;
+        FragColor.a = FragColor.a * alpha;
     }
 
 }

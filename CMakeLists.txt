@@ -20,6 +20,7 @@ add_library(engine SHARED STATIC
     src/asian_town.cpp
     src/billboard.cpp
     src/camera.cpp
+    src/camera_follower.cpp
     src/camera_keyboard.cpp
     src/column.cpp
     src/cube_light.cpp 
@@ -46,6 +47,7 @@ add_library(engine SHARED STATIC
     src/object3d.cpp
     src/orbital_light.cpp
     src/orbital_flash_light.cpp
+    src/point_light.cpp
     src/render.cpp
     src/rotate_camera.cpp
     src/system.cpp
@@ -65,7 +67,7 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/externalLibs/assimp/include
 )
 
-# target_compile_definitions(engine PUBLIC IMGUI_ENABLE)
+target_compile_definitions(engine PUBLIC IMGUI_ENABLE)
 
 target_link_libraries(
   engine 

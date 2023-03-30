@@ -1,5 +1,7 @@
+#include "camera_follower.h"
 #include "camera_keyboard.h"
 #include "cube_map.h"
+#include "directional_light.h"
 #include "factory_engine.h"
 #include "flash_light.h"
 #include "orbital_flash_light.h"
@@ -15,6 +17,23 @@ int main(int argc, char const* argv[])
 
   System::Init();
 
+  // auto rotate_camera = new RotateCamera(Camera::ProjectionType::Perspective,
+  //                                       glm::vec3(-0.95f, 0.f, -15.f),
+  //                                       glm::vec3(0.f, 0.f, -2.f),
+  //                                       glm::vec3(0.f, 1.f, 0.f),
+  //                                       0.08f);
+  auto rotate_camera = std::make_shared<RotateCamera>(Camera::ProjectionType::Perspective,
+                                                      glm::vec3(0.f, 0.f, -15.f),
+                                                      glm::vec3(0.f, 0.f, .1f),
+                                                      glm::vec3(0.f, 1.f, 0.f),
+                                                      .2f);
+
+  // Camera* rotate_camera = new CameraKeyboard(Camera::ProjectionType::Perspective,
+  //                                            glm::vec3(0.f, 0.f, 3.f),
+  //                                            glm::vec3(0.f, 0.f, -1.f),
+  //                                            glm::vec3(0.f, 1.f, 0.f));
+
+  // CameraFollower skybox(rotate_camera);
   CubeMap skybox;
   CubeMap teapot;
   CubeMap suzanne;
@@ -40,56 +59,49 @@ int main(int argc, char const* argv[])
   cube.SetPosition(glm::vec4(0.f, 0.9f, -1.1f, 1.0f));
   cube.SetRotation(glm::vec4(-0.5f, -0.4f, -0.0f, 1.0f));
 
-  auto point_light = new PointLight(glm::vec3(178.f / 255.f, 205.f / 255.f, 210.f / 255.f),
-                                    1.f,
-                                    1.f,
-                                    1.f,
-                                    100.f,
-                                    glm::vec3(-1.f, 2.4f, -4.2f));
-
   System::SetAmbient(glm::vec3(210.f / 255.f, 188.f / 255.f, 127.f / 255.f));
   System::SetAmbientIntensity(0.5f);
   System::SetupAmbient();
 
-  // System::AddLight(point_light);
+  auto directional_light =
+    new DirectionalLight(glm::vec3(1.f, .5f, .8f), .5f, 0.f, 0.f, rotate_camera->GetLookAt());
 
-  auto rotate_camera = new RotateCamera(Camera::ProjectionType::Perspective,
-                                        glm::vec3(-0.95f, 0.f, -15.f),
-                                        glm::vec3(0.f, 0.f, -2.f),
-                                        glm::vec3(0.f, 1.f, 0.f),
-                                        0.08f);
+  auto flash_light = new FlashLight(glm::vec3(1.f, 1.f, 1.f),
+                                    0.f,
+                                    1.f,
+                                    1.f,
+                                    50.f,
+                                    glm::vec3(0.f, 1.f, -5.f),
+                                    glm::normalize(glm::vec3(0.f, -0.02f, .1f)),
+                                    12.5f,
+                                    15.f);
+  auto point_light = new PointLight(glm::vec3(178.f / 255.f, 205.f / 255.f, 210.f / 255.f),
+                                    0.f,
+                                    1.f,
+                                    1.f,
+                                    50.f,
+                                    glm::vec3(0.f, 3.f, 0.f));
   auto orbital_light = new OrbitalLight(glm::vec3(178.f / 255.f, 205.f / 255.f, 210.f / 255.f),
+                                        0.f,
                                         1.f,
                                         1.f,
-                                        1.f,
-                                        100.f,
+                                        75.f,
                                         rotate_camera->GetPosition(),
                                         rotate_camera->GetSpeed());
-  auto orbital_flash_light = new OrbitalFlashLight(glm::vec3(178.f / 255.f, 205.f / 255.f, 210.f / 255.f),
-                                                   1.f,
-                                                   1.f,
-                                                   1.f,
-                                                   100.f,
-                                                   rotate_camera->GetPosition(),
-                                                   -rotate_camera->GetLookAt(),
-                                                   25.f,
-                                                   rotate_camera,
-                                                   rotate_camera->GetSpeed() / 2.f);
 
+  System::AddLight(directional_light);
   System::AddLight(orbital_light);
-  System::AddLight(orbital_flash_light);
-  // Camera* rotate_camera = new CameraKeyboard(Camera::ProjectionType::Perspective,
-  //                                            glm::vec3(0.f, 0.f, 3.f),
-  //                                            glm::vec3(0.f, 0.f, -1.f),
-  //                                            glm::vec3(0.f, 1.f, 0.f));
+  System::AddLight(flash_light);
+  System::AddLight(point_light);
 
-  System::SetCamera(rotate_camera);
+  System::SetCamera(rotate_camera.get());
   System::AddObject(&skybox);
   System::AddObject(&teapot);
   System::AddObject(&suzanne);
   System::AddObject(&cube);
+  System::AddObject(flash_light->GetCube());
   System::AddObject(point_light->GetCube());
-  System::AddObject(orbital_flash_light->GetCube());
+  System::AddObject(orbital_light->GetCube());
 
   try
   {
@@ -101,8 +113,8 @@ int main(int argc, char const* argv[])
   }
   System::End();
 
-  delete rotate_camera;
-  delete point_light;
+  // delete rotate_camera;
+  delete flash_light;
 
   return 0;
 }

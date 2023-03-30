@@ -13,6 +13,7 @@ public:
                     const glm::vec3& position,
                     const glm::vec3& direction,
                     float cutoff_angle_degrees,
+                    float outer_cutoff_angle_degrees,
                     Camera* camera,
                     float orbitation_speed = glm::quarter_pi<float>());
   void Update(float delta_time) override;
