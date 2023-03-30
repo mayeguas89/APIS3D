@@ -17,23 +17,11 @@ int main(int argc, char const* argv[])
 
   System::Init();
 
-  // auto rotate_camera = new RotateCamera(Camera::ProjectionType::Perspective,
-  //                                       glm::vec3(-0.95f, 0.f, -15.f),
-  //                                       glm::vec3(0.f, 0.f, -2.f),
-  //                                       glm::vec3(0.f, 1.f, 0.f),
-  //                                       0.08f);
   auto rotate_camera = std::make_shared<RotateCamera>(Camera::ProjectionType::Perspective,
                                                       glm::vec3(0.f, 0.f, -15.f),
                                                       glm::vec3(0.f, 0.f, .1f),
                                                       glm::vec3(0.f, 1.f, 0.f),
                                                       .2f);
-
-  // Camera* rotate_camera = new CameraKeyboard(Camera::ProjectionType::Perspective,
-  //                                            glm::vec3(0.f, 0.f, 3.f),
-  //                                            glm::vec3(0.f, 0.f, -1.f),
-  //                                            glm::vec3(0.f, 1.f, 0.f));
-
-  // CameraFollower skybox(rotate_camera);
   CubeMap skybox;
   CubeMap teapot;
   CubeMap suzanne;
@@ -113,8 +101,10 @@ int main(int argc, char const* argv[])
   }
   System::End();
 
-  // delete rotate_camera;
   delete flash_light;
+  delete point_light;
+  delete directional_light;
+  delete orbital_light;
 
   return 0;
 }
