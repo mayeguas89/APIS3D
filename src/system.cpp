@@ -308,3 +308,23 @@ const std::vector<Object*>& System::GetMirrors()
 {
   return mirrors_;
 }
+
+bool System::AnimationEnabled()
+{
+  return animation_enabled_;
+}
+
+void System::SetAnimationEnabled(bool value)
+{
+  animation_enabled_ = value;
+}
+
+const std::vector<glm::mat4>& System::GetAnimationMatrices()
+{
+  return animation_matrices_;
+}
+
+void System::SetAnimationMatrices(const std::vector<glm::mat4>& animation_matrices)
+{
+  animation_matrices_ = animation_matrices;
+}

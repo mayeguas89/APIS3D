@@ -19,6 +19,7 @@ link_directories(
 add_library(engine SHARED STATIC
     src/asian_town.cpp
     src/billboard.cpp
+    src/bone.cpp
     src/camera.cpp
     src/camera_follower.cpp
     src/camera_keyboard.cpp

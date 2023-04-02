@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+#include <vector>
 #define GLAD_ONLY_HEADER
 #include "camera.h"
 #include "common.h"
@@ -72,6 +74,12 @@ public:
   static void AddMirror(Mirror* mirror);
   static const std::vector<Object*>& GetMirrors();
 
+  static bool AnimationEnabled();
+  static void SetAnimationEnabled(bool value);
+
+  static const std::vector<glm::mat4>& GetAnimationMatrices();
+  static void SetAnimationMatrices(const std::vector<glm::mat4>& animation_matrices);
+
 private:
   static float near_plane_;
   static float far_plane_;
@@ -100,4 +108,8 @@ private:
   inline static RenderType render_type_ = RenderType::kColor;
 
   inline static std::vector<Object*> mirrors_;
+
+  inline static bool animation_enabled_ = false;
+
+  inline static std::vector<glm::mat4> animation_matrices_;
 };
