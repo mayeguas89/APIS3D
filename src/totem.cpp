@@ -1,7 +1,10 @@
 #include "camera_keyboard.h"
 #include "column.h"
+#include "directional_light.h"
 #include "emitter.h"
 #include "factory_engine.h"
+#include "flash_light.h"
+#include "particle.h"
 #include "point_light.h"
 #include "rotate_camera.h"
 #include "system.h"
@@ -26,19 +29,27 @@ int main(int argc, char const* argv[])
   }
   column.SetScaling(glm::vec4(0.01f, 0.01f, 0.01f, 1.f));
 
-  Light* point_light =
-    new PointLight(glm::vec3(0.75f, 0.75f, 0.75f), 1.f, 1.f, 1.f, 100.f, glm::vec3(0.f, 0.f, -2.f));
-
+  // auto point_light_top = new PointLight({1.f, 1.f, 1.f}, 0.05f, 0.8f, 1.f, 7.f, glm::vec3(0.f, 5.f, 0.5f));
+  auto flash_light_bottom = new FlashLight({1.f, 1.f, 1.f},
+                                           0.f,
+                                           1.f,
+                                           1.f,
+                                           25.f,
+                                           glm::vec3(0.f, -3.f, 2.f),
+                                           glm::vec3(0.f, 1.f, -1.f),
+                                           12.5f,
+                                           15.f);
   System::SetAmbient(glm::vec3(1.f, 1.f, 1.f));
-  System::SetAmbientIntensity(0.7f);
-  System::SetupAmbient();
-  System::SetClearColor(glm::vec4{0.088f, 0.088f, 0.088f, 1.f});
-  System::AddLight(point_light);
+  System::SetAmbientIntensity(0.15f);
 
-  Camera* rotate_camera = new CameraKeyboard(Camera::ProjectionType::Perspective,
-                                             glm::vec3(0.f, 10.f, 15.f),
-                                             glm::vec3(0.f, 3.f, 0.f),
-                                             glm::vec3(0.f, 1.f, 0.f));
+  // System::AddLight(point_light_top);
+  System::AddLight(flash_light_bottom);
+
+  Camera* rotate_camera = new RotateCamera(Camera::ProjectionType::Perspective,
+                                           glm::vec3(0.f, 10.f, 25.f),
+                                           glm::vec3(0.f, 3.f, 0.f),
+                                           glm::vec3(0.f, 1.f, 0.f),
+                                           glm::quarter_pi<float>() / 2.f);
 
   Emitter smoke_emmiter_one("data/column/smoke.msh",
                             glm::vec3{-0.5f, 6.5f, -0.5f},
@@ -66,7 +77,8 @@ int main(int argc, char const* argv[])
   System::AddEmitter(&smoke_emmiter_one);
   System::SetCamera(rotate_camera);
   System::AddObject(&column);
-  System::AddObject(point_light->GetCube());
+  // System::AddObject(point_light_top->GetCube());
+  System::AddObject(flash_light_bottom->GetCube());
 
   try
   {
@@ -79,7 +91,8 @@ int main(int argc, char const* argv[])
   System::End();
 
   delete rotate_camera;
-  delete point_light;
+  delete flash_light_bottom;
+  // delete point_light_top;
 
   return 0;
 }

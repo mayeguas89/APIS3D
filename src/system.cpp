@@ -114,6 +114,11 @@ void System::MainLoop()
       light->Update(TimeManager::deltaTime);
     }
 
+    for (auto mirror: mirrors_)
+    {
+      mirror->Update(TimeManager::deltaTime);
+    }
+
     // Actualiza Objetos
     for (Object* object: *objects_)
       object->Update(TimeManager::deltaTime);

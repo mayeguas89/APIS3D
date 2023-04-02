@@ -91,6 +91,8 @@ void GL1Render::SetSize(int width, int height)
 
 void GL1Render::SetupAmbient() {}
 
+void GL1Render::SetFrameBuffer(GLuint framebuffer) {}
+
 void GL1Render::SetKeyCallback(void (*callback)(GLFWwindow* window, int key, int scancode, int action, int mods))
 {
   glfwSetKeyCallback(window_, callback);

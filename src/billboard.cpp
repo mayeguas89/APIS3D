@@ -51,10 +51,12 @@ void Billboard::LoadDataFromFile(const std::string& filename)
     for (auto mesh: meshes)
       AddMesh(mesh);
   }
+#ifdef ASSIMP_LOAD_ENABLE
   else
   {
     auto meshes = utils::GetMeshesFromAssimp(filename);
     for (auto mesh: meshes)
       AddMesh(mesh);
   }
+#endif
 }

@@ -5,7 +5,7 @@
 				<color>1,1,1,1</color>
 				<texture>data/bricks2.jpg</texture>
 				<normalTexture>data/bricks2_normal.jpg</normalTexture>
-				<shininess>16</shininess>
+				<shininess>5</shininess>
 				<depthWrite>true</depthWrite>
 				<vShader>data/program.vertex</vShader>
 				<fShader>data/program.fragment</fShader>

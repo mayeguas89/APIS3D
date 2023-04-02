@@ -6,11 +6,11 @@
 #include "mesh3d.h"
 #include "pugixml.hpp"
 #include "stb_image.h"
-
+#ifdef ASSIMP_LOAD_ENABLE
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-
+#endif
 #include <sstream>
 #include <string>
 #include <vector>
@@ -221,10 +221,10 @@ inline void ProcessMesh(pugi::xml_node buffer, Mesh3D* mesh)
 {
   std::vector<float> coord_list;
   auto coord_it = coord_list.end();
-  std::vector<float> tangent_list;
-  auto tangent_it = coord_list.end();
   std::vector<float> norm_list;
   auto norm_it = norm_list.end();
+  std::vector<float> tang_list;
+  auto tang_it = tang_list.end();
   std::vector<float> texture_coords_list;
   auto texture_it = texture_coords_list.end();
   std::vector<unsigned int> index_list;
@@ -235,15 +235,15 @@ inline void ProcessMesh(pugi::xml_node buffer, Mesh3D* mesh)
     coord_list = utils::SplitString<float>(attrib.text().as_string(), ',');
     coord_it = coord_list.begin();
   }
-  if (auto attrib = buffer.child("tangents"); attrib != nullptr)
-  {
-    tangent_list = utils::SplitString<float>(attrib.text().as_string(), ',');
-    tangent_it = tangent_list.begin();
-  }
   if (auto attrib = buffer.child("normals"); attrib != nullptr)
   {
     norm_list = utils::SplitString<float>(attrib.text().as_string(), ',');
     norm_it = norm_list.begin();
+  }
+  if (auto attrib = buffer.child("tangents"); attrib != nullptr)
+  {
+    tang_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+    tang_it = tang_list.begin();
   }
 
   if (auto attrib = buffer.child("texCoords"); attrib != nullptr)
@@ -268,20 +268,20 @@ inline void ProcessMesh(pugi::xml_node buffer, Mesh3D* mesh)
 
     v.color = glm::vec4(mesh->GetMaterial()->GetColor(), 1.0f);
 
-    if (!tangent_list.empty() && tangent_it != tangent_list.end())
-    {
-      v.tangent.x = *tangent_it++;
-      v.tangent.y = *tangent_it++;
-      v.tangent.z = *tangent_it++;
-      v.tangent.w = 0.0f;
-    }
-
     if (!norm_list.empty() && norm_it != norm_list.end())
     {
       v.normal.x = *norm_it++;
       v.normal.y = *norm_it++;
       v.normal.z = *norm_it++;
       v.normal.w = 0.0f;
+    }
+
+    if (!tang_list.empty() && tang_it != tang_list.end())
+    {
+      v.tangent.x = *tang_it++;
+      v.tangent.y = *tang_it++;
+      v.tangent.z = *tang_it++;
+      v.tangent.w = 0.0f;
     }
 
     if (!texture_coords_list.empty() && texture_it != texture_coords_list.end())
@@ -330,6 +330,7 @@ inline std::vector<Mesh3D*> GetMeshesFromMshFile(const std::string filename)
   return to_return;
 }
 
+#ifdef ASSIMP_LOAD_ENABLE
 inline void ProcessMesh(aiMesh* mesh, Mesh3D* my_mesh)
 {
   for (int i = 0; i < mesh->mNumVertices; i++)
@@ -464,4 +465,5 @@ inline std::vector<Mesh3D*> GetMeshesFromAssimp(const std::string filename)
   }
   return to_return;
 }
+#endif
 }

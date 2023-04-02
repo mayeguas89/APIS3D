@@ -12,6 +12,7 @@ public:
              float light_range,
              const glm::vec3& position,
              const glm::vec3& direction,
-             float cutoff_angle_degrees);
+             float cutoff_angle_degrees,
+             float outer_cutoff_angle_degrees);
   void Update(float delta_time) override;
 };

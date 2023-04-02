@@ -4,6 +4,8 @@
 #include "system.h"
 #include "utils.h"
 
+#include <glm/gtx/string_cast.hpp>
+
 Mirror::Mirror()
 {
   LoadDataFromFile("data/shadow/square_fb.msh");
@@ -23,18 +25,25 @@ void Mirror::LoadDataFromFile(const std::string& filename)
 
 void Mirror::Update(float delta_time)
 {
+  auto normal = model_mtx_ * GetMeshes().at(0)->GetVertList()->at(0).normal;
+  auto norm = glm::normalize(normal);
+
+  auto reflect =
+    glm::reflect(glm::vec3{position_} - glm::vec3{System::GetCamera()->GetPosition()}, glm::vec3{norm});
+
   Entity::ComputeModelMatrix();
-  //   glm::vec3 look_at;
-  //   look_at.x = glm::cos(glm::radians(rotation_.x)) * glm::cos(glm::radians(rotation_.y));
-  //   look_at.y = glm::sin(glm::radians(rotation_.y));
-  //   look_at.z = glm::sin(glm::radians(rotation_.x)) * glm::cos(glm::radians(rotation_.y));
-  //   auto position = glm::inverse(model_mtx_) * camera_->GetPosition();
   camera_->SetPosition(position_);
-  //   camera_->SetLookAt(look_at);
+  camera_->SetLookAt(reflect);
   camera_->Update(delta_time);
 }
 
 Camera* Mirror::GetCamera()
 {
   return camera_.get();
+}
+
+void Mirror::SetPosition(const glm::vec4& vect4)
+{
+  camera_->SetPosition(vect4);
+  Entity::SetPosition(vect4);
 }

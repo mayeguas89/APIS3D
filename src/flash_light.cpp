@@ -7,7 +7,8 @@ FlashLight::FlashLight(const glm::vec3& color,
                        float light_range,
                        const glm::vec3& position,
                        const glm::vec3& direction,
-                       float cutoff_angle_degrees):
+                       float cutoff_angle_degrees,
+                       float outer_cutoff_angle_degrees):
   Light(color, ambient_contribution, difuse_contribution, specular_contribution)
 {
   light_type_ = Type::kFocal;
@@ -15,6 +16,7 @@ FlashLight::FlashLight(const glm::vec3& color,
   SetPosition(glm::vec4{position, 1.f});
   SetDirection(direction);
   SetCutOff(cutoff_angle_degrees);
+  SetOuterCutOff(outer_cutoff_angle_degrees);
 }
 
 void FlashLight::Update(float delta_time)

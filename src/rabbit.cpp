@@ -65,9 +65,10 @@ int main(int argc, char const* argv[])
                                       0.5f,
                                       0.5f,
                                       10.f,
-                                      glm::vec3(0.f, 0.f, 1.f),
-                                      glm::vec3(0.0f, 0.f, -1.0f),
-                                      45.f);
+                                      glm::vec3(.5f, .5f, .5f),
+                                      glm::vec3(-0.6f, 0.f, -0.8f),
+                                      12.5f,
+                                      17.f);
 
   System::AddLight(flash_light);
 
@@ -81,11 +82,8 @@ int main(int argc, char const* argv[])
                                              glm::vec3(0.f, 0.f, 1.f),
                                              glm::vec3(0.f, 0.f, -1.f),
                                              glm::vec3(0.f, 1.f, 0.f));
-  Camera* free_camera = new FreeCamera(Camera::ProjectionType::Perspective,
-                                       glm::vec3(0.f, 0.f, 1.f),
-                                       glm::vec3(0.f, 0.f, -1.f),
-                                       glm::vec3(0.f, 1.f, 0.f),
-                                       2.f);
+  Camera* free_camera =
+    new FreeCamera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f), 2.f);
 
   System::SetCamera(free_camera);
   System::AddObject(&rabbit);

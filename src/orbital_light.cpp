@@ -3,6 +3,9 @@
 //
 
 #include "orbital_light.h"
+
+#include "system.h"
+
 OrbitalLight::OrbitalLight(const glm::vec3& color,
                            float ambient_contribution,
                            float difuse_contribution,
@@ -30,4 +33,6 @@ void OrbitalLight::Update(float delta_time)
   model_mtx_ = glm::scale(model, glm::vec3(scaling_));
 
   cube_->SetModelMatrix(glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f)));
+
+  position_ = System::GetCamera()->GetPosition();
 }

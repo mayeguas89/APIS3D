@@ -14,13 +14,17 @@ GL4Render::~GL4Render()
 void GL4Render::Init()
 {
   GL1Render::Init();
-  imgui_app_.Init(window_);
   depth_texture_ = new GLTextureFrameBuffer(GLTextureFrameBuffer::FBType::kDepthFb, width_, height_);
+#ifdef IMGUI_ENABLE
+  imgui_app_.Init(window_);
+#endif
 }
 
 void GL4Render::SetupLight(Light* light)
 {
+#ifdef IMGUI_ENABLE
   imgui_app_.AddLight(std::move(light));
+#endif
 }
 
 void GL4Render::SetupParticle(Emitter* emitter)
@@ -56,7 +60,9 @@ void GL4Render::SetupParticle(Emitter* emitter)
 
 void GL4Render::SetupObject(Object* object)
 {
+#ifdef IMGUI_ENABLE
   imgui_app_.AddObject(std::move(object));
+#endif
   for (auto* mesh: object->GetMeshes())
   {
     VBO vbo;
@@ -155,28 +161,25 @@ void GL4Render::DrawParticles(Emitter* emitter)
 
 void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 {
+#ifdef IMGUI_ENABLE
   imgui_app_.StartFrame();
   imgui_app_.Update();
+#endif
+
+  System::SetRenderType(System::RenderType::kColor);
+  SetFrameBuffer(0);
 
   // Calculate shadowMap
   if (System::GetShadowsEnabled())
   {
-    glBindFramebuffer(GL_FRAMEBUFFER, reinterpret_cast<GLTextureFrameBuffer*>(depth_texture_)->GetFrameBufferId());
-    glViewport(0, 0, (int)depth_texture_->GetSize().x, (int)depth_texture_->GetSize().y);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    unsigned int draw_buf = GL_COLOR_ATTACHMENT0;
-    glDrawBuffers(1, &draw_buf);
+    SetFrameBuffer(reinterpret_cast<GLTextureFrameBuffer*>(depth_texture_)->GetFrameBufferId());
 
     System::SetRenderType(System::RenderType::kShadow);
     for (size_t i = 0; i < objects->size(); i++)
       DrawObject(objects->at(i));
     System::SetRenderType(System::RenderType::kColor);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, width_, height_);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    unsigned int draw_buf2 = GL_COLOR_ATTACHMENT0;
-    glDrawBuffers(1, &draw_buf2);
+    SetFrameBuffer(0);
   }
 
   // Draw Mirrors
@@ -188,24 +191,17 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
       auto mesh = mirror->GetMeshes().at(0);
       auto real_mirror = reinterpret_cast<Mirror*>(mirror);
       auto fb_texture = reinterpret_cast<GLTextureFrameBuffer*>(mesh->GetMaterial()->GetBaseTexture());
-      glBindFramebuffer(GL_FRAMEBUFFER, fb_texture->GetFrameBufferId());
-      glViewport(0, 0, (int)fb_texture->GetSize().x, (int)fb_texture->GetSize().y);
-      glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-      unsigned int draw_buf = GL_COLOR_ATTACHMENT0;
-      glDrawBuffers(1, &draw_buf);
+      SetFrameBuffer(fb_texture->GetFrameBufferId());
       System::SetCamera(real_mirror->GetCamera());
       for (size_t i = 0; i < objects->size(); i++)
         DrawObject(objects->at(i));
     }
     System::SetCamera(old_camera);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, width_, height_);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    unsigned int draw_buf2 = GL_COLOR_ATTACHMENT0;
-    glDrawBuffers(1, &draw_buf2);
+    SetFrameBuffer(0);
   }
 
   // Draw objects from camera
+
   for (size_t i = 0; i < objects->size(); i++)
   {
     if (System::GetShadowsEnabled())
@@ -213,7 +209,9 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
     DrawObject(objects->at(i));
   }
 
+#ifdef IMGUI_ENABLE
   imgui_app_.EndFrame();
+#endif
 }
 
 void GL4Render::DrawObject(Object* object)
@@ -253,5 +251,31 @@ void GL4Render::DrawObject(Object* object)
 
 void GL4Render::SetupAmbient()
 {
+#ifdef IMGUI_ENABLE
   imgui_app_.SetupAmbient();
+#endif
+}
+
+void GL4Render::SetFrameBuffer(GLuint framebuffer)
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+  glViewport(0, 0, width_, height_);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  unsigned int draw_buf = GL_COLOR_ATTACHMENT0;
+  glDrawBuffers(1, &draw_buf);
+}
+
+void GL4Render::SetSize(int width, int height)
+{
+  GL1Render::SetSize(width, height);
+  depth_texture_ = new GLTextureFrameBuffer(GLTextureFrameBuffer::FBType::kDepthFb, width_, height_);
+  if (auto mirrors = System::GetMirrors(); !mirrors.empty())
+  {
+    for (auto mirror: mirrors)
+    {
+      auto mesh = mirror->GetMeshes().at(0);
+      auto material = mesh->GetMaterial();
+      material->SetBaseTexture(new GLTextureFrameBuffer(GLTextureFrameBuffer::FBType::kColorFb, width_, height_));
+    }
+  }
 }

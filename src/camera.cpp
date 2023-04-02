@@ -30,3 +30,8 @@ float Camera::GetSpeed()
 {
   return camera_speed_;
 }
+
+void Camera::SetViewMatrix(const glm::mat4& view_matrix)
+{
+  view_mtx_ = view_matrix;
+}

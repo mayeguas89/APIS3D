@@ -72,7 +72,7 @@ protected:
   Texture* reflection_texture_ = nullptr;
   Texture* refraction_texture_ = nullptr;
   glm::vec3 color_;
-  uint8_t shininess_;
+  uint8_t shininess_ = 55;
   bool light_enabled_ = true;
   bool culling_enabled_ = false;
   bool depth_test_enabled_ = true;

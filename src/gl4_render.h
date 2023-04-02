@@ -2,8 +2,10 @@
 
 #define GLAD_ONLY_HEADER
 #include "gl1_render.h"
-#include "imgui_app.h"
 #include "texture.h"
+#ifdef IMGUI_ENABLE
+#include "imgui_app.h"
+#endif
 class GL4Render: public GL1Render
 {
   /**
@@ -42,11 +44,14 @@ public:
   void DrawObjects(const std::vector<Object*>* objects) override;
   void DrawObject(Object* object) override;
   void SetupAmbient() override;
+  void SetFrameBuffer(GLuint framebuffer) override;
+  void SetSize(int width, int height) override;
 
 private:
   // Vamos a acceder a los elementos por ids de cada objeto
   std::unordered_map<int, VBO> buffer_object_list_;
-  ImguiApp imgui_app_;
-
   Texture* depth_texture_ = nullptr;
+#ifdef IMGUI_ENABLE
+  ImguiApp imgui_app_;
+#endif
 };

@@ -17,6 +17,7 @@ public:
   const glm::mat4& GetProjectionMatrix();
   void SetSpeed(float speed);
   float GetSpeed();
+  void SetViewMatrix(const glm::mat4& view_matrix);
   virtual void ComputeProjectionMatrix(ProjectionType type) = 0;
 
   void SetLookAt(const glm::vec3& look_at)
@@ -28,9 +29,9 @@ public:
   {
     return look_at_;
   }
+  virtual void ComputeViewMatrix() = 0;
 
 protected:
-  virtual void ComputeViewMatrix() = 0;
   glm::mat4 view_mtx_ = glm::mat4(0.f);
   glm::mat4 projection_mtx_;
   glm::vec3 up_;

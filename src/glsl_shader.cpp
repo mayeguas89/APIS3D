@@ -178,6 +178,7 @@ void GLSLShader::SetVariables()
   }
 
   // ---------------------Lights----------------------
+
   auto lights = System::GetLights();
   for (auto i = 0; i < lights.size(); i++)
   {
@@ -241,9 +242,14 @@ void GLSLShader::SetVariables()
       glUniform1f(variable_list_[key], glm::cos(glm::radians(light->GetCutOff())));
     }
 
+    if (auto key = "Lights[" + index + "].OuterCutoff"; variable_list_.find(key) != variable_list_.end())
+    {
+      glUniform1f(variable_list_[key], glm::cos(glm::radians(light->GetOuterCutOff())));
+    }
+
     if (auto key = "Lights[" + index + "].Direction"; variable_list_.find(key) != variable_list_.end())
     {
-      glUniform4fv(variable_list_[key], 1, glm::value_ptr(light->GetDirection()));
+      glUniform4fv(variable_list_[key], 1, glm::value_ptr(glm::vec4{light->GetDirection(), 0.f}));
     }
 
     if (auto key = "Lights[" + index + "].Color"; variable_list_.find(key) != variable_list_.end())
@@ -253,9 +259,7 @@ void GLSLShader::SetVariables()
 
     if (auto key = "Lights[" + index + "].Position"; variable_list_.find(key) != variable_list_.end())
     {
-      auto light_mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix() * light->GetModelMatrix();
-      auto light_position = light_mvp * light->GetPosition();
-      glUniform3fv(variable_list_[key], 1, glm::value_ptr(light_position));
+      glUniform3fv(variable_list_[key], 1, glm::value_ptr(light->GetPosition()));
     }
   }
 
