@@ -204,12 +204,6 @@ void GLSLMaterial::PrepareColorVariables()
     render_program_->SetVec3("shadowLightDirection", ortho_camera->GetLookAt());
   }
 
-  // render_program_->SetInt("")
-  // if (frame_buffer_texture_ != nullptr)
-  // {
-
-  // }
-
   render_program_->SetVariables();
 }
 

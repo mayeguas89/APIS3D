@@ -11,6 +11,10 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #endif
+#include "armature.h"
+
+#include <glm/gtx/quaternion.hpp>
+
 #include <sstream>
 #include <string>
 #include <vector>
@@ -227,9 +231,12 @@ inline void ProcessMesh(pugi::xml_node buffer, Mesh3D* mesh)
   auto tang_it = tang_list.end();
   std::vector<float> texture_coords_list;
   auto texture_it = texture_coords_list.end();
+  std::vector<float> bone_index_list;
+  auto bone_index_it = bone_index_list.end();
+  std::vector<float> bone_weight_list;
+  auto bone_weight_it = bone_weight_list.end();
   std::vector<unsigned int> index_list;
   auto index_it = index_list.end();
-
   if (auto attrib = buffer.child("coords"); attrib != nullptr)
   {
     coord_list = utils::SplitString<float>(attrib.text().as_string(), ',');
@@ -250,6 +257,18 @@ inline void ProcessMesh(pugi::xml_node buffer, Mesh3D* mesh)
   {
     texture_coords_list = utils::SplitString<float>(attrib.text().as_string(), ',');
     texture_it = texture_coords_list.begin();
+  }
+
+  if (auto attrib = buffer.child("boneIndices"); attrib != nullptr)
+  {
+    bone_index_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+    bone_index_it = bone_index_list.begin();
+  }
+
+  if (auto attrib = buffer.child("boneWeights"); attrib != nullptr)
+  {
+    bone_weight_list = utils::SplitString<float>(attrib.text().as_string(), ',');
+    bone_weight_it = bone_weight_list.begin();
   }
 
   if (auto attrib = buffer.child("indices"); attrib != nullptr)
@@ -288,6 +307,22 @@ inline void ProcessMesh(pugi::xml_node buffer, Mesh3D* mesh)
     {
       v.texture_coordinates.x = *texture_it++;
       v.texture_coordinates.y = *texture_it++;
+    }
+
+    if (!bone_index_list.empty() && bone_index_it != bone_index_list.end())
+    {
+      v.bone_indices.x = *bone_index_it++;
+      v.bone_indices.y = *bone_index_it++;
+      v.bone_indices.z = *bone_index_it++;
+      v.bone_indices.w = *bone_index_it++;
+    }
+
+    if (!bone_weight_list.empty() && bone_weight_it != bone_weight_list.end())
+    {
+      v.bone_weight.x = *bone_weight_it++;
+      v.bone_weight.y = *bone_weight_it++;
+      v.bone_weight.z = *bone_weight_it++;
+      v.bone_weight.w = *bone_weight_it++;
     }
 
     mesh->AddVertex(v);
@@ -330,10 +365,107 @@ inline std::vector<Mesh3D*> GetMeshesFromMshFile(const std::string filename)
   return to_return;
 }
 
+inline std::unique_ptr<Armature> GetArmatureFromMsfFile(const std::string filename)
+{
+  auto armature = std::make_unique<Armature>();
+
+  auto directory = filename.substr(0, filename.find_last_of('/'));
+  pugi::xml_document doc;
+  pugi::xml_parse_result result = doc.load_file(filename.c_str());
+
+  if (!result)
+  {
+    std::string error_msg = "Error reading the file " + filename + "\nError: " + result.description();
+    throw std::runtime_error(error_msg);
+  }
+
+  if (auto last_frame_node = doc.child("mesh").child("lastFrame"); last_frame_node != nullptr)
+    armature->SetLastFrame(last_frame_node.text().as_uint());
+
+  auto bones_node = doc.child("mesh").child("bones");
+
+  int bone_index = 0;
+
+  for (pugi::xml_node bone_node: bones_node.children("bone"))
+  {
+    std::string bone_name;
+    std::string bone_parent_name;
+    std::shared_ptr<Bone> bone_parent = nullptr;
+
+    if (auto name_node = bone_node.child("name"); name_node != nullptr)
+      bone_name = name_node.text().as_string();
+
+    if (auto name_node = bone_node.child("parent"); name_node != nullptr)
+    {
+      bone_parent_name = name_node.text().as_string();
+      bone_parent = armature->GetBone(bone_parent_name);
+    }
+
+    auto bone = std::make_shared<Bone>(bone_name, bone_parent, bone_index);
+
+    if (auto inv_pose_node = bone_node.child("invPose"); inv_pose_node != nullptr)
+    {
+      auto inv_pose_list = SplitString<float>(inv_pose_node.text().as_string(), ',');
+      auto inv_pose = glm::make_mat4(inv_pose_list.data());
+      bone->SetInvPoseMatrix(inv_pose);
+    }
+
+    if (auto positions_node = bone_node.child("positions"); positions_node != nullptr)
+    {
+      auto positions_list = SplitString<float>(positions_node.text().as_string(), ',');
+      auto it = positions_list.begin();
+      while (it != positions_list.end())
+      {
+        auto frame = static_cast<unsigned int>(*it++);
+        glm::vec3 position{1.f};
+        position.x = *it++;
+        position.y = *it++;
+        position.z = *it++;
+        bone->AddPosition(frame, position);
+      }
+    }
+
+    if (auto rotations_node = bone_node.child("rotations"); rotations_node != nullptr)
+    {
+      auto rotations_list = SplitString<float>(rotations_node.text().as_string(), ',');
+      auto it = rotations_list.begin();
+      while (it != rotations_list.end())
+      {
+        auto frame = static_cast<unsigned int>(*it++);
+        glm::quat rotation;
+        rotation.w = *it++;
+        rotation.x = *it++;
+        rotation.y = *it++;
+        rotation.z = *it++;
+        bone->AddRotation(frame, rotation);
+      }
+    }
+    if (auto scales_node = bone_node.child("scales"); scales_node != nullptr)
+    {
+      auto scales_list = SplitString<float>(scales_node.text().as_string(), ',');
+      auto it = scales_list.begin();
+      while (it != scales_list.end())
+      {
+        auto frame = static_cast<unsigned int>(*it++);
+        glm::vec3 scale;
+        scale.x = *it++;
+        scale.y = *it++;
+        scale.z = *it++;
+        bone->AddScale(frame, scale);
+      }
+    }
+
+    armature->AddBone(bone);
+    bone_index++;
+  }
+
+  return std::move(armature);
+}
+
 #ifdef ASSIMP_LOAD_ENABLE
 inline void ProcessMesh(aiMesh* mesh, Mesh3D* my_mesh)
 {
-  for (int i = 0; i < mesh->mNumVertices; i++)
+  for (unsigned int i = 0; i < mesh->mNumVertices; i++)
   {
     Vertex v;
     v.position.x = mesh->mVertices[i].x;

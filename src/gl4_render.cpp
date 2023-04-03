@@ -217,6 +217,7 @@ void GL4Render::DrawObjects(const std::vector<Object*>* objects)
 void GL4Render::DrawObject(Object* object)
 {
   System::SetModelMatrix(&(object->GetModelMatrix()));
+  System::SetAnimationEnabled(object->Animate());
 
   if (object->IsEnabled())
   {

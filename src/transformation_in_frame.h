@@ -35,22 +35,22 @@ struct UpperBound
   }
 };
 
-bool operator<(const TransformationInFrame& rhs, const TransformationInFrame& lhs)
+inline bool operator<(const TransformationInFrame& rhs, const TransformationInFrame& lhs)
 {
   return rhs.frame < lhs.frame;
 }
 
-bool operator>(const TransformationInFrame& rhs, const TransformationInFrame& lhs)
+inline bool operator>(const TransformationInFrame& rhs, const TransformationInFrame& lhs)
 {
   return rhs.frame > lhs.frame;
 }
 
-bool operator<=(const TransformationInFrame& rhs, const TransformationInFrame& lhs)
+inline bool operator<=(const TransformationInFrame& rhs, const TransformationInFrame& lhs)
 {
   return rhs.frame <= lhs.frame;
 }
 
-bool operator>=(const TransformationInFrame& rhs, const TransformationInFrame& lhs)
+inline bool operator>=(const TransformationInFrame& rhs, const TransformationInFrame& lhs)
 {
   return rhs.frame >= lhs.frame;
 }

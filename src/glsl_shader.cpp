@@ -74,7 +74,10 @@ void GLSLShader::SetVec4(const std::string& name, const glm::vec4& value)
 
 void GLSLShader::SetMat4(const std::string& name, const glm::mat4& value)
 {
-  glUniformMatrix4fv(variable_list_[name], 1, GL_FALSE, &(value)[0][0]);
+  if (variable_list_.find(name) != variable_list_.end())
+  {
+    glUniformMatrix4fv(variable_list_[name], 1, GL_FALSE, &(value)[0][0]);
+  }
 }
 
 void GLSLShader::SetVariables()
@@ -128,6 +131,28 @@ void GLSLShader::SetVariables()
                           GL_FALSE,
                           sizeof(Vertex),
                           (void*)(4 * sizeof(glm::vec4)));
+  }
+
+  if (variable_list_.find("vBoneIndexes") != variable_list_.end())
+  {
+    glEnableVertexAttribArray(variable_list_["vBoneIndexes"]);
+    glVertexAttribPointer(variable_list_["vBoneIndexes"],
+                          4,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          (void*)(4 * sizeof(glm::vec4) + sizeof(glm::vec2)));
+  }
+
+  if (variable_list_.find("vBoneWeights") != variable_list_.end())
+  {
+    glEnableVertexAttribArray(variable_list_["vBoneWeights"]);
+    glVertexAttribPointer(variable_list_["vBoneWeights"],
+                          4,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          (void*)(5 * sizeof(glm::vec4) + sizeof(glm::vec2)));
   }
 
   if (variable_list_.find("mModelMatrix") != variable_list_.end())
@@ -267,6 +292,20 @@ void GLSLShader::SetVariables()
   if (variable_list_.find("M") != variable_list_.end())
   {
     glUniformMatrix4fv(variable_list_["M"], 1, GL_FALSE, &(*System::GetModelMatrix())[0][0]);
+  }
+
+  // ---------------------Animation----------------------
+  SetInt("has_animation", 0);
+  if (System::AnimationEnabled())
+  {
+    SetInt("hasAnimation", 1);
+    auto anim_matrices = System::GetAnimationMatrices();
+    for (int i = 0; i < anim_matrices.size(); i++)
+    {
+      auto variable_name = "animationMatrices[" + std::to_string(i) + "]";
+      int idarray = glGetUniformLocation(program_id_, variable_name.c_str());
+      glUniformMatrix4fv(idarray, 1, GL_FALSE, &anim_matrices[i][0][0]);
+    }
   }
 }
 

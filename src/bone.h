@@ -2,15 +2,16 @@
 
 #include "transformation_in_frame.h"
 
-#include <glm/gtc/quaternion.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
+#include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <variant>
 #include <vector>
-
 
 class Bone
 {
@@ -25,9 +26,11 @@ public:
     return name_;
   }
 
-  unsigned int GetParentIndex() const
+  std::optional<unsigned int> GetParentIndex() const
   {
-    return parent_->GetIndex();
+    if (parent_)
+      return parent_->GetIndex();
+    return std::nullopt;
   }
 
   unsigned int GetIndex() const
@@ -62,4 +65,16 @@ private:
   glm::mat4 inv_pose_matrix_;
 
   std::unordered_map<std::string, std::vector<TransformationInFrame>> transformations_map_;
+
+  Transformation CalculateInterpolation(
+    const std::vector<TransformationInFrame>& transformations,
+    unsigned int frame,
+    std::function<Transformation(Transformation, Transformation, float)> interpolation_function) const;
+
+  static Transformation LinearInterpolation(Transformation t1, Transformation t2, float rate);
+  static Transformation SphericalInterpolation(Transformation t1, Transformation t2, float rate);
+  std::function<Transformation(Transformation, Transformation, float)> linear_interpolation_ =
+    &Bone::LinearInterpolation;
+  std::function<Transformation(Transformation, Transformation, float)> spherical_interpolation_ =
+    &Bone::SphericalInterpolation;
 };

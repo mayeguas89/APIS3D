@@ -122,3 +122,11 @@ add_executable(ShadowMap
 target_link_libraries(
   ShadowMap PRIVATE engine
 )
+
+add_executable(Animation 
+  src/animation.cpp
+)
+
+target_link_libraries(
+  Animation PRIVATE engine
+)
