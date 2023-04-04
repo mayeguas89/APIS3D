@@ -13,6 +13,7 @@ public:
     None = -1,
     GL1Render = 0,
     GL4Render = 1,
+    VulkanRender = 2
   };
 
   enum class InputBackend

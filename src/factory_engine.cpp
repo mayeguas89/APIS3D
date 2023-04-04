@@ -5,6 +5,7 @@
 #include "gl_texture.h"
 #include "glfw_input_manager.h"
 #include "glsl_material.h"
+#include "vulkan_render.h"
 
 FactoryEngine::RenderBackend FactoryEngine::selected_graphics_backend_ = FactoryEngine::RenderBackend::None;
 FactoryEngine::InputBackend FactoryEngine::selected_input_backend_ = FactoryEngine::InputBackend::None;
@@ -70,6 +71,13 @@ Render* FactoryEngine::GetNewRender()
       render->SetCursorPositionCallback(GLFWInputManager::MouseManager);
       render->SetScrollCallback(GLFWInputManager::ScrollManager);
       render->SetMouseButtonCallback(GLFWInputManager::MouseKeyManager);
+      return render;
+      break;
+    }
+
+    case FactoryEngine::RenderBackend::VulkanRender:
+    {
+      auto render = new VulkanRender(600, 480);
       return render;
       break;
     }

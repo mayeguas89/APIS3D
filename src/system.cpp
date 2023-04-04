@@ -103,7 +103,8 @@ void System::MainLoop()
     render_->Clear();
 
     // Actualizar la camara
-    camera_->Update(TimeManager::deltaTime);
+    if (camera_)
+      camera_->Update(TimeManager::deltaTime);
     if (ortographic_camera_ != nullptr)
     {
       ortographic_camera_->Update(TimeManager::deltaTime);

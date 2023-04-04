@@ -60,6 +60,8 @@ add_library(engine SHARED STATIC
     src/texture.cpp
     src/time_manager.cpp
     src/triangle_rot.cpp
+    src/vulkan_context.cpp
+    src/vulkan_render.cpp
   )
 
 target_include_directories(
@@ -130,3 +132,20 @@ add_executable(Animation
 target_link_libraries(
   Animation PRIVATE engine
 )
+
+add_executable(Vulkan 
+  src/vulkan.cpp
+  # 05_window_surface.cpp
+)
+
+target_link_libraries(
+  Vulkan PRIVATE engine
+)
+
+add_custom_command(TARGET Vulkan POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/shaders ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders
+)
+
+# add_custom_command(TARGET Vulkan POST_BUILD
+#   COMMAND cmd /c ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data/shaders/src/compile.bat
+# )
