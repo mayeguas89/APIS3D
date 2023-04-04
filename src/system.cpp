@@ -201,7 +201,8 @@ void System::SetFarPlane(float value)
 void System::WindowResizeCallback(GLFWwindow* window, int width, int height)
 {
   render_->SetSize(width, height);
-  System::GetCamera()->ComputeProjectionMatrix(Camera::ProjectionType::Perspective);
+  if (camera_)
+    camera_->ComputeProjectionMatrix(Camera::ProjectionType::Perspective);
 }
 
 float System::GetNearPlane()

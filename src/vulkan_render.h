@@ -32,7 +32,9 @@ public:
   void SwapBuffers() override;
 
 protected:
+  static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
   void DrawFrame();
+  uint32_t current_frame_ = 0;
 
   GLFWwindow* window_;
   // -------- Vulkan -----------

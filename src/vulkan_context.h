@@ -17,6 +17,7 @@ struct VulkanContext
 #endif
   inline static const std::vector<const char*> kValidationLayers = {"VK_LAYER_KHRONOS_validation"};
   inline static const std::vector<const char*> kDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+  inline static int kMaxBufferInFlight = 2;
 
   struct QueueFamilyIndices
   {
@@ -42,6 +43,7 @@ struct VulkanContext
 
   // -------- Functions -----------
   void ClearInstance();
+  void CleanupSwapChain();
 
   void CreateInstance();
   void SetupDebugMessenger();
@@ -54,10 +56,11 @@ struct VulkanContext
   void CreateGraphicsPipeline();
   void CreateFramebuffers();
   void CreateCommandPool();
-  void CreateCommandBuffer();
+  void CreateCommandBuffers();
   void CreateSyncObjects();
 
   void RecordCommandBuffer(const VkCommandBuffer& command_buffer, uint32_t imageIndex);
+  void RecreateSwapChain(GLFWwindow* window);
 
   VkInstance instance;
   VkDebugUtilsMessengerEXT debug_messenger;
@@ -76,9 +79,10 @@ struct VulkanContext
   VkPipeline graphics_pipeline;
   std::vector<VkFramebuffer> swap_chain_framebuffers;
   VkCommandPool command_pool;
-  VkCommandBuffer command_buffer;
-
-  VkSemaphore image_available_semaphore;
-  VkSemaphore render_finished_semaphore;
-  VkFence in_flight_fence;
+  std::vector<VkCommandBuffer> command_buffers;
+  std::vector<VkSemaphore> image_available_semaphores;
+  std::vector<VkSemaphore> render_finished_semaphores;
+  std::vector<VkFence> in_flight_fences;
+  // Handle window resize
+  bool frame_buffer_resized = false;
 };
