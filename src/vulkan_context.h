@@ -3,8 +3,10 @@
 #define GLAD_ONLY_HEADER
 #define GLFW_INCLUDE_VULKAN
 #include "common.h"
+#include "vertex.h"
 #include "vulkan/vulkan.h"
 
+#include <map>
 #include <optional>
 #include <vector>
 
@@ -18,6 +20,10 @@ struct VulkanContext
   inline static const std::vector<const char*> kValidationLayers = {"VK_LAYER_KHRONOS_validation"};
   inline static const std::vector<const char*> kDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
   inline static int kMaxBufferInFlight = 2;
+
+  const std::vector<Vertex> kVertices = {{{0.0f, -0.5f, 0.f, 1.f}, {1.0f, 0.0f, 0.0f, 1.f}, {}, {}, {}, {}, {}},
+                                         {{0.5f, 0.5f, 0.f, 1.f}, {0.0f, 1.0f, 0.0f, 1.f}, {}, {}, {}, {}, {}},
+                                         {{-0.5f, 0.5f, 0.f, 1.f}, {0.0f, 0.0f, 1.0f, 1.f}, {}, {}, {}, {}, {}}};
 
   struct QueueFamilyIndices
   {
@@ -39,6 +45,13 @@ struct VulkanContext
     std::vector<VkPresentModeKHR> present_modes;
   };
 
+  struct VertexResources
+  {
+    VkBuffer buffer;
+    VkDeviceMemory memory;
+    std::optional<uint32_t> num_elements;
+  };
+
   void Init(GLFWwindow* window);
 
   // -------- Functions -----------
@@ -56,11 +69,14 @@ struct VulkanContext
   void CreateGraphicsPipeline();
   void CreateFramebuffers();
   void CreateCommandPool();
+  void CreateVertexBuffer(int id, std::vector<Vertex>* vertices);
+  void CreateIndexBuffer(int id, std::vector<unsigned int>* indices);
   void CreateCommandBuffers();
   void CreateSyncObjects();
 
   void RecordCommandBuffer(const VkCommandBuffer& command_buffer, uint32_t imageIndex);
   void RecreateSwapChain(GLFWwindow* window);
+  void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
   VkInstance instance;
   VkDebugUtilsMessengerEXT debug_messenger;
@@ -83,6 +99,8 @@ struct VulkanContext
   std::vector<VkSemaphore> image_available_semaphores;
   std::vector<VkSemaphore> render_finished_semaphores;
   std::vector<VkFence> in_flight_fences;
+  std::map<int, VertexResources> vertex_buffer_map;
+  std::map<int, VertexResources> indices_buffer_map;
   // Handle window resize
   bool frame_buffer_resized = false;
 };

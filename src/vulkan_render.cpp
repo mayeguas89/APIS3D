@@ -40,7 +40,14 @@ void VulkanRender::Init()
 
 void VulkanRender::SetupParticle(Emitter* emitter) {}
 
-void VulkanRender::SetupObject(Object* object) {}
+void VulkanRender::SetupObject(Object* object)
+{
+  for (auto mesh: object->GetMeshes())
+  {
+    vulkan_context_->CreateVertexBuffer(mesh->GetMeshId(), mesh->GetVertList());
+    vulkan_context_->CreateIndexBuffer(mesh->GetMeshId(), mesh->GetVertIndexesList());
+  }
+}
 
 void VulkanRender::SetupLight(Light* light) {}
 

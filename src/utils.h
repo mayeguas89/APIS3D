@@ -52,7 +52,10 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
   // Creamos material
   auto material = FactoryEngine::GetNewMaterial();
   if (!material)
-    throw std::runtime_error("Selected backend does not support materials");
+  {
+    std::cout << "Selected backend does not support materials" << std::endl;
+    return nullptr;
+  }
 
   // Material with color
   if (auto attrib = material_node.child("color"); attrib != nullptr)
@@ -285,7 +288,11 @@ inline void ProcessMesh(pugi::xml_node buffer, Mesh3D* mesh)
     v.position.z = *coord_it++;
     v.position.w = 1.0f;
 
-    v.color = glm::vec4(mesh->GetMaterial()->GetColor(), 1.0f);
+    auto material = mesh->GetMaterial();
+    if (material)
+      v.color = glm::vec4(material->GetColor(), 1.0f);
+    else
+      v.color = glm::vec4(1.f, 0.f, 0.f, 1.0f);
 
     if (!norm_list.empty() && norm_it != norm_list.end())
     {
@@ -354,7 +361,8 @@ inline std::vector<Mesh3D*> GetMeshesFromMshFile(const std::string filename)
 
     auto material = utils::ProcessMaterial(buffer, directory);
 
-    mesh->SetMaterial(material);
+    if (material)
+      mesh->SetMaterial(material);
 
     utils::ProcessMesh(buffer, mesh);
 

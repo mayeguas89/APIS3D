@@ -12,6 +12,18 @@ void VulkanContext::ClearInstance()
 {
   CleanupSwapChain();
 
+  for (auto it = indices_buffer_map.begin(); it != indices_buffer_map.end(); it++)
+  {
+    vkDestroyBuffer(device, it->second.buffer, nullptr);
+    vkFreeMemory(device, it->second.memory, nullptr);
+  }
+
+  for (auto it = vertex_buffer_map.begin(); it != vertex_buffer_map.end(); it++)
+  {
+    vkDestroyBuffer(device, it->second.buffer, nullptr);
+    vkFreeMemory(device, it->second.memory, nullptr);
+  }
+
   vkDestroyPipeline(device, graphics_pipeline, nullptr);
   vkDestroyPipelineLayout(device, pipeline_layout, nullptr);
 
@@ -57,6 +69,7 @@ void VulkanContext::Init(GLFWwindow* window)
   CreateGraphicsPipeline();
   CreateFramebuffers();
   CreateCommandPool();
+  // CreateVertexBuffer();
   CreateCommandBuffers();
   CreateSyncObjects();
 }
@@ -369,15 +382,18 @@ void VulkanContext::CreateGraphicsPipeline()
   // dynamicState.pDynamicStates = dynamicStates.data();
 
   // Vertex input
+  auto binding_description = vulkan_helpers::GetBindingDescription();
+  auto attribute_descripton = vulkan_helpers::GetAttributeDescription();
+
   // describes the format of the vertex data that will be passed to the vertex shader
   VkPipelineVertexInputStateCreateInfo vertex_input_info{};
   vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
   // Bindings: spacing between data and whether the data is per-vertex or per-instance (see instancing)
-  vertex_input_info.vertexBindingDescriptionCount = 0;
-  vertex_input_info.pVertexBindingDescriptions = nullptr; // Optional
+  vertex_input_info.vertexBindingDescriptionCount = 1;
+  vertex_input_info.pVertexBindingDescriptions = &binding_description;
   // Attribute descriptions: type of the attributes passed to the vertex shader, which binding to load them from and at which offset
-  vertex_input_info.vertexAttributeDescriptionCount = 0;
-  vertex_input_info.pVertexAttributeDescriptions = nullptr; // Optional
+  vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descripton.size());
+  vertex_input_info.pVertexAttributeDescriptions = attribute_descripton.data();
 
   // Input assembly
   // what kind of geometry will be drawn from the vertices and if primitive restart should be enabled
@@ -531,6 +547,77 @@ void VulkanContext::CreateCommandPool()
     throw std::runtime_error("failed to create command pool!");
 }
 
+void VulkanContext::CreateVertexBuffer(int id, std::vector<Vertex>* vertices)
+{
+  vertex_buffer_map.insert({id, VertexResources{}});
+  auto& vertex_buffer = vertex_buffer_map[id];
+  VkDeviceSize buffer_size = sizeof(Vertex) * vertices->size();
+
+  VkBuffer staging_buffer;
+  VkDeviceMemory staging_buffer_memory;
+
+  vulkan_helpers::CreateBuffer(device,
+                               physical_device,
+                               buffer_size,
+                               VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                               staging_buffer,
+                               staging_buffer_memory);
+
+  void* data;
+  vkMapMemory(device, staging_buffer_memory, 0, buffer_size, 0, &data);
+  memcpy(data, vertices->data(), (size_t)buffer_size);
+  vkUnmapMemory(device, staging_buffer_memory);
+
+  vulkan_helpers::CreateBuffer(device,
+                               physical_device,
+                               buffer_size,
+                               VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                               vertex_buffer.buffer,
+                               vertex_buffer.memory);
+
+  CopyBuffer(staging_buffer, vertex_buffer.buffer, buffer_size);
+  vkDestroyBuffer(device, staging_buffer, nullptr);
+  vkFreeMemory(device, staging_buffer_memory, nullptr);
+}
+
+void VulkanContext::CreateIndexBuffer(int id, std::vector<unsigned int>* indices)
+{
+  indices_buffer_map.insert({id, VertexResources{}});
+  auto& index_buffer = indices_buffer_map[id];
+  index_buffer.num_elements = static_cast<uint32_t>(indices->size());
+  VkDeviceSize buffer_size = sizeof(unsigned int) * indices->size();
+
+  VkBuffer staging_buffer;
+  VkDeviceMemory staging_buffer_memory;
+
+  vulkan_helpers::CreateBuffer(device,
+                               physical_device,
+                               buffer_size,
+                               VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                               staging_buffer,
+                               staging_buffer_memory);
+
+  void* data;
+  vkMapMemory(device, staging_buffer_memory, 0, buffer_size, 0, &data);
+  memcpy(data, indices->data(), (size_t)buffer_size);
+  vkUnmapMemory(device, staging_buffer_memory);
+
+  vulkan_helpers::CreateBuffer(device,
+                               physical_device,
+                               buffer_size,
+                               VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                               index_buffer.buffer,
+                               index_buffer.memory);
+
+  CopyBuffer(staging_buffer, index_buffer.buffer, buffer_size);
+  vkDestroyBuffer(device, staging_buffer, nullptr);
+  vkFreeMemory(device, staging_buffer_memory, nullptr);
+}
+
 void VulkanContext::CreateCommandBuffers()
 {
   command_buffers.resize(kMaxBufferInFlight);
@@ -610,7 +697,16 @@ void VulkanContext::RecordCommandBuffer(const VkCommandBuffer& command_buffer, u
   scissor.extent = swap_chain_extent;
   vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
-  vkCmdDraw(command_buffer, 3, 1, 0, 0);
+  for (auto it = vertex_buffer_map.begin(); it != vertex_buffer_map.end(); it++)
+  {
+    VkBuffer vertex_buffers[] = {it->second.buffer};
+    auto index_resources = indices_buffer_map[it->first];
+    VkDeviceSize offsets[] = {0};
+    vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
+    vkCmdBindIndexBuffer(command_buffer, index_resources.buffer, 0, VK_INDEX_TYPE_UINT32);
+
+    vkCmdDrawIndexed(command_buffer, index_resources.num_elements.value(), 1, 0, 0, 0);
+  }
 
   vkCmdEndRenderPass(command_buffer);
 
@@ -633,4 +729,40 @@ void VulkanContext::RecreateSwapChain(GLFWwindow* window)
   CreateSwapChain(window);
   CreateImageViews();
   CreateFramebuffers();
+}
+
+void VulkanContext::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+{
+  VkCommandBufferAllocateInfo allocate_info{};
+  allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  allocate_info.commandPool = command_pool;
+  allocate_info.commandBufferCount = 1;
+
+  VkCommandBuffer command_buffer;
+  vkAllocateCommandBuffers(device, &allocate_info, &command_buffer);
+
+  VkCommandBufferBeginInfo begin_info{};
+  begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+  vkBeginCommandBuffer(command_buffer, &begin_info);
+
+  VkBufferCopy copy_region{};
+  copy_region.srcOffset = 0; // Optional
+  copy_region.dstOffset = 0; // Optional
+  copy_region.size = size;
+  vkCmdCopyBuffer(command_buffer, srcBuffer, dstBuffer, 1, &copy_region);
+
+  vkEndCommandBuffer(command_buffer);
+
+  VkSubmitInfo submitInfo{};
+  submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+  submitInfo.commandBufferCount = 1;
+  submitInfo.pCommandBuffers = &command_buffer;
+
+  vkQueueSubmit(graphics_queue, 1, &submitInfo, VK_NULL_HANDLE);
+  vkQueueWaitIdle(graphics_queue);
+
+  vkFreeCommandBuffers(device, command_pool, 1, &command_buffer);
 }

@@ -6,25 +6,32 @@
 
 TriangleRot::TriangleRot(): Object()
 {
-  auto mesh = std::make_shared<Mesh3D>();
+  auto mesh = new Mesh3D();
 
   Vertex v1;
   Vertex v2;
   Vertex v3;
 
   v1.position = glm::vec4(-0.5f, -0.5f, 0.f, 1.f);
-  v1.color = glm::vec4(1.f, 0.f, 0.f, 0.f);
+  v1.color = glm::vec4(1.f, 0.f, 0.f, 1.f);
   v1.texture_coordinates = glm::vec2(0.f, 0.f);
   v2.position = glm::vec4(0.f, 0.5f, 0.f, 1.f);
-  v2.color = glm::vec4(0.f, 1.f, 0.f, 0.f);
+  v2.color = glm::vec4(0.f, 1.f, 0.f, 1.f);
   v2.texture_coordinates = glm::vec2(0.5f, 0.5f);
   v3.position = glm::vec4(0.5f, -0.5f, 0.f, 1.f);
-  v3.color = glm::vec4(0.f, 0.f, 1.f, 0.f);
+  v3.color = glm::vec4(0.f, 0.f, 1.f, 1.f);
   v3.texture_coordinates = glm::vec2(1.f, 0.f);
 
-  if (auto* material = FactoryEngine::GetNewMaterial(); material)
+  if (FactoryEngine::GetRenderBackend() == FactoryEngine::RenderBackend::VulkanRender)
   {
-    auto* texture = FactoryEngine::GetNewTexture();
+    v1.position = glm::vec4(0.f, -0.5f, 0.f, 1.f);
+    v2.position = glm::vec4(0.5f, 0.5f, 0.f, 1.f);
+    v3.position = glm::vec4(-0.5f, 0.5f, 0.f, 1.f);
+  }
+
+  if (auto material = FactoryEngine::GetNewMaterial(); material)
+  {
+    auto texture = FactoryEngine::GetNewTexture();
     texture->Load({{"data/front.png"}});
     texture->Bind();
 
@@ -37,7 +44,7 @@ TriangleRot::TriangleRot(): Object()
     mesh->SetMaterial(material);
   }
   mesh->AddTriangle(v1, 0, v2, 1, v3, 2);
-  AddMesh(mesh.get());
+  AddMesh(mesh);
 }
 
 void TriangleRot::LoadDataFromFile(const std::string& filename) {}

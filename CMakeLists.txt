@@ -61,6 +61,7 @@ add_library(engine SHARED STATIC
     src/time_manager.cpp
     src/triangle_rot.cpp
     src/vulkan_context.cpp
+    src/vulkan_helpers.cpp
     src/vulkan_render.cpp
   )
 
@@ -135,7 +136,7 @@ target_link_libraries(
 
 add_executable(Vulkan 
   src/vulkan.cpp
-  # 05_window_surface.cpp
+  # 19_vertex_buffer.cpp
 )
 
 target_link_libraries(

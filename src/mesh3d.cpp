@@ -63,8 +63,8 @@ void Mesh3D::AddTriangle(const Vertex& vertex_one,
     vert_list_->push_back(vertex_three);
 
   indexes_list_->push_back(index_one);
-  indexes_list_->push_back(index_three);
   indexes_list_->push_back(index_two);
+  indexes_list_->push_back(index_three);
 }
 
 void Mesh3D::AddIndex(unsigned int index)
