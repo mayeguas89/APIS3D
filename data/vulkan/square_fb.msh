@@ -4,8 +4,8 @@
 		<material>
 			<color>1,1,1,1</color>
 			<texture>data/vulkan/wall.jpg</texture>
-			<vShader>data/vulkan/shaders/shader.vert</vShader>
-			<fShader>data/vulkan/shaders/shader.frag</fShader>
+			<vShader>data/vulkan/shaders/src/shader.vert</vShader>
+			<fShader>data/vulkan/shaders/src/shader.frag</fShader>
 			<light>false</light>
 			<culling>false</culling>
 			

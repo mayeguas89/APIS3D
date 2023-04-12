@@ -125,6 +125,11 @@ void Material::SetRefractionCoefficient(float value)
   refraction_coefficient_ = value;
 }
 
+RenderProgram* Material::GetRenderProgram()
+{
+  return render_program_;
+}
+
 Texture* Material::GetReflectionTexture()
 {
   return reflection_texture_;

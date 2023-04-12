@@ -40,6 +40,7 @@ std::array<VkVertexInputAttributeDescription, 3> GetAttributeDescription();
 VkVertexInputBindingDescription GetBindingDescription();
 
 VkShaderModule CreateShaderModule(const std::vector<char>& code, const VkDevice& device);
+VkShaderModule CreateShaderModule(uint32_t length, uint32_t* data, const VkDevice& device);
 
 std::vector<char> ReadSource(const std::string& filename);
 

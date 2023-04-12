@@ -84,6 +84,7 @@ struct VulkanContext
   static void CreateRenderPass();
   static void CreateDescriptorSetLayout();
   static void CreateGraphicsPipeline();
+  static void CreateGraphicsPipeline(const std::vector<VkPipelineShaderStageCreateInfo>& shader_stage_vector);
   static void CreateFramebuffers();
   static void CreateCommandPool();
   static void CreateVertexBuffer(int id, std::vector<Vertex>* vertices);

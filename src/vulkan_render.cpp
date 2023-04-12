@@ -2,6 +2,7 @@
 
 #include "vk_texture.h"
 #include "vulkan_context.h"
+#include "vulkan_shader.h"
 
 #include <array>
 
@@ -50,9 +51,11 @@ void VulkanRender::SetupObject(Object* object)
     VulkanContext::CreateVertexBuffer(mesh->GetMeshId(), mesh->GetVertList());
     VulkanContext::CreateIndexBuffer(mesh->GetMeshId(), mesh->GetVertIndexesList());
   }
-  auto vk_texure = reinterpret_cast<VkTexture*>(object->GetMeshes().at(0)->GetMaterial()->GetBaseTexture());
-
-  VulkanContext::CreateDescriptorSets(vk_texure->GetImageView(), vk_texure->GetImageSampler());
+  auto material = object->GetMeshes().at(0)->GetMaterial();
+  auto vk_shader = reinterpret_cast<VulkanShader*>(material->GetRenderProgram());
+  VulkanContext::CreateGraphicsPipeline(vk_shader->GetShaderStages());
+  auto vk_texture = reinterpret_cast<VkTexture*>(material->GetBaseTexture());
+  VulkanContext::CreateDescriptorSets(vk_texture->GetImageView(), vk_texture->GetImageSampler());
 }
 
 void VulkanRender::SetupLight(Light* light) {}

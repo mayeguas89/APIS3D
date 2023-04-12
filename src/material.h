@@ -63,6 +63,7 @@ public:
   void SetRefraction(bool value);
   float GetRefractionCoefficient();
   void SetRefractionCoefficient(float value);
+  RenderProgram* GetRenderProgram();
 
 protected:
   RenderProgram* render_program_ = nullptr;

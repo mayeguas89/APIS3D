@@ -16,11 +16,13 @@
 
 #include "render_program.h"
 #include "shaderc/shaderc.hpp"
+#include "vulkan/vulkan.h"
 
 class VulkanShader: public RenderProgram
 {
 public:
   VulkanShader();
+  ~VulkanShader();
   bool SetProgram(const std::string& filename, RenderType render_type) override;
   bool LinkPrograms() override;
   std::string GetErrorMsg() override;
@@ -33,6 +35,8 @@ public:
   void SetMat4(const std::string& name, const glm::mat4& value) override;
 
   void SetVariables() override;
+
+  std::vector<VkPipelineShaderStageCreateInfo> GetShaderStages() const;
 
 private:
   class Shader
@@ -62,6 +66,7 @@ private:
 
   // Contenedor de shaders
   std::vector<std::unique_ptr<Shader>> shaders_;
+  std::vector<VkShaderModule> shader_modules_;
 };
 
 #endif

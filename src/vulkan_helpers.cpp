@@ -173,6 +173,19 @@ VkShaderModule CreateShaderModule(const std::vector<char>& code, const VkDevice&
   return shader_module;
 }
 
+VkShaderModule CreateShaderModule(uint32_t length, uint32_t* data, const VkDevice& device)
+{
+  VkShaderModuleCreateInfo create_info{};
+  create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+  create_info.codeSize = static_cast<size_t>(4 * length);
+  create_info.pCode = data;
+  VkShaderModule shader_module;
+  if (vkCreateShaderModule(device, &create_info, nullptr, &shader_module) != VK_SUCCESS)
+    throw std::runtime_error("failed to create shader module!");
+
+  return shader_module;
+}
+
 std::vector<char> ReadSource(const std::string& filename)
 {
   std::streampos size;

@@ -1,5 +1,8 @@
 #include "vulkan_shader.h"
 
+#include "vulkan_context.h"
+#include "vulkan_helpers.h"
+
 #include <fstream>
 #include <iostream>
 
@@ -60,7 +63,7 @@ void VulkanShader::Shader::CompileShader()
   }
 
   std::vector<uint32_t> v = {module.cbegin(), module.cend()};
-  length_ = v.size();
+  length_ = static_cast<uint32_t>(v.size());
   data_ = new uint32_t[length_];
 
   memcpy(data_, v.data(), sizeof(uint32_t) * length_);
@@ -75,12 +78,22 @@ bool VulkanShader::Shader::HasErrors(std::string& error_message)
 
 VulkanShader::VulkanShader() {}
 
+VulkanShader::~VulkanShader()
+{
+  for (auto& shader_module: shader_modules_)
+  {
+    vkDestroyShaderModule(VulkanContext::device, shader_module, nullptr);
+  }
+}
+
 bool VulkanShader::SetProgram(const std::string& filename, RenderType render_type)
 {
   auto shader = std::make_unique<Shader>(filename, render_type);
   if (shader->HasErrors(error_message_))
     return false;
 
+  shader_modules_.push_back(
+    std::move(vulkan_helpers::CreateShaderModule(shader->length_, shader->data_, VulkanContext::device)));
   shaders_.push_back(std::move(shader));
   return true;
 }
@@ -108,3 +121,24 @@ void VulkanShader::SetVec4(const std::string& name, const glm::vec4& value) {}
 void VulkanShader::SetMat4(const std::string& name, const glm::mat4& value) {}
 
 void VulkanShader::SetVariables() {}
+
+std::vector<VkPipelineShaderStageCreateInfo> VulkanShader::GetShaderStages() const
+{
+  std::vector<VkPipelineShaderStageCreateInfo> shader_stages;
+  size_t index = 0;
+  for (const auto& shader: shaders_)
+  {
+    VkPipelineShaderStageCreateInfo vert_shader_stage_create_info{};
+    vert_shader_stage_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    if (shader->type_ == shaderc_glsl_vertex_shader)
+      vert_shader_stage_create_info.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    if (shader->type_ == shaderc_glsl_fragment_shader)
+      vert_shader_stage_create_info.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    vert_shader_stage_create_info.module = shader_modules_[index];
+    vert_shader_stage_create_info.pName = "main";
+
+    shader_stages.push_back(vert_shader_stage_create_info);
+    index++;
+  }
+  return shader_stages;
+}
