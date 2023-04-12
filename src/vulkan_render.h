@@ -3,7 +3,6 @@
 #include "common.h"
 #include "object.h"
 #include "render.h"
-#include "vulkan_context.h"
 
 #include <optional>
 
@@ -34,9 +33,10 @@ public:
 protected:
   static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
   void DrawFrame();
+  void UpdateUniformBuffer(Object* object);
   uint32_t current_frame_ = 0;
 
   GLFWwindow* window_;
   // -------- Vulkan -----------
-  std::unique_ptr<VulkanContext> vulkan_context_;
+  // std::unique_ptr<VulkanContext> vulkan_context_;
 };

@@ -121,13 +121,20 @@ inline Material* ProcessMaterial(pugi::xml_node buffer, const std::string& direc
     material->SetBlendMode(blend_mode);
   }
 
-  // Usamos los shaders de vertices y de los fragmentos
-  auto vertex_shader_filename = material_node.child("vShader").text().as_string();
-  auto fragment_shader_filename = material_node.child("fShader").text().as_string();
-
   std::unordered_map<std::string, RenderType> program_map;
-  program_map[vertex_shader_filename] = RenderType::Vertex;
-  program_map[fragment_shader_filename] = RenderType::Fragment;
+  std::string vertex_shader_filename;
+  std::string fragment_shader_filename;
+
+  if (auto attrib = material_node.child("vShader"); attrib != nullptr)
+  {
+    vertex_shader_filename = attrib.text().as_string();
+    program_map[vertex_shader_filename] = RenderType::Vertex;
+  }
+  if (auto attrib = material_node.child("fShader"); attrib != nullptr)
+  {
+    fragment_shader_filename = attrib.text().as_string();
+    program_map[fragment_shader_filename] = RenderType::Fragment;
+  }
 
   material->LoadPrograms(program_map);
 

@@ -13,7 +13,7 @@ Mesh3D::Mesh3D(): id_{counter_}
 
 Mesh3D::~Mesh3D()
 {
-  // delete material_;
+  delete material_;
   delete vert_list_;
   delete indexes_list_;
 }

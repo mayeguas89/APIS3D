@@ -20,7 +20,7 @@ public:
 
   Object();
 
-  virtual ~Object() = default;
+  ~Object();
 
   std::vector<Mesh3D*>& GetMeshes();
 

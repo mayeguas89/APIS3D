@@ -63,6 +63,9 @@ add_library(engine SHARED STATIC
     src/vulkan_context.cpp
     src/vulkan_helpers.cpp
     src/vulkan_render.cpp
+    src/vk_texture.cpp
+    src/vk_material.cpp
+    src/vulkan_shader.cpp
   )
 
 target_include_directories(
@@ -84,6 +87,12 @@ target_link_libraries(
   glfw3
   imgui
   pugixml
+  vulkan-1
+  glslangd
+  shadercd
+  shaderc_utild
+  shaderc_shared
+  shaderc_combinedd
   ${ASSIMP_LIBRARY}
 )
 
@@ -143,9 +152,9 @@ target_link_libraries(
   Vulkan PRIVATE engine
 )
 
-add_custom_command(TARGET Vulkan POST_BUILD
-COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/shaders ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders
-)
+# add_custom_command(TARGET Vulkan POST_BUILD
+# COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/shaders ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders
+# )
 
 # add_custom_command(TARGET Vulkan POST_BUILD
 #   COMMAND cmd /c ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data/shaders/src/compile.bat

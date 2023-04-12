@@ -13,16 +13,30 @@
 
 namespace vulkan_helpers
 {
+
+void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+
+VkCommandBuffer BeginSingleTimeCommands();
+
+void CreateImage(uint32_t width,
+                 uint32_t height,
+                 VkFormat format,
+                 VkImageTiling tiling,
+                 VkImageUsageFlags usage,
+                 VkMemoryPropertyFlags properties,
+                 VkImage& image,
+                 VkDeviceMemory& imageMemory);
 uint32_t FindMemoryType(const VkPhysicalDevice& device, uint32_t type_filter, VkMemoryPropertyFlags properties);
 
-void CreateBuffer(VkDevice device,
-                  VkPhysicalDevice physical_device,
+void CreateBuffer(const VkDevice& device,
+                  const VkPhysicalDevice& physical_device,
                   VkDeviceSize size,
                   VkBufferUsageFlags usage,
                   VkMemoryPropertyFlags properties,
                   VkBuffer& buffer,
                   VkDeviceMemory& buffer_memory);
-std::array<VkVertexInputAttributeDescription, 2> GetAttributeDescription();
+std::array<VkVertexInputAttributeDescription, 3> GetAttributeDescription();
 VkVertexInputBindingDescription GetBindingDescription();
 
 VkShaderModule CreateShaderModule(const std::vector<char>& code, const VkDevice& device);

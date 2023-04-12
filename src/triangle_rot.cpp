@@ -51,7 +51,7 @@ void TriangleRot::LoadDataFromFile(const std::string& filename) {}
 
 void TriangleRot::Update(float delta_time)
 {
-  // rotation_.y += delta_time * glm::quarter_pi<float>();
+  rotation_.z += delta_time * glm::quarter_pi<float>();
 
   UpdateModelMatrix();
 }

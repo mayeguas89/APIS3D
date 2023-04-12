@@ -5,6 +5,12 @@ Object::Object(): Entity()
   type_ = Type::None;
 }
 
+Object::~Object()
+{
+  for (auto mesh: meshes_)
+    delete mesh;
+}
+
 std::vector<Mesh3D*>& Object::GetMeshes()
 {
   return meshes_;

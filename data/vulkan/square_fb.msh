@@ -2,9 +2,10 @@
 <buffers>
 	<buffer>
 		<material>
-			<texture colorFB="true">null</texture>
-			<vShader>data/program.vertex</vShader>
-			<fShader>data/program.fragment</fShader>
+			<color>1,1,1,1</color>
+			<texture>data/vulkan/wall.jpg</texture>
+			<vShader>data/vulkan/shaders/shader.vert</vShader>
+			<fShader>data/vulkan/shaders/shader.frag</fShader>
 			<light>false</light>
 			<culling>false</culling>
 			

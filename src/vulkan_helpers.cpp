@@ -2,6 +2,83 @@
 
 namespace vulkan_helpers
 {
+VkCommandBuffer BeginSingleTimeCommands()
+{
+  VkCommandBufferAllocateInfo alloc_info{};
+  alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  alloc_info.commandPool = VulkanContext::command_pool;
+  alloc_info.commandBufferCount = 1;
+
+  VkCommandBuffer commandBuffer;
+  vkAllocateCommandBuffers(VulkanContext::device, &alloc_info, &commandBuffer);
+
+  VkCommandBufferBeginInfo beginInfo{};
+  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+  vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+  return commandBuffer;
+}
+
+void EndSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+  vkEndCommandBuffer(commandBuffer);
+
+  VkSubmitInfo submitInfo{};
+  submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+  submitInfo.commandBufferCount = 1;
+  submitInfo.pCommandBuffers = &commandBuffer;
+
+  vkQueueSubmit(VulkanContext::graphics_queue, 1, &submitInfo, VK_NULL_HANDLE);
+  vkQueueWaitIdle(VulkanContext::graphics_queue);
+
+  vkFreeCommandBuffers(VulkanContext::device, VulkanContext::command_pool, 1, &commandBuffer);
+}
+void CreateImage(uint32_t width,
+                 uint32_t height,
+                 VkFormat format,
+                 VkImageTiling tiling,
+                 VkImageUsageFlags usage,
+                 VkMemoryPropertyFlags properties,
+                 VkImage& image,
+                 VkDeviceMemory& image_memory)
+{
+  VkImageCreateInfo image_info{};
+  image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+  image_info.imageType = VK_IMAGE_TYPE_2D;
+  image_info.extent.width = static_cast<uint32_t>(width);
+  image_info.extent.height = static_cast<uint32_t>(height);
+  image_info.extent.depth = 1;
+  image_info.mipLevels = 1;
+  image_info.arrayLayers = 1;
+  image_info.format = VK_FORMAT_R8G8B8A8_SRGB;
+  image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+  image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  image_info.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+  image_info.samples = VK_SAMPLE_COUNT_1_BIT;
+  image_info.flags = 0;
+
+  if (vkCreateImage(VulkanContext::device, &image_info, nullptr, &image) != VK_SUCCESS)
+    throw std::runtime_error("failed to create image!");
+
+  VkMemoryRequirements mem_requirements;
+  vkGetImageMemoryRequirements(VulkanContext::device, image, &mem_requirements);
+
+  VkMemoryAllocateInfo alloc_info{};
+  alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+  alloc_info.allocationSize = mem_requirements.size;
+  alloc_info.memoryTypeIndex = vulkan_helpers::FindMemoryType(VulkanContext::physical_device,
+                                                              mem_requirements.memoryTypeBits,
+                                                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+  if (vkAllocateMemory(VulkanContext::device, &alloc_info, nullptr, &image_memory) != VK_SUCCESS)
+    throw std::runtime_error("failed to allocate image memory!");
+
+  vkBindImageMemory(VulkanContext::device, image, image_memory, 0);
+}
+
 uint32_t FindMemoryType(const VkPhysicalDevice& device, uint32_t type_filter, VkMemoryPropertyFlags properties)
 {
   VkPhysicalDeviceMemoryProperties mem_properties;
@@ -18,8 +95,8 @@ uint32_t FindMemoryType(const VkPhysicalDevice& device, uint32_t type_filter, Vk
   throw std::runtime_error("failed to find suitable memory type!");
 }
 
-void CreateBuffer(VkDevice device,
-                  VkPhysicalDevice physical_device,
+void CreateBuffer(const VkDevice& device,
+                  const VkPhysicalDevice& physical_device,
                   VkDeviceSize size,
                   VkBufferUsageFlags usage,
                   VkMemoryPropertyFlags properties,
@@ -51,10 +128,10 @@ void CreateBuffer(VkDevice device,
   vkBindBufferMemory(device, buffer, buffer_memory, 0);
 }
 
-std::array<VkVertexInputAttributeDescription, 2> GetAttributeDescription()
+std::array<VkVertexInputAttributeDescription, 3> GetAttributeDescription()
 {
   // An attribute description struct describes how to extract a vertex attribute from a chunk of vertex data originating from a binding description
-  std::array<VkVertexInputAttributeDescription, 2> attribute_description;
+  std::array<VkVertexInputAttributeDescription, 3> attribute_description;
   // Position
   attribute_description[0].binding = 0;
   attribute_description[0].location = 0;
@@ -65,6 +142,11 @@ std::array<VkVertexInputAttributeDescription, 2> GetAttributeDescription()
   attribute_description[1].location = 1;
   attribute_description[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
   attribute_description[1].offset = offsetof(Vertex, color);
+  // Texture
+  attribute_description[2].binding = 0;
+  attribute_description[2].location = 2;
+  attribute_description[2].format = VK_FORMAT_R32G32_SFLOAT;
+  attribute_description[2].offset = offsetof(Vertex, texture_coordinates);
   return attribute_description;
 }
 
@@ -338,7 +420,11 @@ bool IsDeviceSuitable(const VkPhysicalDevice& device, const VkSurfaceKHR& surfac
     swap_chain_adequate = !swapChainSupport.formats.empty() && !swapChainSupport.present_modes.empty();
   }
 
-  return indices.IsComplete() && extension_supported && swap_chain_adequate;
+  VkPhysicalDeviceFeatures supported_features{};
+  vkGetPhysicalDeviceFeatures(device, &supported_features);
+
+  return indices.IsComplete() && extension_supported && swap_chain_adequate
+         && supported_features.samplerAnisotropy;
 }
 
 }

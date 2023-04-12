@@ -5,6 +5,8 @@
 #include "gl_texture.h"
 #include "glfw_input_manager.h"
 #include "glsl_material.h"
+#include "vk_material.h"
+#include "vk_texture.h"
 #include "vulkan_render.h"
 
 FactoryEngine::RenderBackend FactoryEngine::selected_graphics_backend_ = FactoryEngine::RenderBackend::None;
@@ -26,6 +28,10 @@ Material* FactoryEngine::GetNewMaterial()
   {
     return new GLSLMaterial();
   }
+  else if (selected_graphics_backend_ == FactoryEngine::RenderBackend::VulkanRender)
+  {
+    return new VkMaterial();
+  }
   return nullptr;
 }
 
@@ -35,6 +41,10 @@ Texture* FactoryEngine::GetNewTexture()
       || selected_graphics_backend_ == FactoryEngine::RenderBackend::GL1Render)
   {
     return new GLTexture();
+  }
+  else if (selected_graphics_backend_ == FactoryEngine::RenderBackend::VulkanRender)
+  {
+    return new VkTexture();
   }
   return nullptr;
 }

@@ -52,55 +52,82 @@ struct VulkanContext
     std::optional<uint32_t> num_elements;
   };
 
-  void Init(GLFWwindow* window);
+  struct UniformResources
+  {
+    // We should have multiple buffers,
+    // because multiple frames may be in flight at the same time
+    std::vector<VkBuffer> buffers;
+    std::vector<VkDeviceMemory> buffers_memory;
+    std::vector<void*> buffers_mapped;
+  };
+
+  struct UniformBufferObject
+  {
+    glm::mat4 model_matrix;
+    glm::mat4 view_matrix;
+    glm::mat4 projection_matrix;
+  };
+
+  static void Init(GLFWwindow* window);
 
   // -------- Functions -----------
-  void ClearInstance();
-  void CleanupSwapChain();
+  static void ClearInstance();
+  static void CleanupSwapChain();
 
-  void CreateInstance();
-  void SetupDebugMessenger();
-  void CreateSurface(GLFWwindow* window);
-  void PickPhysicalDevice();
-  void CreateLogicalDevice();
-  void CreateSwapChain(GLFWwindow* window);
-  void CreateImageViews();
-  void CreateRenderPass();
-  void CreateGraphicsPipeline();
-  void CreateFramebuffers();
-  void CreateCommandPool();
-  void CreateVertexBuffer(int id, std::vector<Vertex>* vertices);
-  void CreateIndexBuffer(int id, std::vector<unsigned int>* indices);
-  void CreateCommandBuffers();
-  void CreateSyncObjects();
+  static void CreateInstance();
+  static void SetupDebugMessenger();
+  static void CreateSurface(GLFWwindow* window);
+  static void PickPhysicalDevice();
+  static void CreateLogicalDevice();
+  static void CreateSwapChain(GLFWwindow* window);
+  static void CreateImageViews();
+  static void CreateRenderPass();
+  static void CreateDescriptorSetLayout();
+  static void CreateGraphicsPipeline();
+  static void CreateFramebuffers();
+  static void CreateCommandPool();
+  static void CreateVertexBuffer(int id, std::vector<Vertex>* vertices);
+  static void CreateIndexBuffer(int id, std::vector<unsigned int>* indices);
+  static void CreateUniformBuffers();
+  static void CreateDescriptorPool();
+  static void CreateDescriptorSets(VkImageView image_view, VkSampler sampler);
+  static void CreateCommandBuffers();
+  static void CreateSyncObjects();
 
-  void RecordCommandBuffer(const VkCommandBuffer& command_buffer, uint32_t imageIndex);
-  void RecreateSwapChain(GLFWwindow* window);
-  void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+  static void RecordCommandBuffer(uint32_t current_frame, uint32_t image_index);
+  static void RecreateSwapChain(GLFWwindow* window);
+  static void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+  static void
+    TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
+  static void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
-  VkInstance instance;
-  VkDebugUtilsMessengerEXT debug_messenger;
-  VkPhysicalDevice physical_device = VK_NULL_HANDLE;
-  VkSurfaceKHR surface;
-  VkDevice device;
-  VkQueue graphics_queue;
-  VkQueue present_queue;
-  VkSwapchainKHR swap_chain;
-  std::vector<VkImage> swap_chain_images;
-  VkFormat swap_chain_image_format;
-  VkExtent2D swap_chain_extent;
-  std::vector<VkImageView> swap_chain_image_views;
-  VkRenderPass render_pass;
-  VkPipelineLayout pipeline_layout;
-  VkPipeline graphics_pipeline;
-  std::vector<VkFramebuffer> swap_chain_framebuffers;
-  VkCommandPool command_pool;
-  std::vector<VkCommandBuffer> command_buffers;
-  std::vector<VkSemaphore> image_available_semaphores;
-  std::vector<VkSemaphore> render_finished_semaphores;
-  std::vector<VkFence> in_flight_fences;
-  std::map<int, VertexResources> vertex_buffer_map;
-  std::map<int, VertexResources> indices_buffer_map;
+  inline static VkInstance instance;
+  inline static VkDebugUtilsMessengerEXT debug_messenger;
+  inline static VkPhysicalDevice physical_device = VK_NULL_HANDLE;
+  inline static VkSurfaceKHR surface;
+  inline static VkDevice device;
+  inline static VkQueue graphics_queue;
+  inline static VkQueue present_queue;
+  inline static VkSwapchainKHR swap_chain;
+  inline static std::vector<VkImage> swap_chain_images;
+  inline static VkFormat swap_chain_image_format;
+  inline static VkExtent2D swap_chain_extent;
+  inline static std::vector<VkImageView> swap_chain_image_views;
+  inline static VkRenderPass render_pass;
+  inline static VkDescriptorSetLayout descriptor_set_layout;
+  inline static VkPipelineLayout pipeline_layout;
+  inline static VkPipeline graphics_pipeline;
+  inline static std::vector<VkFramebuffer> swap_chain_framebuffers;
+  inline static VkCommandPool command_pool;
+  inline static std::vector<VkCommandBuffer> command_buffers;
+  inline static std::vector<VkSemaphore> image_available_semaphores;
+  inline static std::vector<VkSemaphore> render_finished_semaphores;
+  inline static std::vector<VkFence> in_flight_fences;
+  inline static std::map<int, VertexResources> vertex_buffer_map;
+  inline static std::map<int, VertexResources> indices_buffer_map;
+  inline static UniformResources uniform_resources;
+  inline static VkDescriptorPool descriptor_pool;
+  inline static std::vector<VkDescriptorSet> descriptor_sets;
   // Handle window resize
-  bool frame_buffer_resized = false;
+  inline static bool frame_buffer_resized = false;
 };
