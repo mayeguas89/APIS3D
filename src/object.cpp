@@ -1,5 +1,7 @@
 #include "object.h"
 
+#include "factory_engine.h"
+
 Object::Object(): Entity()
 {
   type_ = Type::None;
@@ -7,8 +9,11 @@ Object::Object(): Entity()
 
 Object::~Object()
 {
-  for (auto mesh: meshes_)
-    delete mesh;
+  if (FactoryEngine::GetRenderBackend() == FactoryEngine::RenderBackend::VulkanRender)
+  {
+    for (auto mesh: meshes_)
+      delete mesh;
+  }
 }
 
 std::vector<Mesh3D*>& Object::GetMeshes()
