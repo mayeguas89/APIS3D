@@ -284,7 +284,7 @@ void GLSLShader::SetVariables()
 
     if (auto key = "Lights[" + index + "].Position"; variable_list_.find(key) != variable_list_.end())
     {
-      glUniform3fv(variable_list_[key], 1, glm::value_ptr(light->GetPosition()));
+      SetVec3(key, glm::vec3{light->GetPosition()});
     }
   }
 

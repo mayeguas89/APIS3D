@@ -33,6 +33,7 @@ public:
   virtual void Clear() = 0;
   virtual void SwapBuffers() = 0;
   virtual void SetFrameBuffer(GLuint framebuffer) = 0;
+  virtual void HideMouse() = 0;
 
 protected:
   int width_;

@@ -330,3 +330,8 @@ void System::SetAnimationMatrices(const std::vector<glm::mat4>& animation_matric
 {
   animation_matrices_ = animation_matrices;
 }
+
+void System::HideMouse()
+{
+  render_->HideMouse();
+}

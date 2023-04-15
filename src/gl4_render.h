@@ -46,6 +46,7 @@ public:
   void SetupAmbient() override;
   void SetFrameBuffer(GLuint framebuffer) override;
   void SetSize(int width, int height) override;
+  void HideMouse() override;
 
 private:
   // Vamos a acceder a los elementos por ids de cada objeto

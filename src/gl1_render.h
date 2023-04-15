@@ -31,6 +31,7 @@ public:
   void SetScrollCallback(void (*callback)(GLFWwindow* window, double x_offset, double y_offset));
   void Clear() override;
   void SwapBuffers() override;
+  void HideMouse() override;
 
 protected:
   GLFWwindow* window_;

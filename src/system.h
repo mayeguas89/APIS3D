@@ -80,6 +80,8 @@ public:
   static const std::vector<glm::mat4>& GetAnimationMatrices();
   static void SetAnimationMatrices(const std::vector<glm::mat4>& animation_matrices);
 
+  static void HideMouse();
+
 private:
   static float near_plane_;
   static float far_plane_;

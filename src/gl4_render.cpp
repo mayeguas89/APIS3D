@@ -280,3 +280,8 @@ void GL4Render::SetSize(int width, int height)
     }
   }
 }
+
+void GL4Render::HideMouse()
+{
+  GL1Render::HideMouse();
+}

@@ -103,6 +103,14 @@ add_custom_command(TARGET engine POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/externalLibs/assimp/bin/Debug/assimp-vc142-mtd.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )
 
+add_executable(AsianTown 
+  src/asian_town_main.cpp
+)
+
+target_link_libraries(
+  AsianTown PRIVATE engine
+)
+
 add_executable(NormalMapping 
   src/normal_mapping.cpp
 )

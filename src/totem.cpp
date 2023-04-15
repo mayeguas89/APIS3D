@@ -36,7 +36,7 @@ int main(int argc, char const* argv[])
                                            1.f,
                                            25.f,
                                            glm::vec3(0.f, -3.f, 2.f),
-                                           glm::vec3(0.f, 1.f, -1.f),
+                                           glm::vec3(column.GetPosition()) - glm::vec3(0.f, -3.f, 2.f),
                                            12.5f,
                                            15.f);
   System::SetAmbient(glm::vec3(1.f, 1.f, 1.f));

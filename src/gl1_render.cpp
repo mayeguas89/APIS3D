@@ -35,10 +35,6 @@ void GL1Render::Init()
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
   glfwSetWindowSizeCallback(window_, &System::WindowResizeCallback);
-
-  // Set Mouse in middle on the screen
-  // glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  // glfwSetCursorPos(window_, width_ / 2.f, height_ / 2.f);
 }
 
 void GL1Render::SetupObject(Object* object) {}
@@ -122,4 +118,11 @@ void GL1Render::Clear()
 void GL1Render::SwapBuffers()
 {
   glfwSwapBuffers(window_);
+}
+
+void GL1Render::HideMouse()
+{
+  // Set Mouse in middle on the screen
+  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetCursorPos(window_, width_ / 2.f, height_ / 2.f);
 }

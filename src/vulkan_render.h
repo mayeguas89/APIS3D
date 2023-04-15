@@ -29,6 +29,7 @@ public:
 
   void Clear() override;
   void SwapBuffers() override;
+  void HideMouse() override;
 
 protected:
   static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);

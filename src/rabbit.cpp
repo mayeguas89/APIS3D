@@ -1,9 +1,9 @@
-#include "asian_town.h"
 #include "camera_keyboard.h"
 #include "directional_light.h"
 #include "factory_engine.h"
 #include "flash_light.h"
 #include "free_camera.h"
+#include "general_object.h"
 #include "orbital_light.h"
 #include "point_light.h"
 #include "rotate_camera.h"
@@ -16,8 +16,8 @@ int main(int argc, char const* argv[])
 
   System::Init();
 
-  AsianTown rabbit;
-  AsianTown rabbit_two;
+  GeneralObject rabbit;
+  GeneralObject rabbit_two;
 
   try
   {
@@ -42,56 +42,48 @@ int main(int argc, char const* argv[])
   System::SetupAmbient();
 
   Light* point_light = new PointLight(glm::vec3(178.f / 255.f, 205.f / 255.f, 210.f / 255.f),
+                                      0.f,
                                       0.5f,
                                       0.5f,
-                                      0.5f,
-                                      5.f,
-                                      glm::vec3(0.f, -1.f, 0.f));
+                                      50.f,
+                                      glm::vec3(0.f, 1.f, 0.f));
   System::AddLight(point_light);
 
   Light* directional_light = new DirectionalLight(glm::vec3(178.f / 255.f, 205.f / 255.f, 210.f / 255.f),
                                                   0.5f,
-                                                  0.5f,
-                                                  0.5f,
+                                                  0.f,
+                                                  0.f,
                                                   glm::vec3(0.5f, 0.5f, 0.6f));
   System::AddLight(directional_light);
 
   Light* orbital_light =
-    new OrbitalLight(glm::vec3(0.25f, 0.25f, 0.25f), 0.5f, 0.5f, 0.5f, 10.f, glm::vec3(0.25f, 0.25f, 0.25f));
+    new OrbitalLight(glm::vec3(1.f, 1.f, 1.f), 0.f, 0.5f, 0.5f, 10.f, glm::vec3(0.25f, 0.f, 0.25f));
   System::AddLight(orbital_light);
 
   Light* flash_light = new FlashLight(glm::vec3(.1f, 1.f, .1f),
+                                      0.f,
                                       0.5f,
                                       0.5f,
-                                      0.5f,
-                                      10.f,
+                                      5.f,
                                       glm::vec3(.5f, .5f, .5f),
-                                      glm::vec3(-0.6f, 0.f, -0.8f),
-                                      12.5f,
-                                      17.f);
+                                      glm::vec3{rabbit.GetPosition()} - glm::vec3(.5f, .4f, .5f),
+                                      5.5f,
+                                      7.f);
 
   System::AddLight(flash_light);
 
-  // Camera* rotate_camera = new RotateCamera(Camera::ProjectionType::Perspective,
-  //                                          glm::vec3(0.f, 1.f, 1.f),
-  //                                          glm::vec3(0.f, -1.f, -1.f),
-  //                                          glm::vec3(0.f, 1.f, 0.f),
-  //                                          0.1f);
+  auto free_camera = std::make_shared<FreeCamera>(glm::vec3(0.6f, 1.43f, 2.6f),
+                                                  glm::vec3(-0.2f, -0.5f, -0.84f),
+                                                  glm::vec3(0.f, 1.f, 0.f),
+                                                  2.f);
 
-  Camera* rotate_camera = new CameraKeyboard(Camera::ProjectionType::Perspective,
-                                             glm::vec3(0.f, 0.f, 1.f),
-                                             glm::vec3(0.f, 0.f, -1.f),
-                                             glm::vec3(0.f, 1.f, 0.f));
-  Camera* free_camera =
-    new FreeCamera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f), 2.f);
-
-  System::SetCamera(free_camera);
+  System::SetCamera(free_camera.get());
   System::AddObject(&rabbit);
   System::AddObject(&rabbit_two);
   System::AddObject(point_light->GetCube());
   System::AddObject(orbital_light->GetCube());
   System::AddObject(flash_light->GetCube());
-  System::AddLine(flash_light->GetCube()->GetLine());
+  // System::AddLine(flash_light->GetCube()->GetLine());
 
   try
   {
@@ -103,8 +95,6 @@ int main(int argc, char const* argv[])
   }
   System::End();
 
-  delete rotate_camera;
-  delete free_camera;
   delete point_light;
 
   return 0;

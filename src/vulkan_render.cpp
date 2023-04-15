@@ -95,6 +95,8 @@ void VulkanRender::Clear() {}
 
 void VulkanRender::SwapBuffers() {}
 
+void VulkanRender::HideMouse() {}
+
 void VulkanRender::FramebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
   auto instance = reinterpret_cast<VulkanRender*>(glfwGetWindowUserPointer(window));
