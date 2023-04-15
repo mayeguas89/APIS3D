@@ -14,6 +14,7 @@ add_subdirectory("externalLibs")
 
 link_directories(
     ${CMAKE_SOURCE_DIR}/externalLibs/glfw/lib
+    ${CMAKE_SOURCE_DIR}/externalLibs/vulkan/lib
 )
 
 add_library(engine SHARED STATIC
@@ -77,6 +78,7 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/externalLibs/glm/inc
     ${CMAKE_SOURCE_DIR}/externalLibs/stb
     ${CMAKE_SOURCE_DIR}/externalLibs/assimp/include
+    ${CMAKE_SOURCE_DIR}/externalLibs/vulkan/include
 )
 
 target_compile_definitions(engine PUBLIC IMGUI_ENABLE ASSIMP_LOAD_ENABLE)
